@@ -23,10 +23,12 @@ and an empty, deployed shell for every page later phases will fill in.
 ## 1. Set up Supabase
 
 1. Create a project at [supabase.com](https://supabase.com/dashboard).
-2. In the SQL Editor, run [`supabase/migrations/0001_initial_schema.sql`](supabase/migrations/0001_initial_schema.sql).
+2. In the SQL Editor, run [`supabase/migrations/0002_fix_users_and_complete_schema.sql`](supabase/migrations/0002_fix_users_and_complete_schema.sql)
+   (it supersedes `0001` — see the note at the top of that file for why).
    This creates every table (`users`, `classes`, `class_members`, `lessons`, `circuits`,
    `challenges`, `submissions`, `progress`), row-level security policies, and the trigger
-   that turns a signup into a `public.users` profile row with the chosen role.
+   that turns a signup into a `public.users` profile row with the chosen role. It's
+   idempotent, so re-running it is harmless.
 3. In **Project Settings → API**, copy the **Project URL** and **anon public key** — you'll
    need them for the frontend `.env.local` below.
 4. **Email confirmation**: by default Supabase requires users to confirm their email before
