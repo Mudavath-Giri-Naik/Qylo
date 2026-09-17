@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 interface QSpherePoint {
   bitstring: string;
   probability: number;
@@ -50,12 +54,14 @@ export default function QSphere({
   statevector: [number, number][];
   numQubits: number;
 }) {
+  const [showState, setShowState] = useState(true);
+  const [showPhase, setShowPhase] = useState(false);
   const points = computePoints(statevector, numQubits);
 
   const size = 280;
   const cx = size / 2;
   const cy = size / 2;
-  const R = 98;
+  const R = 92;
   const depthX = 0.42;
   const depthY = 0.22;
 
@@ -85,16 +91,64 @@ export default function QSphere({
           const tip = project(p.x, p.y, p.z);
           const radius = 3 + 7 * Math.sqrt(p.probability / maxProbability);
           const color = phaseColor(p.phaseDeg);
+          const label = [showState ? `|${p.bitstring}⟩` : null, showPhase ? `${p.phaseDeg.toFixed(0)}°` : null]
+            .filter(Boolean)
+            .join(" ");
           return (
             <g key={p.bitstring}>
               <title>{`|${p.bitstring}⟩: ${(p.probability * 100).toFixed(1)}%, phase ${p.phaseDeg.toFixed(0)}°`}</title>
               <line x1={cx} y1={cy} x2={tip.x} y2={tip.y} stroke={color} strokeWidth={1.5} strokeOpacity={0.6} />
               <circle cx={tip.x} cy={tip.y} r={radius} fill={color} stroke="var(--surface)" strokeWidth={1.5} />
+              {label && (
+                <text
+                  x={tip.x}
+                  y={tip.y - radius - 4}
+                  textAnchor="middle"
+                  fontSize={9}
+                  fontFamily="var(--font-geist-mono)"
+                  fill="var(--chart-ink-secondary)"
+                >
+                  {label}
+                </text>
+              )}
             </g>
           );
         })}
         <circle cx={cx} cy={cy} r={2} fill="var(--chart-ink-muted)" />
       </svg>
+
+      <div className="flex w-full flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <div
+            className="relative h-14 w-14 shrink-0 rounded-full"
+            style={{
+              background:
+                "conic-gradient(from 90deg, hsl(0,72%,52%), hsl(90,72%,52%), hsl(180,72%,52%), hsl(270,72%,52%), hsl(360,72%,52%))",
+            }}
+          >
+            <div className="absolute inset-[5px] rounded-full bg-[var(--surface)]" />
+            <span className="absolute left-1/2 top-[-13px] -translate-x-1/2 text-[9px] text-[var(--foreground-subtle)]">π/2</span>
+            <span className="absolute right-[-16px] top-1/2 -translate-y-1/2 text-[9px] text-[var(--foreground-subtle)]">0</span>
+            <span className="absolute left-1/2 bottom-[-13px] -translate-x-1/2 text-[9px] text-[var(--foreground-subtle)]">3π/2</span>
+            <span className="absolute left-[-16px] top-1/2 -translate-y-1/2 text-[9px] text-[var(--foreground-subtle)]">π</span>
+            <span className="absolute inset-0 flex items-center justify-center text-[8px] font-medium text-[var(--foreground-muted)]">
+              Phase
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5 text-xs text-[var(--foreground-muted)]">
+          <span className="font-semibold text-[var(--foreground-subtle)]">Labels</span>
+          <label className="flex items-center gap-1.5">
+            <input type="checkbox" checked={showState} onChange={(e) => setShowState(e.target.checked)} className="accent-[var(--accent)]" />
+            State
+          </label>
+          <label className="flex items-center gap-1.5">
+            <input type="checkbox" checked={showPhase} onChange={(e) => setShowPhase(e.target.checked)} className="accent-[var(--accent)]" />
+            Phase angle
+          </label>
+        </div>
+      </div>
 
       <div className="flex w-full flex-col gap-1.5">
         {points.slice(0, 8).map((p) => (

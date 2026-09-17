@@ -39,6 +39,20 @@
   --gate-rotation: #4a3aa7;
   --gate-two-qubit: #0f172a;
   --gate-measure: #eda100;
+
+  /* Composer (IBM Quantum Composer-style) surface tokens. Gate-family fills
+     stay constant across themes -- they're identity colors, not surfaces. */
+  --composer-bar: #ffffff;
+  --composer-panel: #ffffff;
+  --composer-panel-2: #fbfbfa;
+  --composer-wire: #cfd3da;
+  --composer-wire-label: #5b6472;
+  --gate-h-solid: #ef5a72;
+  --gate-x-solid: #172449;
+  --gate-phase-solid: #4c8fd4;
+  --gate-rotation-solid: #9c3f83;
+  --gate-measure-solid: #d5d8de;
+  --gate-measure-solid-fg: #23262e;
 }
 
 :root[data-theme="dark"] {
@@ -72,6 +86,18 @@
   --gate-rotation: #9085e9;
   --gate-two-qubit: #eef1f6;
   --gate-measure: #c98500;
+
+  --composer-bar: #10141c;
+  --composer-panel: #10141c;
+  --composer-panel-2: #0d1017;
+  --composer-wire: #333b4a;
+  --composer-wire-label: #99a2b3;
+  --gate-h-solid: #ef5a72;
+  --gate-x-solid: #2c3a68;
+  --gate-phase-solid: #4c8fd4;
+  --gate-rotation-solid: #a5488c;
+  --gate-measure-solid: #333b4a;
+  --gate-measure-solid-fg: #eef1f6;
 }
 
 @theme inline {

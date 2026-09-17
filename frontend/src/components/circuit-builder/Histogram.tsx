@@ -13,8 +13,8 @@ export default function Histogram({ counts }: { counts: Record<string, number> }
   }
 
   const width = 640;
-  const height = 260;
-  const padding = { top: 24, right: 16, bottom: 36, left: 16 };
+  const height = 300;
+  const padding = { top: 24, right: 16, bottom: 56, left: 40 };
   const plotW = width - padding.left - padding.right;
   const plotH = height - padding.top - padding.bottom;
   const barGap = 12;
@@ -33,15 +33,25 @@ export default function Histogram({ counts }: { counts: Record<string, number> }
         </defs>
 
         {[0, 0.25, 0.5, 0.75, 1].map((f) => (
-          <line
-            key={f}
-            x1={padding.left}
-            x2={width - padding.right}
-            y1={padding.top + plotH * (1 - f)}
-            y2={padding.top + plotH * (1 - f)}
-            stroke="var(--chart-grid)"
-            strokeWidth={1}
-          />
+          <g key={f}>
+            <line
+              x1={padding.left}
+              x2={width - padding.right}
+              y1={padding.top + plotH * (1 - f)}
+              y2={padding.top + plotH * (1 - f)}
+              stroke="var(--chart-grid)"
+              strokeWidth={1}
+            />
+            <text
+              x={padding.left - 8}
+              y={padding.top + plotH * (1 - f) + 4}
+              textAnchor="end"
+              fontSize={10}
+              fill="var(--chart-ink-muted)"
+            >
+              {Math.round(f * (maxProb > 0 ? maxProb * 100 : 100))}
+            </text>
+          </g>
         ))}
 
         <line
@@ -101,6 +111,26 @@ export default function Histogram({ counts }: { counts: Record<string, number> }
             </g>
           );
         })}
+
+        <text
+          x={padding.left / 2 - 6}
+          y={padding.top + plotH / 2}
+          textAnchor="middle"
+          fontSize={11}
+          fill="var(--chart-ink-secondary)"
+          transform={`rotate(-90, ${padding.left / 2 - 6}, ${padding.top + plotH / 2})`}
+        >
+          Probability (%)
+        </text>
+        <text
+          x={padding.left + plotW / 2}
+          y={height - 8}
+          textAnchor="middle"
+          fontSize={11}
+          fill="var(--chart-ink-secondary)"
+        >
+          Computational basis states
+        </text>
       </svg>
       <p className="mt-1 text-center text-xs text-foreground/50">{total} shots</p>
     </div>
