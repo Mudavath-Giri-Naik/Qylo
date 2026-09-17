@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { generateQiskitCode } from "@/lib/circuit/codegen";
 import { parseQiskitCode } from "@/lib/circuit/codeparse";
 import { generateOpenQasm, parseOpenQasm } from "@/lib/circuit/openqasm";
 import { generateCirqCode } from "@/lib/circuit/cirq";
 import { generatePennylaneCode } from "@/lib/circuit/pennylane";
+import { tokenizeLines } from "@/lib/circuit/highlight";
 import type { CircuitJson } from "@/lib/circuit/types";
+import { makeTranslator, type Translate } from "@/lib/i18n/composer";
+
+const defaultT = makeTranslator("en");
 
 type Format = "openqasm" | "qiskit" | "cirq" | "pennylane";
 
@@ -40,45 +44,57 @@ export default function CodeView({
   circuit,
   onApplyCircuit,
   compact = false,
+  t = defaultT,
 }: {
   circuit: CircuitJson;
   onApplyCircuit: (circuit: CircuitJson) => void;
   compact?: boolean;
+  t?: Translate;
 }) {
   const [format, setFormat] = useState<Format>("openqasm");
   const generated = GENERATORS[format](circuit);
   const [draft, setDraft] = useState(generated);
   const [error, setError] = useState<string | null>(null);
-  const [editing, setEditing] = useState(false);
+  const selfEditRef = useRef(false);
 
-  function handleFormatChange(next: Format) {
-    setFormat(next);
-    setEditing(false);
+  // Resync the editor's text from the circuit whenever it changes for a
+  // reason OTHER than this editor's own last edit (a canvas drag, undo, a
+  // loaded circuit, or switching format) -- never while the user is mid-typing.
+  useEffect(() => {
+    if (selfEditRef.current) {
+      selfEditRef.current = false;
+      return;
+    }
+    setDraft(generated);
     setError(null);
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [circuit, format]);
 
-  function handleApply() {
-    const result = format === "openqasm" ? parseOpenQasm(draft) : parseQiskitCode(draft);
+  function handleChange(value: string) {
+    setDraft(value);
+    if (!EDITABLE[format]) return;
+    const result = format === "openqasm" ? parseOpenQasm(value) : parseQiskitCode(value);
     if (result.error) {
       setError(result.error);
       return;
     }
     setError(null);
-    setEditing(false);
+    selfEditRef.current = true;
     onApplyCircuit(result.circuit!);
   }
 
-  const displayed = editing ? draft : generated;
-  const lineCount = displayed.split("\n").length;
+  const lines = tokenizeLines(draft);
+  const lineCount = lines.length;
+  const editable = EDITABLE[format];
 
   return (
     <div className={compact ? "flex h-full flex-col overflow-hidden" : "overflow-hidden rounded-xl border border-[var(--border)] shadow-[var(--shadow-sm)]"}>
-      <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] bg-[var(--composer-panel)] px-3 py-2.5">
+      <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] bg-[var(--composer-panel)] px-3 py-2">
         <label className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
           <select
             value={format}
-            onChange={(e) => handleFormatChange(e.target.value as Format)}
-            aria-label="Code format"
+            onChange={(e) => setFormat(e.target.value as Format)}
+            aria-label={t("codeFormat")}
             className="cursor-pointer appearance-none bg-transparent pr-1 uppercase tracking-wide text-[var(--foreground)] outline-none"
           >
             <option value="openqasm">OpenQASM</option>
@@ -88,65 +104,45 @@ export default function CodeView({
           </select>
           <ChevronIcon />
         </label>
-        {!EDITABLE[format] ? (
+        {!editable && (
           <span className="rounded-lg border border-[var(--border)] px-2.5 py-1 text-xs font-medium text-[var(--foreground-subtle)]">
-            Read only
+            {t("readOnly")}
           </span>
-        ) : editing ? (
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={handleApply}
-              className="rounded-lg bg-[var(--accent)] px-2.5 py-1 text-xs font-semibold text-[var(--accent-foreground)]"
-            >
-              Apply to canvas
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setEditing(false);
-                setError(null);
-                setDraft(generated);
-              }}
-              className="rounded-lg border border-[var(--border)] px-2.5 py-1 text-xs font-medium text-[var(--foreground)]"
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => {
-              setDraft(generated);
-              setEditing(true);
-            }}
-            className="rounded-lg border border-[var(--border)] px-2.5 py-1 text-xs font-medium text-[var(--foreground)] hover:bg-[var(--surface-hover)]"
-          >
-            Edit code
-          </button>
         )}
       </div>
 
-      <div className={`flex bg-[var(--composer-panel-2)] ${compact ? "flex-1 overflow-auto" : ""}`}>
+      <div className={`flex flex-1 bg-[var(--composer-panel-2)] ${compact ? "min-h-0 overflow-auto" : ""}`}>
         <pre
           aria-hidden
-          className="thin-scrollbar select-none overflow-hidden py-4 pl-3 pr-2 text-right font-mono text-xs leading-5 text-[var(--foreground-subtle)]"
+          className="select-none overflow-hidden py-3 pl-3 pr-2 text-right font-mono text-xs leading-5 text-[var(--foreground-subtle)]"
         >
           {Array.from({ length: lineCount }, (_, i) => i + 1).join("\n")}
         </pre>
-        <textarea
-          value={displayed}
-          onChange={(e) => setDraft(e.target.value)}
-          readOnly={!editing}
-          spellCheck={false}
-          rows={Math.max(8, lineCount + 1)}
-          className={`w-full resize-none overflow-hidden bg-transparent py-4 pl-1 pr-4 font-mono text-xs leading-5 text-[var(--foreground)] outline-none ${
-            editing ? "ring-1 ring-inset ring-[var(--accent)]" : ""
-          }`}
-        />
+        <div className="relative flex-1">
+          <pre aria-hidden className="pointer-events-none whitespace-pre-wrap break-all py-3 pl-1 pr-4 font-mono text-xs leading-5">
+            {lines.map((lineTokens, i) => (
+              <div key={i}>
+                {lineTokens.length === 0
+                  ? " "
+                  : lineTokens.map((tok, j) => (
+                      <span key={j} className={tok.cls}>
+                        {tok.text}
+                      </span>
+                    ))}
+              </div>
+            ))}
+          </pre>
+          <textarea
+            value={draft}
+            onChange={(e) => handleChange(e.target.value)}
+            readOnly={!editable}
+            spellCheck={false}
+            className="absolute inset-0 h-full w-full resize-none whitespace-pre-wrap break-all bg-transparent py-3 pl-1 pr-4 font-mono text-xs leading-5 text-transparent caret-[var(--foreground)] outline-none"
+          />
+        </div>
       </div>
       {error && (
-        <p className="border-t border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-xs text-red-600 dark:text-red-400">
+        <p className="shrink-0 border-t border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-xs text-red-600 dark:text-red-400">
           {error}
         </p>
       )}

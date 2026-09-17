@@ -45,6 +45,13 @@
   --gate-rotation-solid: #9c3f83;
   --gate-measure-solid: #d5d8de;
   --gate-measure-solid-fg: #23262e;
+
+  --code-keyword: #a626a4;
+  --code-string: #c85c00;
+  --code-number: #1a9e6c;
+  --code-call: #2a78d6;
+  --code-comment: #8a91a0;
+  --code-punct: #8a91a0;
 }
 
 :root[data-theme="dark"] {
@@ -83,6 +90,13 @@
   --gate-rotation-solid: #a5488c;
   --gate-measure-solid: #333b4a;
   --gate-measure-solid-fg: #eef1f6;
+
+  --code-keyword: #d886e0;
+  --code-string: #e8a25c;
+  --code-number: #7bd4a8;
+  --code-call: #6fa8f5;
+  --code-comment: #6b7383;
+  --code-punct: #6b7383;
 }
 
 @theme inline {
@@ -101,6 +115,19 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Tailwind's preflight resets native buttons to cursor: default -- restore
+   the hand cursor on every clickable button site-wide. */
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+.tok-keyword { color: var(--code-keyword); font-weight: 600; }
+.tok-string { color: var(--code-string); }
+.tok-number { color: var(--code-number); }
+.tok-call { color: var(--code-call); }
+.tok-comment { color: var(--code-comment); font-style: italic; }
+.tok-punct { color: var(--code-punct); }
 
 :lang(hi) {
   font-family: var(--font-noto-devanagari), Arial, Helvetica, sans-serif;

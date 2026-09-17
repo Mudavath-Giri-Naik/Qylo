@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { GATE_DEFS, gateDef, type GateType } from "@/lib/circuit/types";
+import { makeTranslator, type Translate } from "@/lib/i18n/composer";
+
+const defaultT = makeTranslator("en");
 
 export interface PendingControl {
   type: GateType;
@@ -20,9 +23,11 @@ function SearchIcon() {
 export default function GatePalette({
   pendingControl,
   compact = false,
+  t = defaultT,
 }: {
   pendingControl: PendingControl | null;
   compact?: boolean;
+  t?: Translate;
 }) {
   const [query, setQuery] = useState("");
   const filtered = GATE_DEFS.filter(
@@ -36,7 +41,7 @@ export default function GatePalette({
     <div className={compact ? "" : "rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]"}>
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
-          Operations
+          {t("operations")}
         </p>
         <div className="flex items-center gap-1.5 rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1">
           <span className="text-[var(--foreground-subtle)]">
@@ -45,8 +50,8 @@ export default function GatePalette({
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search"
-            aria-label="Search operations"
+            placeholder={t("search")}
+            aria-label={t("searchOperations")}
             className="w-16 bg-transparent text-xs text-[var(--foreground)] outline-none placeholder:text-[var(--foreground-subtle)] sm:w-24"
           />
         </div>
@@ -73,15 +78,14 @@ export default function GatePalette({
         ))}
         {filtered.length === 0 && (
           <p className="col-span-full py-2 text-xs text-[var(--foreground-subtle)]">
-            No operation matches &quot;{query}&quot;.
+            {t("noOperationMatches", { query })}
           </p>
         )}
       </div>
 
       {pendingControl && (
         <p className="mt-2.5 rounded-md bg-amber-500/10 px-2.5 py-1.5 text-xs text-amber-700 dark:text-amber-400">
-          {gateDef(pendingControl.type).label} control set on qubit {pendingControl.qubit} — click
-          another wire to set the target.
+          {t("controlSetOnQubit", { gate: gateDef(pendingControl.type).label, qubit: pendingControl.qubit })}
         </p>
       )}
     </div>

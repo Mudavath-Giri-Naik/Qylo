@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { CircuitJson } from "@/lib/circuit/types";
+import { makeTranslator, type Translate } from "@/lib/i18n/composer";
+
+const defaultT = makeTranslator("en");
 
 interface SavedCircuit {
   id: string;
@@ -13,9 +16,11 @@ interface SavedCircuit {
 export default function MyCircuits({
   refreshKey,
   onLoad,
+  t = defaultT,
 }: {
   refreshKey: number;
   onLoad: (circuit: CircuitJson) => void;
+  t?: Translate;
 }) {
   const [circuits, setCircuits] = useState<SavedCircuit[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,11 +47,11 @@ export default function MyCircuits({
   }, [refreshKey]);
 
   if (loading) {
-    return <p className="text-xs text-[var(--foreground-subtle)]">Loading...</p>;
+    return <p className="text-xs text-[var(--foreground-subtle)]">{t("loading")}</p>;
   }
 
   if (circuits.length === 0) {
-    return <p className="text-xs text-[var(--foreground-subtle)]">No saved circuits yet.</p>;
+    return <p className="text-xs text-[var(--foreground-subtle)]">{t("noSavedCircuits")}</p>;
   }
 
   return (
@@ -59,8 +64,12 @@ export default function MyCircuits({
             className="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-left text-xs transition-colors hover:border-[var(--accent)] hover:bg-[var(--surface-hover)]"
           >
             <span className="font-medium text-[var(--foreground)]">
-              {c.circuit_json.num_qubits} qubit{c.circuit_json.num_qubits === 1 ? "" : "s"} ·{" "}
-              {c.circuit_json.gates.length} gate{c.circuit_json.gates.length === 1 ? "" : "s"}
+              {t("qubitGateSummary", {
+                n: c.circuit_json.num_qubits,
+                qs: c.circuit_json.num_qubits === 1 ? "" : "s",
+                g: c.circuit_json.gates.length,
+                gs: c.circuit_json.gates.length === 1 ? "" : "s",
+              })}
             </span>
             <br />
             <span className="text-[var(--foreground-subtle)]">

@@ -1,16 +1,21 @@
 "use client";
 
 import { useId, useState } from "react";
+import { makeTranslator, type Translate } from "@/lib/i18n/composer";
+
+const defaultT = makeTranslator("en");
 
 export default function Histogram({
   counts,
   mode = "shots",
+  t = defaultT,
 }: {
   counts: Record<string, number>;
   /** "shots" formats the total as integer shot counts (a real backend run);
    * "probability" treats values as exact fractional probabilities (the
    * instant client-side preview, before any run). */
   mode?: "shots" | "probability";
+  t?: Translate;
 }) {
   const gradientId = useId();
   const entries = Object.entries(counts).sort(([a], [b]) => (a < b ? -1 : 1));
@@ -18,7 +23,7 @@ export default function Histogram({
   const [hovered, setHovered] = useState<string | null>(null);
 
   if (entries.length === 0 || total === 0) {
-    return <p className="text-sm text-foreground/60">No results yet.</p>;
+    return <p className="text-sm text-foreground/60">{t("noResultsYet")}</p>;
   }
 
   const width = 640;
@@ -133,7 +138,7 @@ export default function Histogram({
           fill="var(--chart-ink-secondary)"
           transform={`rotate(-90, ${padding.left / 2 - 6}, ${padding.top + plotH / 2})`}
         >
-          Probability (%)
+          {t("probabilityAxis")}
         </text>
         <text
           x={padding.left + plotW / 2}
@@ -142,11 +147,11 @@ export default function Histogram({
           fontSize={11}
           fill="var(--chart-ink-secondary)"
         >
-          Computational basis states
+          {t("basisStatesAxis")}
         </text>
       </svg>
       <p className="mt-1 text-center text-xs text-foreground/50">
-        {mode === "shots" ? `${total} shots` : "Exact probabilities"}
+        {mode === "shots" ? t("shotsCount", { n: total }) : t("exactProbabilities")}
       </p>
     </div>
   );

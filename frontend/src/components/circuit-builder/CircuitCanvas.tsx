@@ -3,6 +3,9 @@
 import { gateDef, type CircuitJson, type GateType } from "@/lib/circuit/types";
 import { maxStep } from "@/lib/circuit/placement";
 import type { PendingControl } from "@/components/circuit-builder/GatePalette";
+import { makeTranslator, type Translate } from "@/lib/i18n/composer";
+
+const defaultT = makeTranslator("en");
 
 const CELL_WIDTH = 64;
 const ROW_HEIGHT = 56;
@@ -26,6 +29,7 @@ export default function CircuitCanvas({
   onSelectGate,
   onRemoveQubit,
   inspect = false,
+  t = defaultT,
 }: {
   circuit: CircuitJson;
   pendingControl: PendingControl | null;
@@ -35,6 +39,7 @@ export default function CircuitCanvas({
   onSelectGate: (index: number) => void;
   onRemoveQubit?: () => void;
   inspect?: boolean;
+  t?: Translate;
 }) {
   const columns = Math.max(MIN_COLUMNS, maxStep(circuit.gates) + 3);
   const width = columns * CELL_WIDTH;
@@ -94,8 +99,8 @@ export default function CircuitCanvas({
                 {onRemoveQubit && (
                   <button
                     type="button"
-                    aria-label={`Remove a qubit (currently ${circuit.num_qubits})`}
-                    title="Remove a qubit"
+                    aria-label={t("removeQubit")}
+                    title={t("removeQubit")}
                     disabled={circuit.num_qubits <= 1}
                     onClick={(e) => {
                       e.stopPropagation();

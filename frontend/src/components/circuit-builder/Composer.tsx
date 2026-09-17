@@ -14,6 +14,7 @@ import {
 import { generateOpenQasm } from "@/lib/circuit/openqasm";
 import { blochVectorFromStatevector, probabilitiesFromStatevector, simulateStatevector } from "@/lib/circuit/simulate";
 import { ANGLE_PRESETS, emptyCircuit, gateDef, type CircuitJson, type GateType } from "@/lib/circuit/types";
+import { makeTranslator, type UiLang } from "@/lib/i18n/composer";
 import GatePalette, { type PendingControl } from "@/components/circuit-builder/GatePalette";
 import CircuitCanvas from "@/components/circuit-builder/CircuitCanvas";
 import CodeView from "@/components/circuit-builder/CodeView";
@@ -178,6 +179,9 @@ export default function Composer({
   loggedIn: boolean;
   links: { href: string; label: string }[];
 }) {
+  const [uiLang, setUiLang] = useState<UiLang>("en");
+  const t = useMemo(() => makeTranslator(uiLang), [uiLang]);
+
   const [circuitName, setCircuitName] = useState("Untitled circuit");
   const [editingName, setEditingName] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -298,7 +302,7 @@ export default function Composer({
   function handleNewCircuit() {
     commit(() => emptyCircuit(DEFAULT_QUBITS));
     resetInteractionState();
-    setCircuitName("Untitled circuit");
+    setCircuitName(t("untitledCircuit"));
     setActiveMenu(null);
   }
 
@@ -328,7 +332,7 @@ export default function Composer({
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      setSaveMessage("You must be logged in to save.");
+      setSaveMessage(t("mustBeLoggedIn"));
       setSaving(false);
       return null;
     }
@@ -339,10 +343,10 @@ export default function Composer({
       .single();
     setSaving(false);
     if (error || !data) {
-      setSaveMessage(error?.message ?? "Save failed.");
+      setSaveMessage(error?.message ?? t("saveFailed"));
       return null;
     }
-    setSaveMessage("Saved.");
+    setSaveMessage(t("saved"));
     setSavedCircuitId(data.id);
     setRefreshKey((k) => k + 1);
     return data.id;
@@ -354,7 +358,7 @@ export default function Composer({
     const url = `${window.location.origin}/circuit/${id}/view`;
     try {
       await navigator.clipboard.writeText(url);
-      setSaveMessage("Share link copied to clipboard.");
+      setSaveMessage(t("shareLinkCopied"));
     } catch {
       setSaveMessage(url);
     }
@@ -370,7 +374,7 @@ export default function Composer({
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
-            aria-label="Open menu"
+            aria-label={t("openMenu")}
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[var(--foreground-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)]"
           >
             <HamburgerIcon />
@@ -393,7 +397,7 @@ export default function Composer({
             <button
               type="button"
               onClick={() => setEditingName(true)}
-              title="Rename circuit"
+              title={t("renameCircuit")}
               className="shrink-0 truncate rounded px-1.5 py-0.5 text-sm text-[var(--foreground)] hover:bg-[var(--surface-hover)]"
             >
               {circuitName}
@@ -401,34 +405,34 @@ export default function Composer({
           )}
 
           <nav className="hidden items-center gap-0.5 md:flex">
-            <MenuButton label="File" isOpen={activeMenu === "file"} onToggle={() => setActiveMenu((m) => (m === "file" ? null : "file"))} onClose={() => setActiveMenu(null)}>
-              <MenuItem onClick={handleNewCircuit}>New circuit</MenuItem>
-              <MenuItem onClick={() => { void handleSave(); setActiveMenu(null); }}>Save to My Circuits</MenuItem>
-              <MenuItem onClick={handleDownloadQasm}>Download OpenQASM (.qasm)</MenuItem>
+            <MenuButton label={t("fileMenu")} isOpen={activeMenu === "file"} onToggle={() => setActiveMenu((m) => (m === "file" ? null : "file"))} onClose={() => setActiveMenu(null)}>
+              <MenuItem onClick={handleNewCircuit}>{t("newCircuit")}</MenuItem>
+              <MenuItem onClick={() => { void handleSave(); setActiveMenu(null); }}>{t("saveToMyCircuits")}</MenuItem>
+              <MenuItem onClick={handleDownloadQasm}>{t("downloadOpenQasm")}</MenuItem>
             </MenuButton>
-            <MenuButton label="Edit" isOpen={activeMenu === "edit"} onToggle={() => setActiveMenu((m) => (m === "edit" ? null : "edit"))} onClose={() => setActiveMenu(null)}>
-              <MenuItem onClick={undo} disabled={historyState.past.length === 0}>Undo</MenuItem>
-              <MenuItem onClick={redo} disabled={historyState.future.length === 0}>Redo</MenuItem>
-              <MenuItem onClick={handleClearGates} disabled={circuit.gates.length === 0}>Clear circuit</MenuItem>
+            <MenuButton label={t("editMenu")} isOpen={activeMenu === "edit"} onToggle={() => setActiveMenu((m) => (m === "edit" ? null : "edit"))} onClose={() => setActiveMenu(null)}>
+              <MenuItem onClick={undo} disabled={historyState.past.length === 0}>{t("undo")}</MenuItem>
+              <MenuItem onClick={redo} disabled={historyState.future.length === 0}>{t("redo")}</MenuItem>
+              <MenuItem onClick={handleClearGates} disabled={circuit.gates.length === 0}>{t("clearCircuit")}</MenuItem>
             </MenuButton>
-            <MenuButton label="View" isOpen={activeMenu === "view"} onToggle={() => setActiveMenu((m) => (m === "view" ? null : "view"))} onClose={() => setActiveMenu(null)}>
+            <MenuButton label={t("viewMenu")} isOpen={activeMenu === "view"} onToggle={() => setActiveMenu((m) => (m === "view" ? null : "view"))} onClose={() => setActiveMenu(null)}>
               <div className="flex items-center justify-between px-3 py-1.5 text-xs text-[var(--foreground)]">
-                Theme
+                {t("theme")}
                 <ThemeToggle />
               </div>
               <label className="flex items-center justify-between px-3 py-1.5 text-xs text-[var(--foreground)]">
-                Inspect mode
+                {t("inspectMode")}
                 <input type="checkbox" checked={inspect} onChange={(e) => setInspect(e.target.checked)} className="accent-[var(--accent)]" />
               </label>
             </MenuButton>
-            <MenuButton label="Help" isOpen={activeMenu === "help"} onToggle={() => setActiveMenu((m) => (m === "help" ? null : "help"))} onClose={() => setActiveMenu(null)}>
+            <MenuButton label={t("helpMenu")} isOpen={activeMenu === "help"} onToggle={() => setActiveMenu((m) => (m === "help" ? null : "help"))} onClose={() => setActiveMenu(null)}>
               <MenuItem
                 onClick={() => {
                   setToolsOpen(true);
                   setActiveMenu(null);
                 }}
               >
-                Ask the AI tutor
+                {t("askAiTutor")}
               </MenuItem>
             </MenuButton>
           </nav>
@@ -440,11 +444,11 @@ export default function Composer({
             <button
               type="button"
               onClick={() => setToolsOpen(true)}
-              title="AI tutor & my circuits"
+              title={t("toolsTitle")}
               className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)]"
             >
               <ToolsIcon />
-              <span className="hidden sm:inline">Tools</span>
+              <span className="hidden sm:inline">{t("tools")}</span>
             </button>
             <button
               type="button"
@@ -453,7 +457,7 @@ export default function Composer({
               className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)] disabled:opacity-60"
             >
               <SaveIcon />
-              <span className="hidden sm:inline">{saving ? "Saving..." : "Save file"}</span>
+              <span className="hidden sm:inline">{saving ? t("saving") : t("saveFile")}</span>
             </button>
             <select
               value={backendName}
@@ -471,44 +475,42 @@ export default function Composer({
               type="button"
               onClick={() => performRun(circuit, backendName, { setRunning, setRunError, setRunResult })}
               disabled={running}
+              title={t("setupAndRun")}
               className="flex items-center gap-1.5 rounded-lg bg-[var(--accent)] px-3.5 py-1.5 text-xs font-semibold text-[var(--accent-foreground)] transition-opacity disabled:opacity-60"
             >
               <PlayIcon />
-              {running ? "Running..." : "Set up and run"}
+              {running ? t("running") : t("setupAndRun")}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Composer body: operations | canvas | OpenQASM -- and results below,
-          sharing the remaining viewport height so the whole workspace fits
-          without a page-level scroll. Each panel scrolls internally if its
-          own content grows taller than its share of the screen. */}
-      <div className="grid min-h-0 flex-[3] grid-cols-1 lg:grid-cols-[300px_1fr_360px]">
-        <div className="flex min-h-0 flex-col overflow-y-auto border-b border-[var(--border)] p-2.5 lg:border-b-0 lg:border-r">
-          <GatePalette pendingControl={pendingControl} compact />
+      {/* Top: operations | canvas (wide) */}
+      <div className="grid min-h-0 flex-[5] grid-cols-1 lg:grid-cols-[300px_1fr]">
+        <div className="flex min-h-0 flex-col overflow-hidden border-b border-[var(--border)] p-2.5 lg:border-b-0 lg:border-r">
+          <GatePalette pendingControl={pendingControl} compact t={t} />
         </div>
 
-        <div className="flex min-h-0 flex-col gap-2 overflow-y-auto border-b border-[var(--border)] p-2.5 lg:border-b-0 lg:border-r">
+        <div className="flex min-h-0 flex-col gap-2 overflow-hidden p-2.5">
           <div className="flex flex-wrap items-center gap-2">
-            <button type="button" onClick={undo} disabled={historyState.past.length === 0} title="Undo" className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--foreground-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30">
+            <button type="button" onClick={undo} disabled={historyState.past.length === 0} title={t("undo")} className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--foreground-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30">
               <UndoIcon />
             </button>
-            <button type="button" onClick={redo} disabled={historyState.future.length === 0} title="Redo" className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--foreground-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30">
+            <button type="button" onClick={redo} disabled={historyState.future.length === 0} title={t("redo")} className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--foreground-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30">
               <RedoIcon />
             </button>
             <span
-              title="Only left alignment is supported right now"
+              title={t("onlyLeftAlignment")}
               className="flex items-center gap-1 rounded-md border border-[var(--border)] px-2 py-1 text-xs text-[var(--foreground-muted)]"
             >
-              Left alignment <ChevronIcon />
+              {t("leftAlignment")} <ChevronIcon />
             </span>
             <label className="flex items-center gap-1.5 rounded-md border border-[var(--border)] px-2 py-1 text-xs text-[var(--foreground-muted)]">
               <input type="checkbox" checked={inspect} onChange={(e) => setInspect(e.target.checked)} className="accent-[var(--accent)]" />
-              Inspect
+              {t("inspect")}
             </label>
             <label className="ml-auto flex items-center gap-1.5 rounded-md border border-[var(--border)] px-2 py-1 text-xs font-medium text-[var(--foreground-muted)]">
-              Qubits
+              {t("qubits")}
               <input
                 type="number"
                 min={1}
@@ -520,21 +522,24 @@ export default function Composer({
             </label>
           </div>
 
-          <CircuitCanvas
-            circuit={circuit}
-            pendingControl={pendingControl}
-            selectedGateIndex={selectedGateIndex}
-            onDropGate={handleDropGate}
-            onWireClick={handleWireClick}
-            onSelectGate={handleSelectGate}
-            onRemoveQubit={handleRemoveQubit}
-            inspect={inspect}
-          />
+          <div className="min-h-0 flex-1 overflow-auto">
+            <CircuitCanvas
+              circuit={circuit}
+              pendingControl={pendingControl}
+              selectedGateIndex={selectedGateIndex}
+              onDropGate={handleDropGate}
+              onWireClick={handleWireClick}
+              onSelectGate={handleSelectGate}
+              onRemoveQubit={handleRemoveQubit}
+              inspect={inspect}
+              t={t}
+            />
+          </div>
 
           {selectedGate && (
-            <div className="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs">
+            <div className="flex shrink-0 flex-wrap items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs">
               <span className="font-medium text-[var(--foreground)]">
-                {selectedGate.type} on qubit{selectedGate.qubits.length > 1 ? "s" : ""} {selectedGate.qubits.join(", ")}
+                {selectedGate.type} {t(selectedGate.qubits.length > 1 ? "onQubits" : "onQubit", { qubits: selectedGate.qubits.join(", ") })}
               </span>
               {selectedGate.angle !== undefined && (
                 <select
@@ -557,49 +562,50 @@ export default function Composer({
                 }}
                 className="ml-auto rounded-lg border border-red-500/30 px-2.5 py-1 text-xs font-medium text-red-600 dark:text-red-400"
               >
-                Remove gate
+                {t("removeGateBtn")}
               </button>
             </div>
           )}
         </div>
-
-        <div className="flex min-h-0 flex-col overflow-hidden">
-          <CodeView circuit={circuit} onApplyCircuit={handleApplyCircuit} compact />
-        </div>
       </div>
 
-      {/* Results: probabilities | Q-sphere */}
-      <div className="grid min-h-0 flex-[2] grid-cols-1 border-t border-[var(--border)] sm:grid-cols-2">
-        <div className="flex min-h-0 flex-col overflow-y-auto border-b border-[var(--border)] p-3 sm:border-b-0 sm:border-r">
+      {/* Bottom: probabilities | Q-sphere (narrow) | code editor (tall) */}
+      <div className="grid min-h-0 flex-[6] grid-cols-1 border-t border-[var(--border)] lg:grid-cols-[1fr_240px_1fr]">
+        <div className="flex min-h-0 flex-col overflow-hidden border-b border-[var(--border)] p-3 lg:border-b-0 lg:border-r">
           <div className="flex shrink-0 items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">Probabilities</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">{t("probabilities")}</p>
             <span className="text-[10px] text-[var(--foreground-subtle)]">
-              {runResult ? `Qiskit Aer · ${Object.values(runResult.counts).reduce((a, b) => a + b, 0)} shots` : "Instant preview"}
+              {runResult ? `Qiskit Aer · ${t("shotsCount", { n: Object.values(runResult.counts).reduce((a, b) => a + b, 0) })}` : t("instantPreview")}
             </span>
           </div>
-          <div className="mt-2">
+          <div className="mt-2 min-h-0 flex-1 overflow-hidden">
             {runError && <p className="text-sm text-red-600 dark:text-red-400">{runError}</p>}
-            <Histogram counts={displayCounts} mode={runResult ? "shots" : "probability"} />
+            <Histogram counts={displayCounts} mode={runResult ? "shots" : "probability"} t={t} />
           </div>
         </div>
-        <div className="flex min-h-0 flex-col overflow-y-auto p-3">
-          <div className="flex shrink-0 items-center justify-between">
+        <div className="flex min-h-0 flex-col items-center overflow-hidden border-b border-[var(--border)] p-3 lg:border-b-0 lg:border-r">
+          <div className="flex w-full shrink-0 items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
-              {displayBlochVector ? "Bloch sphere" : "Q-sphere"}
+              {displayBlochVector ? t("blochSphere") : t("qsphere")}
             </p>
-            <span className="text-[10px] text-[var(--foreground-subtle)]">{runResult ? "Backend result" : "Instant preview"}</span>
           </div>
-          <div className="mt-2">
+          <span className="w-full text-left text-[10px] text-[var(--foreground-subtle)]">
+            {runResult ? t("backendResult") : t("instantPreview")}
+          </span>
+          <div className="mt-1 flex min-h-0 flex-1 items-center justify-center overflow-hidden">
             {displayBlochVector ? (
               <BlochSphere vector={displayBlochVector} />
             ) : (
-              <QSphere statevector={displayStatevector} numQubits={circuit.num_qubits} />
+              <QSphere statevector={displayStatevector} numQubits={circuit.num_qubits} compact t={t} />
             )}
           </div>
         </div>
+        <div className="flex min-h-0 flex-col overflow-hidden">
+          <CodeView circuit={circuit} onApplyCircuit={handleApplyCircuit} compact t={t} />
+        </div>
       </div>
 
-      <ComposerFooter />
+      <ComposerFooter lang={uiLang} onLangChange={setUiLang} t={t} />
 
       <NavMenuPanel open={menuOpen} onClose={() => setMenuOpen(false)} loggedIn={loggedIn} links={links} />
 
@@ -610,7 +616,7 @@ export default function Composer({
           <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" onClick={() => setToolsOpen(false)} />
           <div className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
             <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-              <span className="text-sm font-semibold text-[var(--foreground)]">Qylo tools</span>
+              <span className="text-sm font-semibold text-[var(--foreground)]">{t("qyloTools")}</span>
               <button
                 type="button"
                 onClick={() => setToolsOpen(false)}
@@ -625,10 +631,10 @@ export default function Composer({
             <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
               <div className="h-[380px] shrink-0">
                 <AgentChat
-                  title="Explain my circuit"
+                  title={t("explainMyCircuit")}
                   getCircuit={() => circuit}
-                  quickActionLabel="Explain my circuit"
-                  placeholder="Ask about this circuit..."
+                  quickActionLabel={t("explainMyCircuit")}
+                  placeholder={t("askAboutCircuit")}
                 />
               </div>
               <button
@@ -636,13 +642,14 @@ export default function Composer({
                 onClick={handleCopyShareLink}
                 className="shrink-0 rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)]"
               >
-                Copy share link
+                {t("copyShareLink")}
               </button>
               <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-                <h3 className="text-sm font-semibold text-[var(--foreground)]">My Circuits</h3>
+                <h3 className="text-sm font-semibold text-[var(--foreground)]">{t("myCircuits")}</h3>
                 <div className="mt-3">
                   <MyCircuits
                     refreshKey={refreshKey}
+                    t={t}
                     onLoad={(loaded) => {
                       commit(() => loaded);
                       setRunResult(null);
