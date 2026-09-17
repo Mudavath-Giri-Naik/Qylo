@@ -4,9 +4,29 @@ import { useState } from "react";
 import { generateQiskitCode } from "@/lib/circuit/codegen";
 import { parseQiskitCode } from "@/lib/circuit/codeparse";
 import { generateOpenQasm, parseOpenQasm } from "@/lib/circuit/openqasm";
+import { generateCirqCode } from "@/lib/circuit/cirq";
+import { generatePennylaneCode } from "@/lib/circuit/pennylane";
 import type { CircuitJson } from "@/lib/circuit/types";
 
-type Format = "openqasm" | "qiskit";
+type Format = "openqasm" | "qiskit" | "cirq" | "pennylane";
+
+const GENERATORS: Record<Format, (circuit: CircuitJson) => string> = {
+  openqasm: generateOpenQasm,
+  qiskit: generateQiskitCode,
+  cirq: generateCirqCode,
+  pennylane: generatePennylaneCode,
+};
+
+/** Only OpenQASM and Qiskit round-trip back into the canvas -- Cirq and
+ * PennyLane are reference exports (matching what the backend can actually
+ * execute today: Qiskit Aer, with the others honestly erroring as
+ * not-yet-implemented from the backend selector). */
+const EDITABLE: Record<Format, boolean> = {
+  openqasm: true,
+  qiskit: true,
+  cirq: false,
+  pennylane: false,
+};
 
 function ChevronIcon() {
   return (
@@ -26,7 +46,7 @@ export default function CodeView({
   compact?: boolean;
 }) {
   const [format, setFormat] = useState<Format>("openqasm");
-  const generated = format === "openqasm" ? generateOpenQasm(circuit) : generateQiskitCode(circuit);
+  const generated = GENERATORS[format](circuit);
   const [draft, setDraft] = useState(generated);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
@@ -63,10 +83,16 @@ export default function CodeView({
           >
             <option value="openqasm">OpenQASM</option>
             <option value="qiskit">Qiskit</option>
+            <option value="cirq">Cirq</option>
+            <option value="pennylane">PennyLane</option>
           </select>
           <ChevronIcon />
         </label>
-        {editing ? (
+        {!EDITABLE[format] ? (
+          <span className="rounded-lg border border-[var(--border)] px-2.5 py-1 text-xs font-medium text-[var(--foreground-subtle)]">
+            Read only
+          </span>
+        ) : editing ? (
           <div className="flex gap-2">
             <button
               type="button"

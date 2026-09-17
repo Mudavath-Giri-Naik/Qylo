@@ -2,10 +2,12 @@
 
 import { gateDef, type CircuitJson, type GateType } from "@/lib/circuit/types";
 import { maxStep } from "@/lib/circuit/placement";
+import type { PendingControl } from "@/components/circuit-builder/GatePalette";
 
 const CELL_WIDTH = 64;
 const ROW_HEIGHT = 56;
 const LABEL_WIDTH = 44;
+const MIN_COLUMNS = 10;
 
 function MinusIcon() {
   return (
@@ -17,7 +19,7 @@ function MinusIcon() {
 
 export default function CircuitCanvas({
   circuit,
-  pendingCnotControl,
+  pendingControl,
   selectedGateIndex,
   onDropGate,
   onWireClick,
@@ -26,7 +28,7 @@ export default function CircuitCanvas({
   inspect = false,
 }: {
   circuit: CircuitJson;
-  pendingCnotControl: number | null;
+  pendingControl: PendingControl | null;
   selectedGateIndex: number | null;
   onDropGate: (qubit: number, gateType: GateType) => void;
   onWireClick: (qubit: number) => void;
@@ -34,14 +36,14 @@ export default function CircuitCanvas({
   onRemoveQubit?: () => void;
   inspect?: boolean;
 }) {
-  const columns = Math.max(4, maxStep(circuit.gates) + 3);
+  const columns = Math.max(MIN_COLUMNS, maxStep(circuit.gates) + 3);
   const width = columns * CELL_WIDTH;
   const wiresHeight = circuit.num_qubits * ROW_HEIGHT;
   const height = wiresHeight + ROW_HEIGHT;
 
-  const cnotGates = circuit.gates
+  const twoQubitGates = circuit.gates
     .map((g, i) => ({ g, i }))
-    .filter(({ g }) => g.type === "CNOT");
+    .filter(({ g }) => gateDef(g.type).numQubits === 2);
   const measureGates = circuit.gates
     .map((g, i) => ({ g, i }))
     .filter(({ g }) => g.type === "MEASURE");
@@ -67,9 +69,9 @@ export default function CircuitCanvas({
           </div>
         </div>
 
-        <div className="relative" style={{ width, height }}>
+        <div className="relative" style={{ width, minWidth: "100%", height }}>
           {Array.from({ length: circuit.num_qubits }).map((_, q) => {
-            const isPendingControl = pendingCnotControl === q;
+            const isPendingControl = pendingControl?.qubit === q;
             return (
               <div
                 key={q}
@@ -100,7 +102,7 @@ export default function CircuitCanvas({
                       onRemoveQubit();
                     }}
                     className="absolute flex h-5 w-5 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--foreground-muted)] transition-colors hover:border-red-500/50 hover:text-red-500 disabled:pointer-events-none disabled:opacity-30"
-                    style={{ right: -10, top: ROW_HEIGHT / 2 - 10 }}
+                    style={{ right: 6, top: ROW_HEIGHT / 2 - 10 }}
                   >
                     <MinusIcon />
                   </button>
@@ -138,8 +140,8 @@ export default function CircuitCanvas({
             })}
           </div>
 
-          <svg className="pointer-events-none absolute inset-0" width={width} height={height}>
-            {cnotGates.map(({ g, i }) => {
+          <svg className="pointer-events-none absolute left-0 top-0" width={width} height={height}>
+            {twoQubitGates.map(({ g, i }) => {
               const [control, target] = g.qubits;
               const x = g.step * CELL_WIDTH + CELL_WIDTH / 2;
               const yControl = control * ROW_HEIGHT + ROW_HEIGHT / 2;
@@ -150,9 +152,22 @@ export default function CircuitCanvas({
                 <g key={i}>
                   <line x1={x} y1={yControl} x2={x} y2={yTarget} stroke={stroke} strokeWidth={2} />
                   <circle cx={x} cy={yControl} r={6} fill={stroke} />
-                  <circle cx={x} cy={yTarget} r={11} fill="none" stroke={stroke} strokeWidth={2} />
-                  <line x1={x - 11} y1={yTarget} x2={x + 11} y2={yTarget} stroke={stroke} strokeWidth={2} />
-                  <line x1={x} y1={yTarget - 11} x2={x} y2={yTarget + 11} stroke={stroke} strokeWidth={2} />
+                  {g.type === "CNOT" && (
+                    <>
+                      <circle cx={x} cy={yTarget} r={11} fill="none" stroke={stroke} strokeWidth={2} />
+                      <line x1={x - 11} y1={yTarget} x2={x + 11} y2={yTarget} stroke={stroke} strokeWidth={2} />
+                      <line x1={x} y1={yTarget - 11} x2={x} y2={yTarget + 11} stroke={stroke} strokeWidth={2} />
+                    </>
+                  )}
+                  {g.type === "CZ" && <circle cx={x} cy={yTarget} r={6} fill={stroke} />}
+                  {g.type === "CY" && (
+                    <>
+                      <circle cx={x} cy={yTarget} r={11} fill={stroke} />
+                      <text x={x} y={yTarget + 4} textAnchor="middle" fontSize={11} fontWeight={700} fill="var(--composer-panel-2)">
+                        Y
+                      </text>
+                    </>
+                  )}
                 </g>
               );
             })}
@@ -168,12 +183,13 @@ export default function CircuitCanvas({
           </svg>
 
           {circuit.gates.map((gate, i) => {
-            if (gate.type === "CNOT") {
+            if (gateDef(gate.type).numQubits === 2) {
               return (
                 <button
                   key={i}
                   type="button"
-                  aria-label={`CNOT gate, control qubit ${gate.qubits[0]}, target qubit ${gate.qubits[1]}`}
+                  aria-label={`${gate.type} gate, control qubit ${gate.qubits[0]}, target qubit ${gate.qubits[1]}`}
+                  title={inspect ? `${gateDef(gate.type).description} — control ${gate.qubits[0]}, target ${gate.qubits[1]}, step ${gate.step}` : undefined}
                   onClick={(e) => {
                     e.stopPropagation();
                     onSelectGate(i);
@@ -197,7 +213,7 @@ export default function CircuitCanvas({
                 ? `${gate.type}\n${Math.round((gate.angle * 180) / Math.PI)}°`
                 : gate.type === "MEASURE"
                   ? "M"
-                  : gate.type;
+                  : def.label;
 
             return (
               <button

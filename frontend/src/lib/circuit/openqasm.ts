@@ -2,19 +2,20 @@ import type { CircuitJson, Gate, GateType } from "@/lib/circuit/types";
 import { nextOpenStep } from "@/lib/circuit/placement";
 import type { ParseResult } from "@/lib/circuit/codeparse";
 
-const SINGLE_QUBIT_OPS: Record<GateType, string> = {
-  H: "h",
-  X: "x",
-  Y: "y",
-  Z: "z",
-  S: "s",
-  T: "t",
-  RX: "rx",
-  RY: "ry",
-  RZ: "rz",
-  CNOT: "cx",
-  MEASURE: "measure",
+const SINGLE_QUBIT_OPS: Record<string, GateType> = {
+  h: "H",
+  x: "X",
+  y: "Y",
+  z: "Z",
+  id: "I",
+  s: "S",
+  sdg: "SDG",
+  t: "T",
+  tdg: "TDG",
+  sx: "SX",
 };
+const ROTATION_OPS: Record<string, GateType> = { rx: "RX", ry: "RY", rz: "RZ", p: "P" };
+const TWO_QUBIT_OPS: Record<string, GateType> = { cx: "CNOT", cz: "CZ", cy: "CY" };
 
 function formatAngleQasm(angle: number | undefined): string {
   if (angle === undefined) return "0.0";
@@ -34,18 +35,41 @@ function lineFor(gate: Gate): string {
   const [q0, q1] = gate.qubits;
   switch (gate.type) {
     case "H":
+      return `h q[${q0}];`;
     case "X":
+      return `x q[${q0}];`;
     case "Y":
+      return `y q[${q0}];`;
     case "Z":
+      return `z q[${q0}];`;
+    case "I":
+      return `id q[${q0}];`;
     case "S":
+      return `s q[${q0}];`;
+    case "SDG":
+      return `sdg q[${q0}];`;
     case "T":
-      return `${SINGLE_QUBIT_OPS[gate.type]} q[${q0}];`;
+      return `t q[${q0}];`;
+    case "TDG":
+      return `tdg q[${q0}];`;
+    case "SX":
+      return `sx q[${q0}];`;
+    case "P":
+      return `p(${formatAngleQasm(gate.angle)}) q[${q0}];`;
     case "RX":
+      return `rx(${formatAngleQasm(gate.angle)}) q[${q0}];`;
     case "RY":
+      return `ry(${formatAngleQasm(gate.angle)}) q[${q0}];`;
     case "RZ":
-      return `${SINGLE_QUBIT_OPS[gate.type]}(${formatAngleQasm(gate.angle)}) q[${q0}];`;
+      return `rz(${formatAngleQasm(gate.angle)}) q[${q0}];`;
+    case "RESET":
+      return `reset q[${q0}];`;
     case "CNOT":
       return `cx q[${q0}], q[${q1}];`;
+    case "CZ":
+      return `cz q[${q0}], q[${q1}];`;
+    case "CY":
+      return `cy q[${q0}], q[${q1}];`;
     case "MEASURE":
       return `measure q[${q0}] -> c[${q0}];`;
     default:
@@ -84,13 +108,10 @@ function parseQasmAngle(expr: string): number | null {
   return Number.isFinite(num) ? num : null;
 }
 
-const SINGLE_QUBIT_KEYWORDS: Record<string, GateType> = { h: "H", x: "X", y: "Y", z: "Z", s: "S", t: "T" };
-const ROTATION_KEYWORDS: Record<string, GateType> = { rx: "RX", ry: "RY", rz: "RZ" };
-
 /**
  * A deliberately narrow, regex-based parser for the exact OpenQASM 3 lines this
- * app generates (h q[0];, cx q[0], q[1];, rz(pi/2) q[0];, measure q[0] -> c[0];).
- * Never evaluates or executes the source text.
+ * app generates (h q[0];, cx q[0], q[1];, rz(pi/2) q[0];, measure q[0] -> c[0];,
+ * reset q[0];). Never evaluates or executes the source text.
  */
 export function parseOpenQasm(code: string): ParseResult {
   const qubitCountMatch = code.match(/qubit\s*\[\s*(\d+)\s*\]/);
@@ -125,33 +146,41 @@ export function parseOpenQasm(code: string): ParseResult {
       continue;
     }
 
-    const cxMatch = line.match(/^cx\s+q\s*\[\s*(\d+)\s*\]\s*,\s*q\s*\[\s*(\d+)\s*\]$/);
-    if (cxMatch) {
-      const control = parseInt(cxMatch[1], 10);
-      const target = parseInt(cxMatch[2], 10);
+    const resetMatch = line.match(/^reset\s+q\s*\[\s*(\d+)\s*\]$/);
+    if (resetMatch) {
+      const q = parseInt(resetMatch[1], 10);
+      gates.push({ type: "RESET", qubits: [q], step: nextOpenStep(gates, q) });
+      continue;
+    }
+
+    const twoQubitMatch = line.match(/^(cx|cz|cy)\s+q\s*\[\s*(\d+)\s*\]\s*,\s*q\s*\[\s*(\d+)\s*\]$/);
+    if (twoQubitMatch) {
+      const [, op, controlStr, targetStr] = twoQubitMatch;
+      const control = parseInt(controlStr, 10);
+      const target = parseInt(targetStr, 10);
       gates.push({
-        type: "CNOT",
+        type: TWO_QUBIT_OPS[op],
         qubits: [control, target],
         step: Math.max(nextOpenStep(gates, control), nextOpenStep(gates, target)),
       });
       continue;
     }
 
-    const rotationMatch = line.match(/^(rx|ry|rz)\s*\(([^)]*)\)\s+q\s*\[\s*(\d+)\s*\]$/);
+    const rotationMatch = line.match(/^(rx|ry|rz|p)\s*\(([^)]*)\)\s+q\s*\[\s*(\d+)\s*\]$/);
     if (rotationMatch) {
       const [, op, angleExpr, qStr] = rotationMatch;
       const angle = parseQasmAngle(angleExpr);
       const q = parseInt(qStr, 10);
       if (angle === null) return { error: `Couldn't parse rotation angle in: "${line}"` };
-      gates.push({ type: ROTATION_KEYWORDS[op], qubits: [q], step: nextOpenStep(gates, q), angle });
+      gates.push({ type: ROTATION_OPS[op], qubits: [q], step: nextOpenStep(gates, q), angle });
       continue;
     }
 
-    const singleMatch = line.match(/^(h|x|y|z|s|t)\s+q\s*\[\s*(\d+)\s*\]$/);
+    const singleMatch = line.match(/^(h|x|y|z|id|sdg|s|tdg|t|sx)\s+q\s*\[\s*(\d+)\s*\]$/);
     if (singleMatch) {
       const [, op, qStr] = singleMatch;
       const q = parseInt(qStr, 10);
-      gates.push({ type: SINGLE_QUBIT_KEYWORDS[op], qubits: [q], step: nextOpenStep(gates, q) });
+      gates.push({ type: SINGLE_QUBIT_OPS[op], qubits: [q], step: nextOpenStep(gates, q) });
       continue;
     }
 

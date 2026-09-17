@@ -26,18 +26,34 @@ function lineFor(gate: Gate): string {
       return `qc.y(${q0})`;
     case "Z":
       return `qc.z(${q0})`;
+    case "I":
+      return `qc.id(${q0})`;
     case "S":
       return `qc.s(${q0})`;
+    case "SDG":
+      return `qc.sdg(${q0})`;
     case "T":
       return `qc.t(${q0})`;
+    case "TDG":
+      return `qc.tdg(${q0})`;
+    case "SX":
+      return `qc.sx(${q0})`;
+    case "P":
+      return `qc.p(${formatAngle(gate.angle)}, ${q0})`;
     case "RX":
       return `qc.rx(${formatAngle(gate.angle)}, ${q0})`;
     case "RY":
       return `qc.ry(${formatAngle(gate.angle)}, ${q0})`;
     case "RZ":
       return `qc.rz(${formatAngle(gate.angle)}, ${q0})`;
+    case "RESET":
+      return `qc.reset(${q0})`;
     case "CNOT":
       return `qc.cx(${q0}, ${q1})`;
+    case "CZ":
+      return `qc.cz(${q0}, ${q1})`;
+    case "CY":
+      return `qc.cy(${q0}, ${q1})`;
     case "MEASURE":
       return `qc.measure(${q0}, ${q0})`;
     default:

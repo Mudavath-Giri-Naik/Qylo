@@ -32,14 +32,6 @@
   --chart-grid: #e1e0d9;
   --chart-baseline: #c3c2b7;
 
-  /* Gate-family colors (used only for the gate palette icons). */
-  --gate-h: #2a78d6;
-  --gate-pauli: #e34948;
-  --gate-phase: #1baf7a;
-  --gate-rotation: #4a3aa7;
-  --gate-two-qubit: #0f172a;
-  --gate-measure: #eda100;
-
   /* Composer (IBM Quantum Composer-style) surface tokens. Gate-family fills
      stay constant across themes -- they're identity colors, not surfaces. */
   --composer-bar: #ffffff;
@@ -79,13 +71,6 @@
   --chart-ink-muted: #6b7383;
   --chart-grid: #232936;
   --chart-baseline: #323a49;
-
-  --gate-h: #4c93ec;
-  --gate-pauli: #e66767;
-  --gate-phase: #199e70;
-  --gate-rotation: #9085e9;
-  --gate-two-qubit: #eef1f6;
-  --gate-measure: #c98500;
 
   --composer-bar: #10141c;
   --composer-panel: #10141c;

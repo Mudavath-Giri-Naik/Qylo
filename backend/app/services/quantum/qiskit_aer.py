@@ -13,10 +13,22 @@ _SINGLE_QUBIT_GATES: dict[str, Any] = {
     "Y": lambda qc, q, a: qc.y(q[0]),
     "Z": lambda qc, q, a: qc.z(q[0]),
     "S": lambda qc, q, a: qc.s(q[0]),
+    "SDG": lambda qc, q, a: qc.sdg(q[0]),
     "T": lambda qc, q, a: qc.t(q[0]),
+    "TDG": lambda qc, q, a: qc.tdg(q[0]),
+    "SX": lambda qc, q, a: qc.sx(q[0]),
+    "I": lambda qc, q, a: qc.id(q[0]),
+    "P": lambda qc, q, a: qc.p(a or 0.0, q[0]),
     "RX": lambda qc, q, a: qc.rx(a or 0.0, q[0]),
     "RY": lambda qc, q, a: qc.ry(a or 0.0, q[0]),
     "RZ": lambda qc, q, a: qc.rz(a or 0.0, q[0]),
+    "RESET": lambda qc, q, a: qc.reset(q[0]),
+}
+
+_TWO_QUBIT_GATES: dict[str, Any] = {
+    "CNOT": lambda qc, q: qc.cx(q[0], q[1]),
+    "CZ": lambda qc, q: qc.cz(q[0], q[1]),
+    "CY": lambda qc, q: qc.cy(q[0], q[1]),
 }
 
 
@@ -42,10 +54,12 @@ def _apply_gates(qc: QuantumCircuit, gates: list[dict[str, Any]]) -> None:
 
         if gtype == "MEASURE":
             continue
-        if gtype == "CNOT":
+
+        two_qubit_builder = _TWO_QUBIT_GATES.get(gtype)
+        if two_qubit_builder is not None:
             if len(qubits) != 2:
-                raise ValueError("CNOT requires exactly 2 qubits (control, target)")
-            qc.cx(qubits[0], qubits[1])
+                raise ValueError(f"{gtype} requires exactly 2 qubits (control, target)")
+            two_qubit_builder(qc, qubits)
             continue
 
         builder = _SINGLE_QUBIT_GATES.get(gtype)

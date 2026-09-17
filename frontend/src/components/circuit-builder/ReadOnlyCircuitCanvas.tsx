@@ -7,7 +7,7 @@ export default function ReadOnlyCircuitCanvas({ circuit }: { circuit: CircuitJso
   return (
     <CircuitCanvas
       circuit={circuit}
-      pendingCnotControl={null}
+      pendingControl={null}
       selectedGateIndex={null}
       onDropGate={() => {}}
       onWireClick={() => {}}

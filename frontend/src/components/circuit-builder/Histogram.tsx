@@ -2,7 +2,16 @@
 
 import { useId, useState } from "react";
 
-export default function Histogram({ counts }: { counts: Record<string, number> }) {
+export default function Histogram({
+  counts,
+  mode = "shots",
+}: {
+  counts: Record<string, number>;
+  /** "shots" formats the total as integer shot counts (a real backend run);
+   * "probability" treats values as exact fractional probabilities (the
+   * instant client-side preview, before any run). */
+  mode?: "shots" | "probability";
+}) {
   const gradientId = useId();
   const entries = Object.entries(counts).sort(([a], [b]) => (a < b ? -1 : 1));
   const total = entries.reduce((sum, [, c]) => sum + c, 0);
@@ -79,7 +88,11 @@ export default function Histogram({ counts }: { counts: Record<string, number> }
               onMouseEnter={() => setHovered(bitstring)}
               onMouseLeave={() => setHovered(null)}
             >
-              <title>{`${bitstring}: ${count} shots (${(prob * 100).toFixed(1)}%)`}</title>
+              <title>
+                {mode === "shots"
+                  ? `${bitstring}: ${count} shots (${(prob * 100).toFixed(1)}%)`
+                  : `${bitstring}: ${(prob * 100).toFixed(1)}%`}
+              </title>
               <rect
                 x={x}
                 y={y}
@@ -132,7 +145,9 @@ export default function Histogram({ counts }: { counts: Record<string, number> }
           Computational basis states
         </text>
       </svg>
-      <p className="mt-1 text-center text-xs text-foreground/50">{total} shots</p>
+      <p className="mt-1 text-center text-xs text-foreground/50">
+        {mode === "shots" ? `${total} shots` : "Exact probabilities"}
+      </p>
     </div>
   );
 }

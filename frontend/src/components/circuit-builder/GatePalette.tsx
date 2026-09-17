@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { GATE_DEFS, type GateType } from "@/lib/circuit/types";
+import { GATE_DEFS, gateDef, type GateType } from "@/lib/circuit/types";
+
+export interface PendingControl {
+  type: GateType;
+  qubit: number;
+}
 
 function SearchIcon() {
   return (
@@ -13,10 +18,10 @@ function SearchIcon() {
 }
 
 export default function GatePalette({
-  pendingCnotControl,
+  pendingControl,
   compact = false,
 }: {
-  pendingCnotControl: number | null;
+  pendingControl: PendingControl | null;
   compact?: boolean;
 }) {
   const [query, setQuery] = useState("");
@@ -47,7 +52,7 @@ export default function GatePalette({
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-6 xl:grid-cols-7">
+      <div className="mt-2.5 grid grid-cols-6 gap-1.5">
         {filtered.map((def) => (
           <div
             key={def.type}
@@ -61,7 +66,7 @@ export default function GatePalette({
               backgroundColor: `var(${def.solidVar})`,
               color: def.solidFg === "light" ? "#ffffff" : "var(--gate-measure-solid-fg)",
             }}
-            className="flex aspect-square cursor-grab select-none items-center justify-center rounded-md text-sm font-semibold shadow-[var(--shadow-sm)] transition-transform active:cursor-grabbing active:scale-95"
+            className="flex aspect-square cursor-grab select-none items-center justify-center rounded-md text-xs font-semibold shadow-[var(--shadow-sm)] transition-transform active:cursor-grabbing active:scale-95"
           >
             {def.label}
           </div>
@@ -73,16 +78,12 @@ export default function GatePalette({
         )}
       </div>
 
-      {pendingCnotControl !== null && (
-        <p className="mt-3 rounded-md bg-amber-500/10 px-2.5 py-1.5 text-xs text-amber-700 dark:text-amber-400">
-          CNOT control set on qubit {pendingCnotControl} — click another wire to set the
-          target.
+      {pendingControl && (
+        <p className="mt-2.5 rounded-md bg-amber-500/10 px-2.5 py-1.5 text-xs text-amber-700 dark:text-amber-400">
+          {gateDef(pendingControl.type).label} control set on qubit {pendingControl.qubit} — click
+          another wire to set the target.
         </p>
       )}
-      <p className="mt-3 text-xs text-[var(--foreground-subtle)]">
-        Drag a gate onto a wire. CNOT: drop on the control wire, then click the target
-        wire. Click a placed gate to remove it or edit its angle.
-      </p>
     </div>
   );
 }

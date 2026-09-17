@@ -13,7 +13,7 @@ import {
   updateGateAngle,
 } from "@/lib/circuit/placement";
 import { ANGLE_PRESETS, emptyCircuit, gateDef, type CircuitJson, type GateType } from "@/lib/circuit/types";
-import GatePalette from "@/components/circuit-builder/GatePalette";
+import GatePalette, { type PendingControl } from "@/components/circuit-builder/GatePalette";
 import CircuitCanvas from "@/components/circuit-builder/CircuitCanvas";
 import CodeView from "@/components/circuit-builder/CodeView";
 import Histogram from "@/components/circuit-builder/Histogram";
@@ -69,7 +69,7 @@ export default function CircuitBuilder({
 } = {}) {
   const [circuit, setCircuit] = useState<CircuitJson>(initialCircuit ?? emptyCircuit(2));
   const [mode, setMode] = useState<"canvas" | "code">("canvas");
-  const [pendingCnotControl, setPendingCnotControl] = useState<number | null>(null);
+  const [pendingControl, setPendingControl] = useState<PendingControl | null>(null);
   const [selectedGateIndex, setSelectedGateIndex] = useState<number | null>(null);
 
   const [running, setRunning] = useState(false);
@@ -88,7 +88,7 @@ export default function CircuitBuilder({
   } | null>(null);
 
   function resetInteractionState() {
-    setPendingCnotControl(null);
+    setPendingControl(null);
     setSelectedGateIndex(null);
   }
 
@@ -98,8 +98,8 @@ export default function CircuitBuilder({
   }
 
   function handleDropGate(qubit: number, type: GateType) {
-    if (type === "CNOT") {
-      setPendingCnotControl(qubit);
+    if (gateDef(type).numQubits === 2) {
+      setPendingControl({ type, qubit });
       return;
     }
     const def = gateDef(type);
@@ -107,13 +107,13 @@ export default function CircuitBuilder({
   }
 
   function handleWireClick(qubit: number) {
-    if (pendingCnotControl === null) return;
-    if (qubit === pendingCnotControl) {
-      setPendingCnotControl(null);
+    if (!pendingControl) return;
+    if (qubit === pendingControl.qubit) {
+      setPendingControl(null);
       return;
     }
-    setCircuit((c) => placeTwoQubitGate(c, "CNOT", pendingCnotControl, qubit));
-    setPendingCnotControl(null);
+    setCircuit((c) => placeTwoQubitGate(c, pendingControl.type, pendingControl.qubit, qubit));
+    setPendingControl(null);
   }
 
   function handleSelectGate(index: number) {
@@ -297,10 +297,10 @@ export default function CircuitBuilder({
         <div className="flex flex-col gap-4">
           {mode === "canvas" ? (
             <>
-              <GatePalette pendingCnotControl={pendingCnotControl} />
+              <GatePalette pendingControl={pendingControl} />
               <CircuitCanvas
                 circuit={circuit}
-                pendingCnotControl={pendingCnotControl}
+                pendingControl={pendingControl}
                 selectedGateIndex={selectedGateIndex}
                 onDropGate={handleDropGate}
                 onWireClick={handleWireClick}

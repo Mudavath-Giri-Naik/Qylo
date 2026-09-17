@@ -11,10 +11,16 @@ const SINGLE_QUBIT_METHODS: Record<string, GateType> = {
   x: "X",
   y: "Y",
   z: "Z",
+  id: "I",
   s: "S",
+  sdg: "SDG",
   t: "T",
+  tdg: "TDG",
+  sx: "SX",
+  reset: "RESET",
 };
-const ROTATION_METHODS: Record<string, GateType> = { rx: "RX", ry: "RY", rz: "RZ" };
+const ROTATION_METHODS: Record<string, GateType> = { rx: "RX", ry: "RY", rz: "RZ", p: "P" };
+const TWO_QUBIT_METHODS: Record<string, GateType> = { cx: "CNOT", cz: "CZ", cy: "CY" };
 
 /** Parses angle expressions our own generator emits, e.g. "np.pi / 2", "-np.pi", "1.5708". */
 function parseAngle(expr: string): number | null {
@@ -89,14 +95,14 @@ export function parseQiskitCode(code: string): ParseResult {
         step: nextOpenStep(gates, q),
         angle,
       });
-    } else if (method === "cx") {
+    } else if (method in TWO_QUBIT_METHODS) {
       const control = parseInt(args[0], 10);
       const target = parseInt(args[1], 10);
       if (Number.isNaN(control) || Number.isNaN(target)) {
         return { error: `Bad qubit indices in: "${line}"` };
       }
       gates.push({
-        type: "CNOT",
+        type: TWO_QUBIT_METHODS[method],
         qubits: [control, target],
         step: Math.max(nextOpenStep(gates, control), nextOpenStep(gates, target)),
       });

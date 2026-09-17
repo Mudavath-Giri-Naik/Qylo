@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { runCircuit, type RunResult } from "@/lib/circuit/api";
 import {
-  maxStep,
   placeSingleQubitGate,
   placeTwoQubitGate,
   removeGate,
@@ -13,8 +12,9 @@ import {
   updateGateAngle,
 } from "@/lib/circuit/placement";
 import { generateOpenQasm } from "@/lib/circuit/openqasm";
+import { blochVectorFromStatevector, probabilitiesFromStatevector, simulateStatevector } from "@/lib/circuit/simulate";
 import { ANGLE_PRESETS, emptyCircuit, gateDef, type CircuitJson, type GateType } from "@/lib/circuit/types";
-import GatePalette from "@/components/circuit-builder/GatePalette";
+import GatePalette, { type PendingControl } from "@/components/circuit-builder/GatePalette";
 import CircuitCanvas from "@/components/circuit-builder/CircuitCanvas";
 import CodeView from "@/components/circuit-builder/CodeView";
 import Histogram from "@/components/circuit-builder/Histogram";
@@ -27,7 +27,7 @@ import NavMenuPanel from "@/components/NavMenuPanel";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const DEFAULT_ANGLE = Math.PI / 2;
-const AUTO_RUN_DELAY = 600;
+const DEFAULT_QUBITS = 4;
 
 const BACKENDS = [
   { value: "qiskit_aer", label: "Qiskit Aer (Simulator)" },
@@ -106,11 +106,10 @@ function SaveIcon() {
     </svg>
   );
 }
-function LinkIcon() {
+function ToolsIcon() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5" />
-      <path d="M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07L12.5 19.5" />
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
     </svg>
   );
 }
@@ -182,18 +181,19 @@ export default function Composer({
   const [circuitName, setCircuitName] = useState("Untitled circuit");
   const [editingName, setEditingName] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [inspect, setInspect] = useState(false);
   const [backendName, setBackendName] = useState("qiskit_aer");
 
   const [historyState, setHistoryState] = useState<HistoryState>({
     past: [],
-    present: emptyCircuit(2),
+    present: emptyCircuit(DEFAULT_QUBITS),
     future: [],
   });
   const circuit = historyState.present;
 
-  const [pendingCnotControl, setPendingCnotControl] = useState<number | null>(null);
+  const [pendingControl, setPendingControl] = useState<PendingControl | null>(null);
   const [selectedGateIndex, setSelectedGateIndex] = useState<number | null>(null);
 
   const [running, setRunning] = useState(false);
@@ -205,8 +205,25 @@ export default function Composer({
   const [savedCircuitId, setSavedCircuitId] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Instant client-side preview: recomputed synchronously on every circuit
+  // edit (pure math, no network), so probabilities/Q-sphere never lag behind
+  // a drag. The authoritative "Set up and run" hits the real backend and
+  // takes over the display until the next edit invalidates it.
+  const livePreview = useMemo(() => {
+    const statevector = simulateStatevector(circuit);
+    return {
+      statevector,
+      probabilities: probabilitiesFromStatevector(statevector, circuit.num_qubits),
+      blochVector: circuit.num_qubits === 1 ? blochVectorFromStatevector(statevector) : null,
+    };
+  }, [circuit]);
+
+  const displayCounts = runResult?.counts ?? livePreview.probabilities;
+  const displayStatevector = runResult?.statevector ?? livePreview.statevector;
+  const displayBlochVector = runResult ? runResult.bloch_vector : livePreview.blochVector;
+
   function resetInteractionState() {
-    setPendingCnotControl(null);
+    setPendingControl(null);
     setSelectedGateIndex(null);
   }
 
@@ -216,6 +233,8 @@ export default function Composer({
       if (next === h.present) return h;
       return { past: [...h.past, h.present], present: next, future: [] };
     });
+    setRunResult(null);
+    setRunError(null);
   }
 
   function undo() {
@@ -224,6 +243,7 @@ export default function Composer({
       const previous = h.past[h.past.length - 1];
       return { past: h.past.slice(0, -1), present: previous, future: [h.present, ...h.future] };
     });
+    setRunResult(null);
     resetInteractionState();
   }
 
@@ -233,18 +253,9 @@ export default function Composer({
       const next = h.future[0];
       return { past: [...h.past, h.present], present: next, future: h.future.slice(1) };
     });
+    setRunResult(null);
     resetInteractionState();
   }
-
-  // Debounced auto-run: any circuit or backend change re-simulates shortly
-  // after the last edit, so the code/probabilities/Q-sphere stay live without
-  // firing a request on every intermediate drag frame.
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      performRun(circuit, backendName, { setRunning, setRunError, setRunResult });
-    }, AUTO_RUN_DELAY);
-    return () => clearTimeout(timer);
-  }, [circuit, backendName]);
 
   function handleQubitCountChange(n: number) {
     commit((c) => setQubitCount(c, n));
@@ -257,8 +268,8 @@ export default function Composer({
   }
 
   function handleDropGate(qubit: number, type: GateType) {
-    if (type === "CNOT") {
-      setPendingCnotControl(qubit);
+    if (gateDef(type).numQubits === 2) {
+      setPendingControl({ type, qubit });
       return;
     }
     const def = gateDef(type);
@@ -266,13 +277,13 @@ export default function Composer({
   }
 
   function handleWireClick(qubit: number) {
-    if (pendingCnotControl === null) return;
-    if (qubit === pendingCnotControl) {
-      setPendingCnotControl(null);
+    if (!pendingControl) return;
+    if (qubit === pendingControl.qubit) {
+      setPendingControl(null);
       return;
     }
-    commit((c) => placeTwoQubitGate(c, "CNOT", pendingCnotControl, qubit));
-    setPendingCnotControl(null);
+    commit((c) => placeTwoQubitGate(c, pendingControl.type, pendingControl.qubit, qubit));
+    setPendingControl(null);
   }
 
   function handleSelectGate(index: number) {
@@ -285,7 +296,7 @@ export default function Composer({
   }
 
   function handleNewCircuit() {
-    commit(() => emptyCircuit(2));
+    commit(() => emptyCircuit(DEFAULT_QUBITS));
     resetInteractionState();
     setCircuitName("Untitled circuit");
     setActiveMenu(null);
@@ -352,10 +363,10 @@ export default function Composer({
   const selectedGate = selectedGateIndex !== null ? circuit.gates[selectedGateIndex] : null;
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-[var(--background)]">
+    <div className="flex h-screen w-full flex-col overflow-hidden bg-[var(--background)]">
       {/* Top app bar */}
-      <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--composer-bar)]">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2">
+      <header className="z-30 shrink-0 border-b border-[var(--border)] bg-[var(--composer-bar)]">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5">
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
@@ -413,7 +424,7 @@ export default function Composer({
             <MenuButton label="Help" isOpen={activeMenu === "help"} onToggle={() => setActiveMenu((m) => (m === "help" ? null : "help"))} onClose={() => setActiveMenu(null)}>
               <MenuItem
                 onClick={() => {
-                  document.getElementById("qylo-agent-chat")?.scrollIntoView({ behavior: "smooth" });
+                  setToolsOpen(true);
                   setActiveMenu(null);
                 }}
               >
@@ -424,31 +435,38 @@ export default function Composer({
 
           <div className="ml-auto flex items-center gap-2">
             {saveMessage && (
-              <span className="hidden max-w-[14rem] truncate text-xs text-[var(--foreground-subtle)] lg:inline">{saveMessage}</span>
+              <span className="hidden max-w-[12rem] truncate text-xs text-[var(--foreground-subtle)] lg:inline">{saveMessage}</span>
             )}
+            <button
+              type="button"
+              onClick={() => setToolsOpen(true)}
+              title="AI tutor & my circuits"
+              className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)]"
+            >
+              <ToolsIcon />
+              <span className="hidden sm:inline">Tools</span>
+            </button>
             <button
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)] disabled:opacity-60"
+              className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)] disabled:opacity-60"
             >
               <SaveIcon />
-              {saving ? "Saving..." : "Save file"}
+              <span className="hidden sm:inline">{saving ? "Saving..." : "Save file"}</span>
             </button>
-            <label className="flex items-center gap-1 text-xs font-medium text-[var(--foreground-muted)]">
-              <select
-                value={backendName}
-                onChange={(e) => setBackendName(e.target.value)}
-                title="Simulation backend"
-                className="cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-xs text-[var(--foreground)] outline-none"
-              >
-                {BACKENDS.map((b) => (
-                  <option key={b.value} value={b.value}>
-                    {b.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <select
+              value={backendName}
+              onChange={(e) => setBackendName(e.target.value)}
+              title="Simulation backend"
+              className="cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-xs text-[var(--foreground)] outline-none"
+            >
+              {BACKENDS.map((b) => (
+                <option key={b.value} value={b.value}>
+                  {b.label}
+                </option>
+              ))}
+            </select>
             <button
               type="button"
               onClick={() => performRun(circuit, backendName, { setRunning, setRunError, setRunResult })}
@@ -462,13 +480,16 @@ export default function Composer({
         </div>
       </header>
 
-      {/* Composer body: operations | canvas | OpenQASM */}
-      <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr_380px]">
-        <div className="flex flex-col border-b border-[var(--border)] p-3 lg:border-b-0 lg:border-r">
-          <GatePalette pendingCnotControl={pendingCnotControl} compact />
+      {/* Composer body: operations | canvas | OpenQASM -- and results below,
+          sharing the remaining viewport height so the whole workspace fits
+          without a page-level scroll. Each panel scrolls internally if its
+          own content grows taller than its share of the screen. */}
+      <div className="grid min-h-0 flex-[3] grid-cols-1 lg:grid-cols-[300px_1fr_360px]">
+        <div className="flex min-h-0 flex-col overflow-y-auto border-b border-[var(--border)] p-2.5 lg:border-b-0 lg:border-r">
+          <GatePalette pendingControl={pendingControl} compact />
         </div>
 
-        <div className="flex flex-col gap-2 border-b border-[var(--border)] p-3 lg:border-b-0 lg:border-r">
+        <div className="flex min-h-0 flex-col gap-2 overflow-y-auto border-b border-[var(--border)] p-2.5 lg:border-b-0 lg:border-r">
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" onClick={undo} disabled={historyState.past.length === 0} title="Undo" className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--foreground-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30">
               <UndoIcon />
@@ -501,7 +522,7 @@ export default function Composer({
 
           <CircuitCanvas
             circuit={circuit}
-            pendingCnotControl={pendingCnotControl}
+            pendingControl={pendingControl}
             selectedGateIndex={selectedGateIndex}
             onDropGate={handleDropGate}
             onWireClick={handleWireClick}
@@ -540,83 +561,40 @@ export default function Composer({
               </button>
             </div>
           )}
-
-          {circuit.gates.length === 0 && maxStep(circuit.gates) === -1 && (
-            <p className="text-xs text-[var(--foreground-subtle)]">
-              Empty circuit — drag a gate from the palette onto a wire above.
-            </p>
-          )}
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex min-h-0 flex-col overflow-hidden">
           <CodeView circuit={circuit} onApplyCircuit={handleApplyCircuit} compact />
         </div>
       </div>
 
       {/* Results: probabilities | Q-sphere */}
-      <div className="grid grid-cols-1 border-t border-[var(--border)] sm:grid-cols-2">
-        <div className="border-b border-[var(--border)] p-4 sm:border-b-0 sm:border-r">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">Probabilities</p>
-          <div className="mt-3">
+      <div className="grid min-h-0 flex-[2] grid-cols-1 border-t border-[var(--border)] sm:grid-cols-2">
+        <div className="flex min-h-0 flex-col overflow-y-auto border-b border-[var(--border)] p-3 sm:border-b-0 sm:border-r">
+          <div className="flex shrink-0 items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">Probabilities</p>
+            <span className="text-[10px] text-[var(--foreground-subtle)]">
+              {runResult ? `Qiskit Aer · ${Object.values(runResult.counts).reduce((a, b) => a + b, 0)} shots` : "Instant preview"}
+            </span>
+          </div>
+          <div className="mt-2">
             {runError && <p className="text-sm text-red-600 dark:text-red-400">{runError}</p>}
-            {!runError && !runResult && <p className="text-sm text-[var(--foreground-muted)]">Simulating...</p>}
-            {runResult && <Histogram counts={runResult.counts} />}
+            <Histogram counts={displayCounts} mode={runResult ? "shots" : "probability"} />
           </div>
         </div>
-        <div className="p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
-            {runResult?.bloch_vector ? "Bloch sphere" : "Q-sphere"}
-          </p>
-          <div className="mt-3">
-            {runResult?.bloch_vector ? (
-              <BlochSphere vector={runResult.bloch_vector} />
-            ) : runResult ? (
-              <QSphere statevector={runResult.statevector} numQubits={circuit.num_qubits} />
+        <div className="flex min-h-0 flex-col overflow-y-auto p-3">
+          <div className="flex shrink-0 items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
+              {displayBlochVector ? "Bloch sphere" : "Q-sphere"}
+            </p>
+            <span className="text-[10px] text-[var(--foreground-subtle)]">{runResult ? "Backend result" : "Instant preview"}</span>
+          </div>
+          <div className="mt-2">
+            {displayBlochVector ? (
+              <BlochSphere vector={displayBlochVector} />
             ) : (
-              !runError && <p className="text-sm text-[var(--foreground-muted)]">Simulating...</p>
+              <QSphere statevector={displayStatevector} numQubits={circuit.num_qubits} />
             )}
-          </div>
-        </div>
-      </div>
-
-      {/* Qylo extras: AI tutor + saved circuits, secondary to the composer above */}
-      <div className="border-t border-[var(--border)] bg-[var(--background)] px-4 py-6">
-        <h2 className="text-sm font-semibold text-[var(--foreground)]">Qylo tools</h2>
-        <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
-          <div id="qylo-agent-chat" className="h-[420px]">
-            <AgentChat
-              title="Explain my circuit"
-              getCircuit={() => circuit}
-              quickActionLabel="Explain my circuit"
-              placeholder="Ask about this circuit..."
-            />
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={handleCopyShareLink}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)]"
-              >
-                <LinkIcon />
-                Share
-              </button>
-            </div>
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-              <h3 className="text-sm font-semibold text-[var(--foreground)]">My Circuits</h3>
-              <div className="mt-3">
-                <MyCircuits
-                  refreshKey={refreshKey}
-                  onLoad={(loaded) => {
-                    commit(() => loaded);
-                    setRunResult(null);
-                    setRunError(null);
-                    resetInteractionState();
-                  }}
-                />
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -624,6 +602,61 @@ export default function Composer({
       <ComposerFooter />
 
       <NavMenuPanel open={menuOpen} onClose={() => setMenuOpen(false)} loggedIn={loggedIn} links={links} />
+
+      {/* Tools panel: AI tutor + saved circuits, kept out of the main
+          composer view so that view fits on one screen without scrolling. */}
+      {toolsOpen && (
+        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" onClick={() => setToolsOpen(false)} />
+          <div className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
+            <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
+              <span className="text-sm font-semibold text-[var(--foreground)]">Qylo tools</span>
+              <button
+                type="button"
+                onClick={() => setToolsOpen(false)}
+                aria-label="Close"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--foreground-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)]"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
+              <div className="h-[380px] shrink-0">
+                <AgentChat
+                  title="Explain my circuit"
+                  getCircuit={() => circuit}
+                  quickActionLabel="Explain my circuit"
+                  placeholder="Ask about this circuit..."
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyShareLink}
+                className="shrink-0 rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)]"
+              >
+                Copy share link
+              </button>
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+                <h3 className="text-sm font-semibold text-[var(--foreground)]">My Circuits</h3>
+                <div className="mt-3">
+                  <MyCircuits
+                    refreshKey={refreshKey}
+                    onLoad={(loaded) => {
+                      commit(() => loaded);
+                      setRunResult(null);
+                      setRunError(null);
+                      resetInteractionState();
+                      setToolsOpen(false);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
