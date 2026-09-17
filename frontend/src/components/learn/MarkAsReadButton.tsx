@@ -16,7 +16,7 @@ export default function MarkAsReadButton({
 
   if (done) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-600/30 bg-emerald-600/10 px-3 py-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+      <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-600/30 bg-emerald-600/10 px-3 py-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400">
         ✓ Marked as read
       </span>
     );
@@ -34,7 +34,7 @@ export default function MarkAsReadButton({
             else setDone(true);
           })
         }
-        className="rounded-md border border-black/10 px-3 py-1.5 text-sm font-medium transition-colors hover:bg-black/5 disabled:opacity-60 dark:border-white/15 dark:hover:bg-white/10"
+        className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)] disabled:opacity-60"
       >
         {pending ? "Marking..." : "Mark as read"}
       </button>

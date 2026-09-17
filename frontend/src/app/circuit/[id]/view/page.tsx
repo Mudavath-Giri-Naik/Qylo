@@ -6,7 +6,7 @@ import type { RunResult } from "@/lib/circuit/api";
 import ReadOnlyCircuitCanvas from "@/components/circuit-builder/ReadOnlyCircuitCanvas";
 import Histogram from "@/components/circuit-builder/Histogram";
 import BlochSphere from "@/components/circuit-builder/BlochSphere";
-import AmplitudeList from "@/components/circuit-builder/AmplitudeList";
+import QSphere from "@/components/circuit-builder/QSphere";
 
 async function getSharedCircuit(id: string): Promise<CircuitJson | null> {
   const supabase = await createClient();
@@ -41,11 +41,13 @@ export default async function SharedCircuitPage({
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
-      <Link href="/" className="text-sm text-foreground/60 hover:text-foreground">
+      <Link href="/" className="text-sm text-[var(--foreground-muted)] hover:text-[var(--foreground)]">
         ← Qylo
       </Link>
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight">Shared circuit</h1>
-      <p className="mt-1 text-sm text-foreground/60">
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--foreground)]">
+        Shared circuit
+      </h1>
+      <p className="mt-1 text-sm text-[var(--foreground-muted)]">
         A read-only view of a saved circuit and its most recent run. No login required.
       </p>
 
@@ -53,29 +55,29 @@ export default async function SharedCircuitPage({
         <ReadOnlyCircuitCanvas circuit={circuit} />
       </div>
 
-      <section className="mt-6 rounded-lg border border-black/10 p-5 dark:border-white/10">
-        <h2 className="text-sm font-semibold">Results</h2>
+      <section className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)]">
+        <h2 className="text-sm font-semibold text-[var(--foreground)]">Results</h2>
         {!runResult && (
-          <p className="mt-2 text-sm text-foreground/50">
+          <p className="mt-2 text-sm text-[var(--foreground-muted)]">
             Couldn&apos;t reach the simulator to re-run this circuit right now.
           </p>
         )}
         {runResult && (
           <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
-              <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-foreground/50">
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
                 Measurement probabilities
               </h3>
               <Histogram counts={runResult.counts} />
             </div>
             <div>
-              <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-foreground/50">
-                {runResult.bloch_vector ? "Bloch sphere" : "Statevector"}
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
+                {runResult.bloch_vector ? "Bloch sphere" : "Q-sphere"}
               </h3>
               {runResult.bloch_vector ? (
                 <BlochSphere vector={runResult.bloch_vector} />
               ) : (
-                <AmplitudeList statevector={runResult.statevector} numQubits={circuit.num_qubits} />
+                <QSphere statevector={runResult.statevector} numQubits={circuit.num_qubits} />
               )}
             </div>
           </div>

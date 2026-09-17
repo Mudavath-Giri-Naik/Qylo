@@ -69,14 +69,15 @@ export default function AgentChat({
   }
 
   return (
-    <div className="flex h-full flex-col rounded-lg border border-black/10 dark:border-white/10">
-      <div className="border-b border-black/10 px-4 py-3 dark:border-white/10">
-        <h2 className="text-sm font-semibold">{title}</h2>
+    <div className="flex h-full flex-col rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-sm)]">
+      <div className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-3">
+        <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+        <h2 className="text-sm font-semibold text-[var(--foreground)]">{title}</h2>
       </div>
 
-      <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
+      <div ref={scrollRef} className="thin-scrollbar flex-1 space-y-3 overflow-y-auto px-4 py-3">
         {messages.length === 0 && (
-          <p className="text-xs text-foreground/50">
+          <p className="text-xs text-[var(--foreground-subtle)]">
             {quickActionLabel
               ? `Ask a question, or use "${quickActionLabel}" below.`
               : "Ask a question about this lesson."}
@@ -85,26 +86,26 @@ export default function AgentChat({
         {messages.map((m, i) => (
           <div
             key={i}
-            className={`rounded-md px-3 py-2 text-sm ${
+            className={`rounded-xl px-3 py-2 text-sm ${
               m.role === "user"
-                ? "ml-6 bg-foreground text-background"
-                : "mr-6 bg-black/[0.04] dark:bg-white/[0.06]"
+                ? "ml-6 bg-[var(--accent)] text-[var(--accent-foreground)]"
+                : "mr-6 bg-[var(--surface-2)] text-[var(--foreground)]"
             }`}
           >
             <p className="whitespace-pre-wrap">{m.content}</p>
           </div>
         ))}
-        {loading && <p className="mr-6 text-xs text-foreground/50">Thinking...</p>}
+        {loading && <p className="mr-6 text-xs text-[var(--foreground-subtle)]">Thinking...</p>}
         {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
       </div>
 
-      <div className="flex flex-col gap-2 border-t border-black/10 p-3 dark:border-white/10">
+      <div className="flex flex-col gap-2 border-t border-[var(--border)] p-3">
         {quickActionLabel && getCircuit && (
           <button
             type="button"
             onClick={() => send("")}
             disabled={loading}
-            className="rounded-md border border-black/10 px-3 py-1.5 text-xs font-medium disabled:opacity-60 dark:border-white/15"
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)] disabled:opacity-60"
           >
             {quickActionLabel}
           </button>
@@ -121,12 +122,12 @@ export default function AgentChat({
             onChange={(e) => setInput(e.target.value)}
             placeholder={placeholder}
             disabled={loading}
-            className="flex-1 rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm dark:border-white/15"
+            className="flex-1 rounded-lg border border-[var(--border)] bg-transparent px-3 py-1.5 text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background disabled:opacity-60"
+            className="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-[var(--accent-foreground)] disabled:opacity-60"
           >
             Send
           </button>

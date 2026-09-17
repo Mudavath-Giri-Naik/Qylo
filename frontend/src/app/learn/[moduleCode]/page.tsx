@@ -25,13 +25,13 @@ export default async function ModulePage({
     <main className="mx-auto max-w-3xl px-6 py-12">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <Link href="/learn" className="text-sm text-foreground/60 hover:text-foreground">
+          <Link href="/learn" className="text-sm text-[var(--foreground-muted)] hover:text-[var(--foreground)]">
             ← All modules
           </Link>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight" lang={lang}>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[var(--foreground)]" lang={lang}>
             {moduleTitle(mod, lang)}
           </h1>
-          <span className="text-xs font-medium uppercase tracking-wide text-foreground/50">
+          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--accent)]">
             {mod.code}
           </span>
         </div>
@@ -43,20 +43,22 @@ export default async function ModulePage({
           <li key={lesson.id}>
             <Link
               href={`/learn/${moduleCode}/${lesson.order_index}${langSuffix}`}
-              className="flex items-center justify-between rounded-lg border border-black/10 px-5 py-4 transition-colors hover:border-foreground/30 dark:border-white/10"
+              className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface)] px-5 py-4 shadow-[var(--shadow-sm)] transition-all hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-[var(--shadow-md)]"
             >
               <span className="flex items-center gap-3">
-                <span className="text-sm text-foreground/40">{i + 1}</span>
-                <span lang={lesson.language}>{lesson.title}</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--surface-2)] text-xs font-medium text-[var(--foreground-muted)]">
+                  {i + 1}
+                </span>
+                <span className="text-[var(--foreground)]" lang={lesson.language}>{lesson.title}</span>
               </span>
               {lesson.isFallback && (
-                <span className="text-xs text-foreground/50">English</span>
+                <span className="rounded-full bg-[var(--surface-2)] px-2 py-0.5 text-xs text-[var(--foreground-subtle)]">English</span>
               )}
             </Link>
           </li>
         ))}
         {lessons.length === 0 && (
-          <p className="text-foreground/60">No lessons in this module yet.</p>
+          <p className="text-[var(--foreground-muted)]">No lessons in this module yet.</p>
         )}
       </ol>
     </main>

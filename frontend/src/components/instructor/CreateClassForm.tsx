@@ -65,12 +65,12 @@ export default function CreateClassForm() {
         onChange={(e) => setName(e.target.value)}
         placeholder="Class name"
         disabled={loading}
-        className="rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm dark:border-white/15"
+        className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
       />
       <button
         type="submit"
         disabled={loading || !name.trim()}
-        className="rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background disabled:opacity-60"
+        className="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-[var(--accent-foreground)] disabled:opacity-60"
       >
         {loading ? "Creating..." : "Create class"}
       </button>

@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { logoutAction } from "@/app/auth/actions";
+import NavDrawer from "@/components/NavDrawer";
 
 export default async function NavBar() {
   const supabase = await createClient();
@@ -18,73 +17,16 @@ export default async function NavBar() {
     role = profile?.role ?? null;
   }
 
-  const links = [
-    { href: "/learn", label: "Learn" },
-    { href: "/circuit-builder", label: "Circuit Builder" },
-    { href: "/challenges", label: "Challenges" },
-  ];
+  const links = user
+    ? [
+        { href: "/learn", label: "Learn" },
+        { href: "/circuit-builder", label: "Circuit Builder" },
+        { href: "/challenges", label: "Challenges" },
+        role === "instructor"
+          ? { href: "/instructor-dashboard", label: "Instructor Dashboard" }
+          : { href: "/dashboard", label: "Dashboard" },
+      ]
+    : [];
 
-  return (
-    <header className="border-b border-black/10 dark:border-white/10">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
-          Qylo
-        </Link>
-
-        <div className="flex items-center gap-6">
-          {user &&
-            links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
-
-          {user && role === "learner" && (
-            <Link
-              href="/dashboard"
-              className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-            >
-              Dashboard
-            </Link>
-          )}
-
-          {user && role === "instructor" && (
-            <Link
-              href="/instructor-dashboard"
-              className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-            >
-              Instructor Dashboard
-            </Link>
-          )}
-
-          {user ? (
-            <form action={logoutAction}>
-              <button
-                type="submit"
-                className="rounded-md border border-black/10 px-3 py-1.5 text-sm transition-colors hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/10"
-              >
-                Log out
-              </button>
-            </form>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Link href="/login" className="text-sm text-foreground/70 hover:text-foreground">
-                Log in
-              </Link>
-              <Link
-                href="/signup"
-                className="rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background"
-              >
-                Sign up
-              </Link>
-            </div>
-          )}
-        </div>
-      </nav>
-    </header>
-  );
+  return <NavDrawer loggedIn={!!user} links={links} />;
 }

@@ -63,12 +63,12 @@ export default function JoinClassForm() {
         onChange={(e) => setCode(e.target.value)}
         placeholder="Join code"
         disabled={loading}
-        className="w-32 rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm uppercase dark:border-white/15"
+        className="w-32 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm uppercase text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
       />
       <button
         type="submit"
         disabled={loading || !code.trim()}
-        className="rounded-md border border-black/10 px-3 py-1.5 text-sm font-medium disabled:opacity-60 dark:border-white/15"
+        className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)] disabled:opacity-60"
       >
         {loading ? "Joining..." : "Join class"}
       </button>

@@ -33,20 +33,20 @@ export default function QuizChallenge({ challenge }: { challenge: Challenge }) {
   }
 
   return (
-    <div className="rounded-lg border border-black/10 p-5 dark:border-white/10">
-      <p className="text-xs font-medium uppercase tracking-wide text-foreground/50">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)]">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
         {challenge.difficulty}
       </p>
-      <p className="mt-1 font-medium">{challenge.prompt}</p>
+      <p className="mt-1 font-medium text-[var(--foreground)]">{challenge.prompt}</p>
 
       <div className="mt-4 flex flex-col gap-2">
         {rule.options.map((option, i) => (
           <label
             key={i}
-            className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm ${
+            className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors ${
               selected === i
-                ? "border-[var(--chart-series-1)] bg-[var(--chart-series-1)]/10"
-                : "border-black/10 dark:border-white/15"
+                ? "border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--foreground)]"
+                : "border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-hover)]"
             }`}
           >
             <input
@@ -57,7 +57,7 @@ export default function QuizChallenge({ challenge }: { challenge: Challenge }) {
                 setSelected(i);
                 setResult(null);
               }}
-              className="shrink-0"
+              className="shrink-0 accent-[var(--accent)]"
             />
             {option}
           </label>
@@ -69,7 +69,7 @@ export default function QuizChallenge({ challenge }: { challenge: Challenge }) {
           type="button"
           onClick={handleSubmit}
           disabled={selected === null || submitting}
-          className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background disabled:opacity-60"
+          className="rounded-lg bg-[var(--accent)] px-4 py-1.5 text-sm font-semibold text-[var(--accent-foreground)] disabled:opacity-60"
         >
           {submitting ? "Checking..." : "Submit"}
         </button>

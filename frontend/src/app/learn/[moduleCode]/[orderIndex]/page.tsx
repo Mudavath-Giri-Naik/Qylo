@@ -42,7 +42,7 @@ export default async function LessonPage({
         <div>
           <Link
             href={`/learn/${moduleCode}${langSuffix}`}
-            className="text-sm text-foreground/60 hover:text-foreground"
+            className="text-sm text-[var(--foreground-muted)] hover:text-[var(--foreground)]"
           >
             ← {moduleTitle(mod, lang)}
           </Link>
@@ -52,14 +52,14 @@ export default async function LessonPage({
 
       <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
         <div>
-          <article>
-            <h1 className="text-3xl font-semibold tracking-tight" lang={lesson.language}>
+          <article className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-sm)] sm:p-8">
+            <h1 className="text-3xl font-semibold tracking-tight text-[var(--foreground)]" lang={lesson.language}>
               {lesson.title}
             </h1>
-            <div className="mt-2 flex items-center gap-3 text-xs text-foreground/50">
+            <div className="mt-2 flex items-center gap-3 text-xs text-[var(--foreground-subtle)]">
               <span className="uppercase tracking-wide">{lesson.difficulty}</span>
               {lesson.isFallback && (
-                <span className="rounded-full border border-black/10 px-2 py-0.5 dark:border-white/15">
+                <span className="rounded-full border border-[var(--border)] px-2 py-0.5">
                   Not yet translated — showing English
                 </span>
               )}
@@ -74,11 +74,11 @@ export default async function LessonPage({
             </div>
           </article>
 
-          <nav className="mt-10 flex items-center justify-between border-t border-black/10 pt-6 dark:border-white/10">
+          <nav className="mt-6 flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface)] px-5 py-4 shadow-[var(--shadow-sm)]">
             {prev ? (
               <Link
                 href={`/learn/${moduleCode}/${prev.order_index}${langSuffix}`}
-                className="text-sm text-foreground/70 hover:text-foreground"
+                className="text-sm text-[var(--foreground-muted)] hover:text-[var(--foreground)]"
               >
                 ← {prev.title}
               </Link>
@@ -88,7 +88,7 @@ export default async function LessonPage({
             {next ? (
               <Link
                 href={`/learn/${moduleCode}/${next.order_index}${langSuffix}`}
-                className="text-sm text-foreground/70 hover:text-foreground"
+                className="text-sm text-[var(--foreground-muted)] hover:text-[var(--foreground)]"
               >
                 {next.title} →
               </Link>

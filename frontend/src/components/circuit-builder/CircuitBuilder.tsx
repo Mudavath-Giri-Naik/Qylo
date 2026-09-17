@@ -18,11 +18,42 @@ import CircuitCanvas from "@/components/circuit-builder/CircuitCanvas";
 import CodeView from "@/components/circuit-builder/CodeView";
 import Histogram from "@/components/circuit-builder/Histogram";
 import BlochSphere from "@/components/circuit-builder/BlochSphere";
-import AmplitudeList from "@/components/circuit-builder/AmplitudeList";
+import QSphere from "@/components/circuit-builder/QSphere";
 import MyCircuits from "@/components/circuit-builder/MyCircuits";
 import AgentChat from "@/components/agent/AgentChat";
 
 const DEFAULT_ANGLE = Math.PI / 2;
+
+function PlayIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  );
+}
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  );
+}
+function SaveIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+      <path d="M17 21v-8H7v8M7 3v5h8" />
+    </svg>
+  );
+}
+function LinkIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5" />
+      <path d="M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07L12.5 19.5" />
+    </svg>
+  );
+}
 
 export interface CircuitChallengeContext {
   id: string;
@@ -176,19 +207,21 @@ export default function CircuitBuilder({
 
   return (
     <div className={challenge ? "" : "mx-auto max-w-6xl px-6 py-8"}>
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 shadow-[var(--shadow-sm)]">
         {!challenge && (
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Circuit Builder</h1>
-            <p className="mt-1 text-sm text-foreground/60">
-              Drag gates onto qubit wires, or switch to code. Runs on a real Qiskit Aer
-              simulator.
+          <div className="mr-auto">
+            <h1 className="text-base font-semibold tracking-tight text-[var(--foreground)]">
+              Circuit Builder
+            </h1>
+            <p className="text-xs text-[var(--foreground-muted)]">
+              Real Qiskit Aer simulation, 1-5 qubits.
             </p>
           </div>
         )}
 
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-2 text-sm">
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs font-medium text-[var(--foreground-muted)]">
             Qubits
             <input
               type="number"
@@ -196,22 +229,22 @@ export default function CircuitBuilder({
               max={5}
               value={circuit.num_qubits}
               onChange={(e) => handleQubitCountChange(Math.min(5, Math.max(1, Number(e.target.value) || 1)))}
-              className="w-14 rounded-md border border-black/10 bg-transparent px-2 py-1 text-sm dark:border-white/15"
+              className="w-10 bg-transparent text-center text-sm font-semibold text-[var(--foreground)] outline-none"
             />
           </label>
 
-          <div className="flex overflow-hidden rounded-md border border-black/10 text-sm dark:border-white/15">
+          <div className="flex overflow-hidden rounded-lg border border-[var(--border)] text-xs font-medium">
             <button
               type="button"
               onClick={() => setMode("canvas")}
-              className={`px-3 py-1.5 ${mode === "canvas" ? "bg-foreground text-background" : ""}`}
+              className={`px-3 py-1.5 transition-colors ${mode === "canvas" ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "text-[var(--foreground-muted)] hover:bg-[var(--surface-hover)]"}`}
             >
               Canvas
             </button>
             <button
               type="button"
               onClick={() => setMode("code")}
-              className={`px-3 py-1.5 ${mode === "code" ? "bg-foreground text-background" : ""}`}
+              className={`px-3 py-1.5 transition-colors ${mode === "code" ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "text-[var(--foreground-muted)] hover:bg-[var(--surface-hover)]"}`}
             >
               Code
             </button>
@@ -221,8 +254,9 @@ export default function CircuitBuilder({
             type="button"
             onClick={handleRun}
             disabled={running}
-            className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background disabled:opacity-60"
+            className="flex items-center gap-1.5 rounded-lg bg-[var(--accent)] px-3.5 py-1.5 text-xs font-semibold text-[var(--accent-foreground)] transition-opacity disabled:opacity-60"
           >
+            <PlayIcon />
             {running ? "Running..." : "Run"}
           </button>
           {challenge && (
@@ -230,8 +264,9 @@ export default function CircuitBuilder({
               type="button"
               onClick={handleSubmitChallenge}
               disabled={submittingChallenge}
-              className="rounded-md bg-emerald-600 px-4 py-1.5 text-sm font-medium text-white disabled:opacity-60"
+              className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-opacity hover:bg-emerald-700 disabled:opacity-60"
             >
+              <CheckIcon />
               {submittingChallenge ? "Grading..." : "Submit"}
             </button>
           )}
@@ -239,22 +274,26 @@ export default function CircuitBuilder({
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="rounded-md border border-black/10 px-4 py-1.5 text-sm font-medium disabled:opacity-60 dark:border-white/15"
+            className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-3.5 py-1.5 text-xs font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)] disabled:opacity-60"
           >
+            <SaveIcon />
             {saving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
             onClick={handleCopyShareLink}
-            className="rounded-md border border-black/10 px-4 py-1.5 text-sm font-medium dark:border-white/15"
+            className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-3.5 py-1.5 text-xs font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)]"
           >
-            Copy share link
+            <LinkIcon />
+            Share
           </button>
         </div>
       </div>
-      {saveMessage && <p className="mt-2 text-xs text-foreground/60">{saveMessage}</p>}
+      {saveMessage && (
+        <p className="mt-2 break-all text-xs text-[var(--foreground-muted)]">{saveMessage}</p>
+      )}
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_260px]">
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_280px]">
         <div className="flex flex-col gap-4">
           {mode === "canvas" ? (
             <>
@@ -269,8 +308,8 @@ export default function CircuitBuilder({
               />
 
               {selectedGate && (
-                <div className="flex flex-wrap items-center gap-3 rounded-md border border-black/10 px-4 py-3 text-sm dark:border-white/15">
-                  <span className="font-medium">
+                <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm shadow-[var(--shadow-sm)]">
+                  <span className="font-medium text-[var(--foreground)]">
                     {selectedGate.type} on qubit{selectedGate.qubits.length > 1 ? "s" : ""}{" "}
                     {selectedGate.qubits.join(", ")}
                   </span>
@@ -282,7 +321,7 @@ export default function CircuitBuilder({
                           updateGateAngle(c, selectedGateIndex!, Number(e.target.value))
                         )
                       }
-                      className="rounded-md border border-black/10 bg-transparent px-2 py-1 text-sm dark:border-white/15"
+                      className="rounded-lg border border-[var(--border)] bg-transparent px-2 py-1 text-sm text-[var(--foreground)]"
                     >
                       {ANGLE_PRESETS.map((p) => (
                         <option key={p.label} value={p.value}>
@@ -297,7 +336,7 @@ export default function CircuitBuilder({
                       setCircuit((c) => removeGate(c, selectedGateIndex!));
                       setSelectedGateIndex(null);
                     }}
-                    className="ml-auto rounded-md border border-red-500/30 px-3 py-1 text-xs font-medium text-red-600 dark:text-red-400"
+                    className="ml-auto rounded-lg border border-red-500/30 px-3 py-1 text-xs font-medium text-red-600 dark:text-red-400"
                   >
                     Remove gate
                   </button>
@@ -305,7 +344,7 @@ export default function CircuitBuilder({
               )}
 
               {circuit.gates.length === 0 && maxStep(circuit.gates) === -1 && (
-                <p className="text-xs text-foreground/40">
+                <p className="text-xs text-[var(--foreground-subtle)]">
                   Empty circuit — drag a gate from the palette onto a wire above.
                 </p>
               )}
@@ -316,7 +355,7 @@ export default function CircuitBuilder({
 
           {challengeResult && (
             <section
-              className={`rounded-lg border p-5 ${
+              className={`rounded-xl border p-5 shadow-[var(--shadow-sm)] ${
                 challengeResult.passed
                   ? "border-emerald-600/30 bg-emerald-600/5"
                   : "border-red-500/30 bg-red-500/5"
@@ -332,42 +371,39 @@ export default function CircuitBuilder({
                 {challengeResult.passed ? "✓ Passed" : "✗ Not quite yet"}
               </h2>
               {challengeResult.ai_feedback && (
-                <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/80">
+                <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--foreground)]/80">
                   {challengeResult.ai_feedback}
                 </p>
               )}
             </section>
           )}
 
-          <section className="rounded-lg border border-black/10 p-5 dark:border-white/10">
-            <h2 className="text-sm font-semibold">Results</h2>
+          <section className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)]">
+            <h2 className="text-sm font-semibold text-[var(--foreground)]">Results</h2>
             {runError && (
               <p className="mt-2 text-sm text-red-600 dark:text-red-400">{runError}</p>
             )}
             {!runError && !runResult && (
-              <p className="mt-2 text-sm text-foreground/50">
+              <p className="mt-2 text-sm text-[var(--foreground-muted)]">
                 Hit Run to simulate this circuit on Qiskit Aer.
               </p>
             )}
             {runResult && (
               <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                  <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-foreground/50">
+                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
                     Measurement probabilities
                   </h3>
                   <Histogram counts={runResult.counts} />
                 </div>
                 <div>
-                  <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-foreground/50">
-                    {runResult.bloch_vector ? "Bloch sphere" : "Statevector"}
+                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
+                    {runResult.bloch_vector ? "Bloch sphere" : "Q-sphere"}
                   </h3>
                   {runResult.bloch_vector ? (
                     <BlochSphere vector={runResult.bloch_vector} />
                   ) : (
-                    <AmplitudeList
-                      statevector={runResult.statevector}
-                      numQubits={circuit.num_qubits}
-                    />
+                    <QSphere statevector={runResult.statevector} numQubits={circuit.num_qubits} />
                   )}
                 </div>
               </div>
@@ -375,7 +411,7 @@ export default function CircuitBuilder({
           </section>
         </div>
 
-        <aside className="flex flex-col gap-6">
+        <aside className="flex flex-col gap-4">
           <div className="h-[420px]">
             <AgentChat
               title="Explain my circuit"
@@ -385,8 +421,8 @@ export default function CircuitBuilder({
             />
           </div>
 
-          <div>
-            <h2 className="text-sm font-semibold">My Circuits</h2>
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+            <h2 className="text-sm font-semibold text-[var(--foreground)]">My Circuits</h2>
             <div className="mt-3">
               <MyCircuits
                 refreshKey={refreshKey}

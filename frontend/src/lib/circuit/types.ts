@@ -29,20 +29,22 @@ export interface GateDef {
   numQubits: 1 | 2;
   hasAngle: boolean;
   description: string;
+  /** CSS custom property (defined in globals.css) used to color this gate's icon. */
+  colorVar: string;
 }
 
 export const GATE_DEFS: GateDef[] = [
-  { type: "H", label: "H", numQubits: 1, hasAngle: false, description: "Hadamard" },
-  { type: "X", label: "X", numQubits: 1, hasAngle: false, description: "Pauli-X (NOT)" },
-  { type: "Y", label: "Y", numQubits: 1, hasAngle: false, description: "Pauli-Y" },
-  { type: "Z", label: "Z", numQubits: 1, hasAngle: false, description: "Pauli-Z" },
-  { type: "S", label: "S", numQubits: 1, hasAngle: false, description: "S (phase)" },
-  { type: "T", label: "T", numQubits: 1, hasAngle: false, description: "T (π/8 phase)" },
-  { type: "RX", label: "RX", numQubits: 1, hasAngle: true, description: "Rotate X" },
-  { type: "RY", label: "RY", numQubits: 1, hasAngle: true, description: "Rotate Y" },
-  { type: "RZ", label: "RZ", numQubits: 1, hasAngle: true, description: "Rotate Z" },
-  { type: "CNOT", label: "CNOT", numQubits: 2, hasAngle: false, description: "Controlled-NOT" },
-  { type: "MEASURE", label: "M", numQubits: 1, hasAngle: false, description: "Measure" },
+  { type: "H", label: "H", numQubits: 1, hasAngle: false, description: "Hadamard", colorVar: "--gate-h" },
+  { type: "X", label: "X", numQubits: 1, hasAngle: false, description: "Pauli-X (NOT)", colorVar: "--gate-pauli" },
+  { type: "Y", label: "Y", numQubits: 1, hasAngle: false, description: "Pauli-Y", colorVar: "--gate-pauli" },
+  { type: "Z", label: "Z", numQubits: 1, hasAngle: false, description: "Pauli-Z", colorVar: "--gate-pauli" },
+  { type: "S", label: "S", numQubits: 1, hasAngle: false, description: "S (phase)", colorVar: "--gate-phase" },
+  { type: "T", label: "T", numQubits: 1, hasAngle: false, description: "T (π/8 phase)", colorVar: "--gate-phase" },
+  { type: "RX", label: "RX", numQubits: 1, hasAngle: true, description: "Rotate X", colorVar: "--gate-rotation" },
+  { type: "RY", label: "RY", numQubits: 1, hasAngle: true, description: "Rotate Y", colorVar: "--gate-rotation" },
+  { type: "RZ", label: "RZ", numQubits: 1, hasAngle: true, description: "Rotate Z", colorVar: "--gate-rotation" },
+  { type: "CNOT", label: "CNOT", numQubits: 2, hasAngle: false, description: "Controlled-NOT", colorVar: "--gate-two-qubit" },
+  { type: "MEASURE", label: "M", numQubits: 1, hasAngle: false, description: "Measure", colorVar: "--gate-measure" },
 ];
 
 export const ANGLE_PRESETS: { label: string; value: number }[] = [

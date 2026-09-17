@@ -1,6 +1,6 @@
 "use client";
 
-import type { CircuitJson, GateType } from "@/lib/circuit/types";
+import { gateDef, type CircuitJson, type GateType } from "@/lib/circuit/types";
 import { maxStep } from "@/lib/circuit/placement";
 
 const CELL_WIDTH = 64;
@@ -31,13 +31,13 @@ export default function CircuitCanvas({
     .filter(({ g }) => g.type === "CNOT");
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-black/10 dark:border-white/10">
+    <div className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface-2)] shadow-[var(--shadow-sm)]">
       <div className="flex">
-        <div className="shrink-0 border-r border-black/10 dark:border-white/10" style={{ width: LABEL_WIDTH }}>
+        <div className="shrink-0 border-r border-[var(--border)]" style={{ width: LABEL_WIDTH }}>
           {Array.from({ length: circuit.num_qubits }).map((_, q) => (
             <div
               key={q}
-              className="flex items-center justify-center text-xs font-mono text-foreground/50"
+              className="flex items-center justify-center text-xs font-mono font-medium text-[var(--foreground-muted)]"
               style={{ height: ROW_HEIGHT }}
             >
               q{q}
@@ -58,13 +58,13 @@ export default function CircuitCanvas({
                   if (gateType) onDropGate(q, gateType);
                 }}
                 onClick={() => onWireClick(q)}
-                className={`absolute left-0 right-0 cursor-pointer ${
+                className={`absolute left-0 right-0 cursor-pointer transition-colors ${
                   isPendingControl ? "bg-amber-500/10" : ""
                 }`}
                 style={{ top: q * ROW_HEIGHT, height: ROW_HEIGHT }}
               >
                 <div
-                  className="absolute left-0 right-0 h-px bg-foreground/20"
+                  className="absolute left-0 right-0 h-px bg-[var(--border-strong)]"
                   style={{ top: ROW_HEIGHT / 2 }}
                 />
               </div>
@@ -78,27 +78,14 @@ export default function CircuitCanvas({
               const yControl = control * ROW_HEIGHT + ROW_HEIGHT / 2;
               const yTarget = target * ROW_HEIGHT + ROW_HEIGHT / 2;
               const isSelected = selectedGateIndex === i;
+              const stroke = isSelected ? "var(--chart-series-1)" : "var(--gate-two-qubit)";
               return (
                 <g key={i}>
-                  <line
-                    x1={x}
-                    y1={yControl}
-                    x2={x}
-                    y2={yTarget}
-                    stroke={isSelected ? "var(--chart-series-1)" : "var(--chart-ink-primary)"}
-                    strokeWidth={2}
-                  />
-                  <circle cx={x} cy={yControl} r={6} fill={isSelected ? "var(--chart-series-1)" : "var(--chart-ink-primary)"} />
-                  <circle
-                    cx={x}
-                    cy={yTarget}
-                    r={11}
-                    fill="none"
-                    stroke={isSelected ? "var(--chart-series-1)" : "var(--chart-ink-primary)"}
-                    strokeWidth={2}
-                  />
-                  <line x1={x - 11} y1={yTarget} x2={x + 11} y2={yTarget} stroke={isSelected ? "var(--chart-series-1)" : "var(--chart-ink-primary)"} strokeWidth={2} />
-                  <line x1={x} y1={yTarget - 11} x2={x} y2={yTarget + 11} stroke={isSelected ? "var(--chart-series-1)" : "var(--chart-ink-primary)"} strokeWidth={2} />
+                  <line x1={x} y1={yControl} x2={x} y2={yTarget} stroke={stroke} strokeWidth={2} />
+                  <circle cx={x} cy={yControl} r={6} fill={stroke} />
+                  <circle cx={x} cy={yTarget} r={11} fill="none" stroke={stroke} strokeWidth={2} />
+                  <line x1={x - 11} y1={yTarget} x2={x + 11} y2={yTarget} stroke={stroke} strokeWidth={2} />
+                  <line x1={x} y1={yTarget - 11} x2={x} y2={yTarget + 11} stroke={stroke} strokeWidth={2} />
                 </g>
               );
             })}
@@ -127,8 +114,8 @@ export default function CircuitCanvas({
             }
 
             const q = gate.qubits[0];
-            const isMeasure = gate.type === "MEASURE";
             const isSelected = selectedGateIndex === i;
+            const colorVar = gateDef(gate.type).colorVar;
             const label =
               gate.angle !== undefined
                 ? `${gate.type}\n${Math.round((gate.angle * 180) / Math.PI)}°`
@@ -144,18 +131,17 @@ export default function CircuitCanvas({
                   e.stopPropagation();
                   onSelectGate(i);
                 }}
-                className={`absolute flex flex-col items-center justify-center whitespace-pre-line rounded-md border text-[11px] font-semibold leading-tight ${
-                  isSelected
-                    ? "border-[var(--chart-series-1)] bg-[var(--chart-series-1)]/15"
-                    : isMeasure
-                      ? "border-amber-500/50 bg-amber-500/10"
-                      : "border-black/15 bg-background dark:border-white/20"
-                }`}
+                className="absolute flex flex-col items-center justify-center whitespace-pre-line rounded-lg border text-[11px] font-semibold leading-tight shadow-[var(--shadow-sm)] transition-transform hover:scale-[1.04]"
                 style={{
                   left: gate.step * CELL_WIDTH + CELL_WIDTH / 2 - 20,
                   top: q * ROW_HEIGHT + ROW_HEIGHT / 2 - 18,
                   width: 40,
                   height: 36,
+                  color: `var(${colorVar})`,
+                  borderColor: isSelected ? "var(--chart-series-1)" : `var(${colorVar})`,
+                  backgroundColor: isSelected
+                    ? "color-mix(in srgb, var(--chart-series-1) 18%, var(--surface))"
+                    : `color-mix(in srgb, var(${colorVar}) 14%, var(--surface))`,
                 }}
               >
                 {label}

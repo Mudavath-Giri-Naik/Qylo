@@ -10,18 +10,18 @@ export default function CircuitChallenge({ challenge }: { challenge: Challenge }
   const [passed, setPassed] = useState(false);
 
   return (
-    <div className="rounded-lg border border-black/10 p-5 dark:border-white/10">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)]">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium uppercase tracking-wide text-foreground/50">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
           {challenge.difficulty} · circuit challenge
         </p>
         {passed && (
-          <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+          <span className="rounded-full bg-emerald-600/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
             ✓ Passed
           </span>
         )}
       </div>
-      <p className="mt-1 font-medium">{challenge.prompt}</p>
+      <p className="mt-1 font-medium text-[var(--foreground)]">{challenge.prompt}</p>
 
       <div className="mt-4">
         <CircuitBuilder

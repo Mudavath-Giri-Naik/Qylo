@@ -1,9 +1,29 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Toggle-driven dark mode: `dark:` classes activate off [data-theme="dark"]
+   on the root, not the OS preference -- the theme toggle is the only source
+   of truth. See src/components/ThemeToggle.tsx and the init script in
+   layout.tsx that stamps data-theme before first paint. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  --background: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --surface-hover: #ecedf1;
+  --foreground: #0f172a;
+  --foreground-muted: #5b6472;
+  --foreground-subtle: #8a91a0;
+  --border: rgba(15, 23, 42, 0.09);
+  --border-strong: rgba(15, 23, 42, 0.16);
+  --accent: #2a78d6;
+  --accent-foreground: #ffffff;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.08);
+
   --chart-surface: #fcfcfb;
   --chart-series-1: #2a78d6;
   --chart-ink-primary: #0b0b0b;
@@ -11,33 +31,64 @@
   --chart-ink-muted: #898781;
   --chart-grid: #e1e0d9;
   --chart-baseline: #c3c2b7;
+
+  /* Gate-family colors (used only for the gate palette icons). */
+  --gate-h: #2a78d6;
+  --gate-pauli: #e34948;
+  --gate-phase: #1baf7a;
+  --gate-rotation: #4a3aa7;
+  --gate-two-qubit: #0f172a;
+  --gate-measure: #eda100;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --background: #0a0d13;
+  --surface: #10141c;
+  --surface-2: #171c26;
+  --surface-hover: #1e2430;
+  --foreground: #eef1f6;
+  --foreground-muted: #99a2b3;
+  --foreground-subtle: #6b7383;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --accent: #4c93ec;
+  --accent-foreground: #051224;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  --chart-surface: #10141c;
+  --chart-series-1: #4c93ec;
+  --chart-ink-primary: #eef1f6;
+  --chart-ink-secondary: #99a2b3;
+  --chart-ink-muted: #6b7383;
+  --chart-grid: #232936;
+  --chart-baseline: #323a49;
+
+  --gate-h: #4c93ec;
+  --gate-pauli: #e66767;
+  --gate-phase: #199e70;
+  --gate-rotation: #9085e9;
+  --gate-two-qubit: #eef1f6;
+  --gate-measure: #c98500;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --chart-surface: #1a1a19;
-    --chart-series-1: #3987e5;
-    --chart-ink-primary: #ffffff;
-    --chart-ink-secondary: #c3c2b7;
-    --chart-ink-muted: #898781;
-    --chart-grid: #2c2c2a;
-    --chart-baseline: #383835;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
 :lang(hi) {
@@ -54,4 +105,18 @@ body {
 
 .prose-lesson :where(code):not(:where([class~="not-prose"] *)) {
   word-break: break-word;
+}
+
+/* Thin, unobtrusive scrollbars for densely-scrollable panels (chat, canvas). */
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.thin-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
 }

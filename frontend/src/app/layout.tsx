@@ -1,7 +1,19 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono, Noto_Sans_Devanagari, Noto_Sans_Telugu } from "next/font/google";
 import NavBar from "@/components/NavBar";
 import "./globals.css";
+
+// Runs before hydration so a returning dark-theme visitor never sees a flash
+// of the light theme. The default (no stored choice, or first visit) is
+// light -- set statically on <html> below -- regardless of OS preference.
+const THEME_INIT_SCRIPT = `
+try {
+  if (localStorage.getItem('qylo-theme') === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+} catch (e) {}
+`;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,9 +45,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      data-theme="light"
       className={`${geistSans.variable} ${geistMono.variable} ${notoDevanagari.variable} ${notoTelugu.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <head>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {THEME_INIT_SCRIPT}
+        </Script>
+      </head>
+      <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
         <NavBar />
         <div className="flex-1">{children}</div>
       </body>

@@ -24,17 +24,17 @@ export default function LanguageSwitcher({
   }
 
   return (
-    <div className="flex items-center gap-1 rounded-md border border-black/10 p-1 text-sm dark:border-white/15">
+    <div className="flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface)] p-1 text-sm shadow-[var(--shadow-sm)]">
       {SUPPORTED_LANGUAGES.map((option) => (
         <button
           key={option.code}
           type="button"
           onClick={() => handleChange(option.code)}
           aria-pressed={current === option.code}
-          className={`rounded px-2.5 py-1 transition-colors ${
+          className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
             current === option.code
-              ? "bg-foreground text-background"
-              : "text-foreground/60 hover:text-foreground"
+              ? "bg-[var(--accent)] text-[var(--accent-foreground)]"
+              : "text-[var(--foreground-muted)] hover:text-[var(--foreground)]"
           }`}
         >
           {option.label}

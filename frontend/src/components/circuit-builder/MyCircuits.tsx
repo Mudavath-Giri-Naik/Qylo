@@ -42,11 +42,11 @@ export default function MyCircuits({
   }, [refreshKey]);
 
   if (loading) {
-    return <p className="text-xs text-foreground/50">Loading...</p>;
+    return <p className="text-xs text-[var(--foreground-subtle)]">Loading...</p>;
   }
 
   if (circuits.length === 0) {
-    return <p className="text-xs text-foreground/50">No saved circuits yet.</p>;
+    return <p className="text-xs text-[var(--foreground-subtle)]">No saved circuits yet.</p>;
   }
 
   return (
@@ -56,14 +56,14 @@ export default function MyCircuits({
           <button
             type="button"
             onClick={() => onLoad(c.circuit_json)}
-            className="w-full rounded-md border border-black/10 px-3 py-2 text-left text-xs transition-colors hover:border-foreground/30 dark:border-white/10"
+            className="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-left text-xs transition-colors hover:border-[var(--accent)] hover:bg-[var(--surface-hover)]"
           >
-            <span className="font-medium">
+            <span className="font-medium text-[var(--foreground)]">
               {c.circuit_json.num_qubits} qubit{c.circuit_json.num_qubits === 1 ? "" : "s"} ·{" "}
               {c.circuit_json.gates.length} gate{c.circuit_json.gates.length === 1 ? "" : "s"}
             </span>
             <br />
-            <span className="text-foreground/50">
+            <span className="text-[var(--foreground-subtle)]">
               {new Date(c.created_at).toLocaleString()}
             </span>
           </button>
