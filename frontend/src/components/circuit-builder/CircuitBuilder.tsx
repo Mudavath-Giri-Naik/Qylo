@@ -19,6 +19,7 @@ import Histogram from "@/components/circuit-builder/Histogram";
 import BlochSphere from "@/components/circuit-builder/BlochSphere";
 import AmplitudeList from "@/components/circuit-builder/AmplitudeList";
 import MyCircuits from "@/components/circuit-builder/MyCircuits";
+import AgentChat from "@/components/agent/AgentChat";
 
 const DEFAULT_ANGLE = Math.PI / 2;
 
@@ -271,19 +272,30 @@ export default function CircuitBuilder() {
           </section>
         </div>
 
-        <aside>
-          <h2 className="text-sm font-semibold">My Circuits</h2>
-          <div className="mt-3">
-            <MyCircuits
-              refreshKey={refreshKey}
-              onLoad={(loaded) => {
-                setCircuit(loaded);
-                setRunResult(null);
-                setRunError(null);
-                resetInteractionState();
-                setMode("canvas");
-              }}
+        <aside className="flex flex-col gap-6">
+          <div className="h-[420px]">
+            <AgentChat
+              title="Explain my circuit"
+              getCircuit={() => circuit}
+              quickActionLabel="Explain my circuit"
+              placeholder="Ask about this circuit..."
             />
+          </div>
+
+          <div>
+            <h2 className="text-sm font-semibold">My Circuits</h2>
+            <div className="mt-3">
+              <MyCircuits
+                refreshKey={refreshKey}
+                onLoad={(loaded) => {
+                  setCircuit(loaded);
+                  setRunResult(null);
+                  setRunError(null);
+                  resetInteractionState();
+                  setMode("canvas");
+                }}
+              />
+            </div>
           </div>
         </aside>
       </div>

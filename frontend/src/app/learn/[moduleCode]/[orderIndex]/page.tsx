@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import LanguageSwitcher from "@/components/learn/LanguageSwitcher";
 import LessonMarkdown from "@/components/learn/LessonMarkdown";
 import MarkAsReadButton from "@/components/learn/MarkAsReadButton";
+import AgentChat from "@/components/agent/AgentChat";
 import { getLesson, getModuleLessons } from "@/lib/learn/queries";
 import { MODULES, isLessonLanguage, moduleTitle } from "@/lib/learn/modules";
 
@@ -36,7 +37,7 @@ export default async function LessonPage({
       : null;
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
+    <main className="mx-auto max-w-6xl px-6 py-12">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <Link
@@ -49,50 +50,62 @@ export default async function LessonPage({
         <LanguageSwitcher current={lang} />
       </div>
 
-      <article className="mt-6">
-        <h1 className="text-3xl font-semibold tracking-tight" lang={lesson.language}>
-          {lesson.title}
-        </h1>
-        <div className="mt-2 flex items-center gap-3 text-xs text-foreground/50">
-          <span className="uppercase tracking-wide">{lesson.difficulty}</span>
-          {lesson.isFallback && (
-            <span className="rounded-full border border-black/10 px-2 py-0.5 dark:border-white/15">
-              Not yet translated — showing English
-            </span>
-          )}
+      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
+        <div>
+          <article>
+            <h1 className="text-3xl font-semibold tracking-tight" lang={lesson.language}>
+              {lesson.title}
+            </h1>
+            <div className="mt-2 flex items-center gap-3 text-xs text-foreground/50">
+              <span className="uppercase tracking-wide">{lesson.difficulty}</span>
+              {lesson.isFallback && (
+                <span className="rounded-full border border-black/10 px-2 py-0.5 dark:border-white/15">
+                  Not yet translated — showing English
+                </span>
+              )}
+            </div>
+
+            <div className="mt-6" lang={lesson.language}>
+              <LessonMarkdown markdown={lesson.body_markdown} />
+            </div>
+
+            <div className="mt-8">
+              <MarkAsReadButton moduleCode={moduleCode} lessonId={lesson.id} />
+            </div>
+          </article>
+
+          <nav className="mt-10 flex items-center justify-between border-t border-black/10 pt-6 dark:border-white/10">
+            {prev ? (
+              <Link
+                href={`/learn/${moduleCode}/${prev.order_index}${langSuffix}`}
+                className="text-sm text-foreground/70 hover:text-foreground"
+              >
+                ← {prev.title}
+              </Link>
+            ) : (
+              <span />
+            )}
+            {next ? (
+              <Link
+                href={`/learn/${moduleCode}/${next.order_index}${langSuffix}`}
+                className="text-sm text-foreground/70 hover:text-foreground"
+              >
+                {next.title} →
+              </Link>
+            ) : (
+              <span />
+            )}
+          </nav>
         </div>
 
-        <div className="mt-6" lang={lesson.language}>
-          <LessonMarkdown markdown={lesson.body_markdown} />
+        <div className="lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)]">
+          <AgentChat
+            title="Ask the tutor"
+            moduleCode={moduleCode}
+            placeholder="Ask about this lesson..."
+          />
         </div>
-
-        <div className="mt-8">
-          <MarkAsReadButton moduleCode={moduleCode} lessonId={lesson.id} />
-        </div>
-      </article>
-
-      <nav className="mt-10 flex items-center justify-between border-t border-black/10 pt-6 dark:border-white/10">
-        {prev ? (
-          <Link
-            href={`/learn/${moduleCode}/${prev.order_index}${langSuffix}`}
-            className="text-sm text-foreground/70 hover:text-foreground"
-          >
-            ← {prev.title}
-          </Link>
-        ) : (
-          <span />
-        )}
-        {next ? (
-          <Link
-            href={`/learn/${moduleCode}/${next.order_index}${langSuffix}`}
-            className="text-sm text-foreground/70 hover:text-foreground"
-          >
-            {next.title} →
-          </Link>
-        ) : (
-          <span />
-        )}
-      </nav>
+      </div>
     </main>
   );
 }

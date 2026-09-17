@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import circuits
+from app.routers import agent, circuits
 
 app = FastAPI(title="Qylo API", version="0.1.0")
 
@@ -15,6 +15,7 @@ app.add_middleware(
 )
 
 app.include_router(circuits.router)
+app.include_router(agent.router)
 
 
 @app.get("/")
@@ -27,5 +28,4 @@ def health():
     return {"status": "ok"}
 
 
-# Phase 4: POST /tutor/ask -> LangGraph router (RAG / circuit-analysis / progress tools)
 # Phase 5: POST /challenges/{id}/submit -> auto-grading
