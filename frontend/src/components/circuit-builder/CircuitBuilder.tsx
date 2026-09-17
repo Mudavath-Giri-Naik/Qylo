@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { runCircuit, type RunResult } from "@/lib/circuit/api";
+import { submitChallenge } from "@/lib/challenges/api";
 import {
   maxStep,
   placeSingleQubitGate,
@@ -23,8 +24,19 @@ import AgentChat from "@/components/agent/AgentChat";
 
 const DEFAULT_ANGLE = Math.PI / 2;
 
-export default function CircuitBuilder() {
-  const [circuit, setCircuit] = useState<CircuitJson>(emptyCircuit(2));
+export interface CircuitChallengeContext {
+  id: string;
+  onResult?: (passed: boolean) => void;
+}
+
+export default function CircuitBuilder({
+  initialCircuit,
+  challenge,
+}: {
+  initialCircuit?: CircuitJson;
+  challenge?: CircuitChallengeContext;
+} = {}) {
+  const [circuit, setCircuit] = useState<CircuitJson>(initialCircuit ?? emptyCircuit(2));
   const [mode, setMode] = useState<"canvas" | "code">("canvas");
   const [pendingCnotControl, setPendingCnotControl] = useState<number | null>(null);
   const [selectedGateIndex, setSelectedGateIndex] = useState<number | null>(null);
@@ -35,7 +47,14 @@ export default function CircuitBuilder() {
 
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [savedCircuitId, setSavedCircuitId] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const [submittingChallenge, setSubmittingChallenge] = useState(false);
+  const [challengeResult, setChallengeResult] = useState<{
+    passed: boolean;
+    ai_feedback: string | null;
+  } | null>(null);
 
   function resetInteractionState() {
     setPendingCnotControl(null);
@@ -89,7 +108,7 @@ export default function CircuitBuilder() {
     }
   }
 
-  async function handleSave() {
+  async function handleSave(): Promise<string | null> {
     setSaving(true);
     setSaveMessage(null);
     const supabase = createClient();
@@ -99,34 +118,76 @@ export default function CircuitBuilder() {
     if (!user) {
       setSaveMessage("You must be logged in to save.");
       setSaving(false);
-      return;
+      return null;
     }
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("circuits")
-      .insert({ user_id: user.id, circuit_json: circuit as unknown as Record<string, unknown> });
+      .insert({ user_id: user.id, circuit_json: circuit as unknown as Record<string, unknown> })
+      .select("id")
+      .single();
     setSaving(false);
-    if (error) {
-      setSaveMessage(error.message);
-    } else {
-      setSaveMessage("Saved.");
-      setRefreshKey((k) => k + 1);
+    if (error || !data) {
+      setSaveMessage(error?.message ?? "Save failed.");
+      return null;
+    }
+    setSaveMessage("Saved.");
+    setSavedCircuitId(data.id);
+    setRefreshKey((k) => k + 1);
+    return data.id;
+  }
+
+  async function handleCopyShareLink() {
+    const id = savedCircuitId ?? (await handleSave());
+    if (!id) return;
+    const url = `${window.location.origin}/circuit/${id}/view`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setSaveMessage("Share link copied to clipboard.");
+    } catch {
+      setSaveMessage(url);
+    }
+  }
+
+  async function handleSubmitChallenge() {
+    if (!challenge) return;
+    setSubmittingChallenge(true);
+    setChallengeResult(null);
+    try {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("You must be logged in.");
+
+      const res = await submitChallenge(challenge.id, { userId: user.id, circuit });
+      setChallengeResult({ passed: res.passed, ai_feedback: res.ai_feedback });
+      challenge.onResult?.(res.passed);
+    } catch (err) {
+      setChallengeResult({
+        passed: false,
+        ai_feedback: err instanceof Error ? err.message : "Submission failed.",
+      });
+    } finally {
+      setSubmittingChallenge(false);
     }
   }
 
   const selectedGate = selectedGateIndex !== null ? circuit.gates[selectedGateIndex] : null;
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8">
+    <div className={challenge ? "" : "mx-auto max-w-6xl px-6 py-8"}>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Circuit Builder</h1>
-          <p className="mt-1 text-sm text-foreground/60">
-            Drag gates onto qubit wires, or switch to code. Runs on a real Qiskit Aer
-            simulator.
-          </p>
-        </div>
+        {!challenge && (
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Circuit Builder</h1>
+            <p className="mt-1 text-sm text-foreground/60">
+              Drag gates onto qubit wires, or switch to code. Runs on a real Qiskit Aer
+              simulator.
+            </p>
+          </div>
+        )}
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <label className="flex items-center gap-2 text-sm">
             Qubits
             <input
@@ -164,6 +225,16 @@ export default function CircuitBuilder() {
           >
             {running ? "Running..." : "Run"}
           </button>
+          {challenge && (
+            <button
+              type="button"
+              onClick={handleSubmitChallenge}
+              disabled={submittingChallenge}
+              className="rounded-md bg-emerald-600 px-4 py-1.5 text-sm font-medium text-white disabled:opacity-60"
+            >
+              {submittingChallenge ? "Grading..." : "Submit"}
+            </button>
+          )}
           <button
             type="button"
             onClick={handleSave}
@@ -171,6 +242,13 @@ export default function CircuitBuilder() {
             className="rounded-md border border-black/10 px-4 py-1.5 text-sm font-medium disabled:opacity-60 dark:border-white/15"
           >
             {saving ? "Saving..." : "Save"}
+          </button>
+          <button
+            type="button"
+            onClick={handleCopyShareLink}
+            className="rounded-md border border-black/10 px-4 py-1.5 text-sm font-medium dark:border-white/15"
+          >
+            Copy share link
           </button>
         </div>
       </div>
@@ -234,6 +312,31 @@ export default function CircuitBuilder() {
             </>
           ) : (
             <CodeView circuit={circuit} onApplyCircuit={handleApplyCircuit} />
+          )}
+
+          {challengeResult && (
+            <section
+              className={`rounded-lg border p-5 ${
+                challengeResult.passed
+                  ? "border-emerald-600/30 bg-emerald-600/5"
+                  : "border-red-500/30 bg-red-500/5"
+              }`}
+            >
+              <h2
+                className={`text-sm font-semibold ${
+                  challengeResult.passed
+                    ? "text-emerald-700 dark:text-emerald-400"
+                    : "text-red-700 dark:text-red-400"
+                }`}
+              >
+                {challengeResult.passed ? "✓ Passed" : "✗ Not quite yet"}
+              </h2>
+              {challengeResult.ai_feedback && (
+                <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/80">
+                  {challengeResult.ai_feedback}
+                </p>
+              )}
+            </section>
           )}
 
           <section className="rounded-lg border border-black/10 p-5 dark:border-white/10">

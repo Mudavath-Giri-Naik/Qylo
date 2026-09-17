@@ -35,18 +35,21 @@ export interface Database {
           id: string;
           instructor_id: string;
           name: string;
+          join_code: string | null;
           created_at: string;
         };
         Insert: {
           id?: string;
           instructor_id: string;
           name: string;
+          join_code?: string | null;
           created_at?: string;
         };
         Update: {
           id?: string;
           instructor_id?: string;
           name?: string;
+          join_code?: string | null;
           created_at?: string;
         };
         Relationships: [];
