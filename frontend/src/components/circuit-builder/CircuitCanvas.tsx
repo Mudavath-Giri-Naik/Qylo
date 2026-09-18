@@ -1,5 +1,6 @@
 "use client";
 
+import { useLayoutEffect, useRef, useState } from "react";
 import { gateDef, type CircuitJson, type GateType } from "@/lib/circuit/types";
 import { maxStep } from "@/lib/circuit/placement";
 import type { PendingControl } from "@/components/circuit-builder/GatePalette";
@@ -8,7 +9,8 @@ import { makeTranslator, type Translate } from "@/lib/i18n/composer";
 const defaultT = makeTranslator("en");
 
 const CELL_WIDTH = 60;
-const ROW_HEIGHT = 46;
+const MIN_ROW_HEIGHT = 46;
+const MAX_ROW_HEIGHT = 84;
 const LABEL_WIDTH = 40;
 const MIN_COLUMNS = 6;
 
@@ -41,10 +43,31 @@ export default function CircuitCanvas({
   inspect?: boolean;
   t?: Translate;
 }) {
+  // The wire rows fill whatever vertical space the panel actually has,
+  // rather than a fixed height that either overflows (scrollbars) or leaves
+  // a gap underneath. Measured via ResizeObserver on the outer frame, since
+  // gate/connector positions need a real pixel value, not just CSS flex.
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [frameHeight, setFrameHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const el = frameRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      setFrameHeight(entries[0].contentRect.height);
+    });
+    observer.observe(el);
+    setFrameHeight(el.getBoundingClientRect().height);
+    return () => observer.disconnect();
+  }, []);
+
+  const rows = circuit.num_qubits + 1; // +1 for the classical register row
+  const rowHeight = Math.min(MAX_ROW_HEIGHT, Math.max(MIN_ROW_HEIGHT, Math.floor(frameHeight / rows)));
+
   const columns = Math.max(MIN_COLUMNS, maxStep(circuit.gates) + 3);
   const width = columns * CELL_WIDTH;
-  const wiresHeight = circuit.num_qubits * ROW_HEIGHT;
-  const height = wiresHeight + ROW_HEIGHT;
+  const wiresHeight = circuit.num_qubits * rowHeight;
+  const height = Math.max(frameHeight, wiresHeight + rowHeight);
 
   const twoQubitGates = circuit.gates
     .map((g, i) => ({ g, i }))
@@ -54,21 +77,24 @@ export default function CircuitCanvas({
     .filter(({ g }) => g.type === "MEASURE");
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--composer-panel-2)] shadow-[var(--shadow-sm)]">
+    <div
+      ref={frameRef}
+      className="h-full overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--composer-panel-2)] shadow-[var(--shadow-sm)]"
+    >
       <div className="flex">
         <div className="shrink-0 border-r border-[var(--border)]" style={{ width: LABEL_WIDTH }}>
           {Array.from({ length: circuit.num_qubits }).map((_, q) => (
             <div
               key={q}
               className="flex items-center justify-center text-xs font-mono font-medium text-[var(--composer-wire-label)]"
-              style={{ height: ROW_HEIGHT }}
+              style={{ height: rowHeight }}
             >
               q[{q}]
             </div>
           ))}
           <div
             className="flex items-center justify-center text-xs font-mono font-medium text-[var(--composer-wire-label)]"
-            style={{ height: ROW_HEIGHT }}
+            style={{ height: rowHeight }}
           >
             c{circuit.num_qubits}
           </div>
@@ -90,11 +116,11 @@ export default function CircuitCanvas({
                 className={`absolute left-0 right-0 cursor-pointer transition-colors ${
                   isPendingControl ? "bg-amber-500/10" : ""
                 }`}
-                style={{ top: q * ROW_HEIGHT, height: ROW_HEIGHT }}
+                style={{ top: q * rowHeight, height: rowHeight }}
               >
                 <div
                   className="absolute left-0 right-0 h-px bg-[var(--composer-wire)]"
-                  style={{ top: ROW_HEIGHT / 2 }}
+                  style={{ top: rowHeight / 2 }}
                 />
                 {onRemoveQubit && (
                   <button
@@ -107,7 +133,7 @@ export default function CircuitCanvas({
                       onRemoveQubit();
                     }}
                     className="absolute flex h-5 w-5 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--foreground-muted)] transition-colors hover:border-red-500/50 hover:text-red-500 disabled:pointer-events-none disabled:opacity-30"
-                    style={{ right: 6, top: ROW_HEIGHT / 2 - 10 }}
+                    style={{ right: 6, top: rowHeight / 2 - 10 }}
                   >
                     <MinusIcon />
                   </button>
@@ -117,11 +143,11 @@ export default function CircuitCanvas({
           })}
 
           {/* Classical register row */}
-          <div className="absolute left-0 right-0" style={{ top: wiresHeight, height: ROW_HEIGHT }}>
+          <div className="absolute left-0 right-0" style={{ top: wiresHeight, height: rowHeight }}>
             <div
               className="absolute left-0 right-0 h-[3px]"
               style={{
-                top: ROW_HEIGHT / 2 - 2,
+                top: rowHeight / 2 - 2,
                 background:
                   "repeating-linear-gradient(to bottom, var(--composer-wire) 0, var(--composer-wire) 2px, transparent 2px, transparent 5px)",
               }}
@@ -135,7 +161,7 @@ export default function CircuitCanvas({
                   className="absolute -translate-x-1/2 font-mono text-[10px] font-semibold"
                   style={{
                     left: x,
-                    top: ROW_HEIGHT / 2 - 8,
+                    top: rowHeight / 2 - 8,
                     color: isSelected ? "var(--chart-series-1)" : "var(--gate-measure-solid-fg)",
                   }}
                 >
@@ -149,8 +175,8 @@ export default function CircuitCanvas({
             {twoQubitGates.map(({ g, i }) => {
               const [control, target] = g.qubits;
               const x = g.step * CELL_WIDTH + CELL_WIDTH / 2;
-              const yControl = control * ROW_HEIGHT + ROW_HEIGHT / 2;
-              const yTarget = target * ROW_HEIGHT + ROW_HEIGHT / 2;
+              const yControl = control * rowHeight + rowHeight / 2;
+              const yTarget = target * rowHeight + rowHeight / 2;
               const isSelected = selectedGateIndex === i;
               const stroke = isSelected ? "var(--chart-series-1)" : "var(--gate-x-solid)";
               return (
@@ -178,11 +204,11 @@ export default function CircuitCanvas({
             })}
             {measureGates.map(({ g, i }) => {
               const x = g.step * CELL_WIDTH + CELL_WIDTH / 2;
-              const y = g.qubits[0] * ROW_HEIGHT + ROW_HEIGHT / 2;
+              const y = g.qubits[0] * rowHeight + rowHeight / 2;
               const isSelected = selectedGateIndex === i;
               const stroke = isSelected ? "var(--chart-series-1)" : "var(--composer-wire)";
               return (
-                <line key={i} x1={x} y1={y} x2={x} y2={wiresHeight + ROW_HEIGHT / 2} stroke={stroke} strokeWidth={1.5} strokeDasharray="2 3" />
+                <line key={i} x1={x} y1={y} x2={x} y2={wiresHeight + rowHeight / 2} stroke={stroke} strokeWidth={1.5} strokeDasharray="2 3" />
               );
             })}
           </svg>
@@ -202,7 +228,7 @@ export default function CircuitCanvas({
                   className="absolute"
                   style={{
                     left: gate.step * CELL_WIDTH + CELL_WIDTH / 2 - 14,
-                    top: Math.min(gate.qubits[0], gate.qubits[1]) * ROW_HEIGHT + ROW_HEIGHT / 2 - 14,
+                    top: Math.min(gate.qubits[0], gate.qubits[1]) * rowHeight + rowHeight / 2 - 14,
                     width: 28,
                     height: 28,
                   }}
@@ -232,7 +258,7 @@ export default function CircuitCanvas({
                 className="absolute flex flex-col items-center justify-center whitespace-pre-line rounded-md text-[11px] font-semibold leading-tight shadow-[var(--shadow-sm)] transition-transform hover:scale-[1.04]"
                 style={{
                   left: gate.step * CELL_WIDTH + CELL_WIDTH / 2 - 20,
-                  top: q * ROW_HEIGHT + ROW_HEIGHT / 2 - 18,
+                  top: q * rowHeight + rowHeight / 2 - 18,
                   width: 40,
                   height: 36,
                   color: def.solidFg === "light" ? "#ffffff" : "var(--gate-measure-solid-fg)",
