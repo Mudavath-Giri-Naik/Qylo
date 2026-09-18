@@ -50,6 +50,32 @@ function computePoints(statevector: [number, number][], numQubits: number): QSph
   return points.sort((a, b) => b.probability - a.probability);
 }
 
+/** Self-contained: the outer box is bigger than the ring so the four edge
+ * labels (π/2, 0, 3π/2, π) sit fully inside its own bounds instead of
+ * overflowing past it -- safe to drop anywhere, including a corner next to
+ * an overflow-hidden panel edge, without any label getting clipped. */
+function PhaseWheel({ t }: { t: Translate }) {
+  return (
+    <div className="relative h-16 w-16 shrink-0">
+      <div
+        className="absolute left-1/2 top-1/2 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{
+          background: "conic-gradient(from 90deg, hsl(0,72%,52%), hsl(90,72%,52%), hsl(180,72%,52%), hsl(270,72%,52%), hsl(360,72%,52%))",
+        }}
+      >
+        <div className="absolute inset-[4px] rounded-full bg-[var(--surface)]" />
+        <span className="absolute inset-0 flex items-center justify-center text-[7px] font-medium text-[var(--foreground-muted)]">
+          {t("phaseAngle").split(" ")[0]}
+        </span>
+      </div>
+      <span className="absolute left-1/2 top-0 -translate-x-1/2 text-[8px] text-[var(--foreground-subtle)]">π/2</span>
+      <span className="absolute right-0 top-1/2 -translate-y-1/2 text-[8px] text-[var(--foreground-subtle)]">0</span>
+      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-[var(--foreground-subtle)]">3π/2</span>
+      <span className="absolute left-0 top-1/2 -translate-y-1/2 text-[8px] text-[var(--foreground-subtle)]">π</span>
+    </div>
+  );
+}
+
 export default function QSphere({
   statevector,
   numQubits,
@@ -84,7 +110,10 @@ export default function QSphere({
 
   return (
     <div className="flex h-full w-full flex-col items-center gap-2">
-      <div className="flex min-h-0 w-full flex-1 items-center justify-center">
+      {/* Sphere fills the panel; Labels and the phase wheel float in the
+          top-right / bottom-right corners as overlays, out of the sphere's
+          way, so neither competes with it for layout space. */}
+      <div className="relative flex min-h-0 w-full flex-1 items-center justify-center">
         <div className="aspect-square h-full max-h-[320px] max-w-full">
           <svg viewBox={`0 0 ${size} ${size}`} className="h-full w-full" role="img" aria-label="Q-sphere">
             <circle cx={cx} cy={cy} r={R} fill="var(--chart-series-1)" fillOpacity={0.05} stroke="var(--chart-baseline)" strokeWidth={1} />
@@ -128,41 +157,26 @@ export default function QSphere({
             <circle cx={cx} cy={cy} r={2} fill="var(--chart-ink-muted)" />
           </svg>
         </div>
-      </div>
 
-      <div className="flex w-full max-w-[320px] shrink-0 items-end justify-between gap-3 px-1">
-        <div
-          className="relative h-12 w-12 shrink-0 rounded-full"
-          style={{
-            background:
-              "conic-gradient(from 90deg, hsl(0,72%,52%), hsl(90,72%,52%), hsl(180,72%,52%), hsl(270,72%,52%), hsl(360,72%,52%))",
-          }}
-        >
-          <div className="absolute inset-[4px] rounded-full bg-[var(--surface)]" />
-          <span className="absolute left-1/2 top-[-12px] -translate-x-1/2 text-[8px] text-[var(--foreground-subtle)]">π/2</span>
-          <span className="absolute right-[-14px] top-1/2 -translate-y-1/2 text-[8px] text-[var(--foreground-subtle)]">0</span>
-          <span className="absolute left-1/2 bottom-[-12px] -translate-x-1/2 text-[8px] text-[var(--foreground-subtle)]">3π/2</span>
-          <span className="absolute left-[-14px] top-1/2 -translate-y-1/2 text-[8px] text-[var(--foreground-subtle)]">π</span>
-          <span className="absolute inset-0 flex items-center justify-center text-[7px] font-medium text-[var(--foreground-muted)]">
-            {t("phaseAngle").split(" ")[0]}
-          </span>
-        </div>
-
-        <div className="flex shrink-0 flex-col items-start gap-1 text-right text-[10px] text-[var(--foreground-muted)]">
+        <div className="absolute right-1 top-1 z-10 flex flex-col items-end gap-1 text-right text-[10px] text-[var(--foreground-muted)]">
           <span className="font-semibold text-[var(--foreground-subtle)]">{t("labels")}</span>
           <label className="flex items-center gap-1.5 whitespace-nowrap">
-            <input type="checkbox" checked={showState} onChange={(e) => setShowState(e.target.checked)} className="accent-[var(--accent)]" />
             {t("state")}
+            <input type="checkbox" checked={showState} onChange={(e) => setShowState(e.target.checked)} className="accent-[var(--accent)]" />
           </label>
           <label className="flex items-center gap-1.5 whitespace-nowrap">
-            <input type="checkbox" checked={showPhase} onChange={(e) => setShowPhase(e.target.checked)} className="accent-[var(--accent)]" />
             {t("phaseAngle")}
+            <input type="checkbox" checked={showPhase} onChange={(e) => setShowPhase(e.target.checked)} className="accent-[var(--accent)]" />
           </label>
+        </div>
+
+        <div className="absolute bottom-1 right-1 z-10">
+          <PhaseWheel t={t} />
         </div>
       </div>
 
       {!compact && (
-        <div className="flex w-full flex-col gap-1.5">
+        <div className="flex w-full shrink-0 flex-col gap-1.5">
           {points.slice(0, 8).map((p) => (
             <div key={p.bitstring} className="flex items-center gap-2 text-xs">
               <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: phaseColor(p.phaseDeg) }} />
