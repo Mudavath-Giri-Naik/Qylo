@@ -74,7 +74,7 @@ export default function CircuitCanvas({
           </div>
         </div>
 
-        <div className="relative" style={{ width, minWidth: "100%", height }}>
+        <div className="relative flex-1" style={{ minWidth: width, height }}>
           {Array.from({ length: circuit.num_qubits }).map((_, q) => {
             const isPendingControl = pendingControl?.qubit === q;
             return (
