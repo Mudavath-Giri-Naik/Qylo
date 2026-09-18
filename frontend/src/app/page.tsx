@@ -86,10 +86,10 @@ export default function Home() {
           />
 
           {/* eslint-disable @next/next/no-img-element -- decorative, local SVGs with spaces in their filenames; next/image blocks local SVGs by default */}
-          <img src="/Connected%20world-rafiki.svg" alt="" aria-hidden width={145} height={145} className="pointer-events-none absolute right-[3%] top-20 hidden opacity-90 sm:block" />
-          <img src="/Research%20paper-rafiki.svg" alt="" aria-hidden width={105} height={105} className="pointer-events-none absolute right-[6%] top-[360px] hidden opacity-90 md:block" />
-          <img src="/Team-rafiki.svg" alt="" aria-hidden width={105} height={105} className="pointer-events-none absolute left-[6%] top-[360px] hidden opacity-90 md:block" />
-          <img src="/Online%20learning-rafiki.svg" alt="" aria-hidden width={105} height={105} className="pointer-events-none absolute left-[3%] top-[132px] hidden opacity-90 lg:block" />
+          <img src="/Connected%20world-rafiki.svg" alt="" aria-hidden width={145} height={145} className="animate-float pointer-events-none absolute right-[3%] top-20 hidden opacity-90 sm:block" style={{ animationDelay: "0s" }} />
+          <img src="/Research%20paper-rafiki.svg" alt="" aria-hidden width={105} height={105} className="animate-float pointer-events-none absolute right-[12%] top-[360px] hidden opacity-90 md:block" style={{ animationDelay: "1.5s" }} />
+          <img src="/Team-rafiki.svg" alt="" aria-hidden width={105} height={105} className="animate-float pointer-events-none absolute left-[12%] top-[360px] hidden opacity-90 md:block" style={{ animationDelay: "3s" }} />
+          <img src="/Online%20learning-rafiki.svg" alt="" aria-hidden width={105} height={105} className="animate-float pointer-events-none absolute left-[3%] top-[132px] hidden opacity-90 lg:block" style={{ animationDelay: "4.5s" }} />
           {/* eslint-enable @next/next/no-img-element */}
 
           <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 pb-20 pt-20 text-center">
