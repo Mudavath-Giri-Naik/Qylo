@@ -45,7 +45,7 @@ export default async function DashboardPage() {
       <div className="mt-3 grid min-h-0 flex-1 grid-rows-[4fr_6fr_3fr] gap-3">
         {/* Row 1 */}
         <div className="grid min-h-0 grid-cols-1 gap-3 lg:grid-cols-4">
-          <Card className="relative min-h-0 overflow-hidden p-5 lg:col-span-2">
+          <Card className="relative min-h-0 gap-0 overflow-hidden p-5 lg:col-span-2">
             <div className="absolute right-2 top-1/2 h-[85%] w-[38%] -translate-y-1/2 opacity-80 max-lg:hidden">
               <AtomIllustration />
             </div>
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
             </div>
           </Card>
 
-          <Card className="min-h-0 overflow-hidden p-4">
+          <Card className="min-h-0 gap-0 overflow-hidden p-4">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-[var(--foreground)]">Current Learning Path</h3>
               <Link href="/learn" className="text-[11px] font-semibold text-[var(--accent)] hover:underline">
@@ -121,7 +121,7 @@ export default async function DashboardPage() {
           </Card>
 
           <Card
-            className="min-h-0 overflow-hidden p-4"
+            className="min-h-0 gap-0 overflow-hidden p-4"
             style={{ background: "color-mix(in srgb, var(--marketing-green) 10%, var(--surface))" }}
           >
             <div className="flex items-center justify-between">
@@ -161,7 +161,7 @@ export default async function DashboardPage() {
 
         {/* Row 2 */}
         <div className="grid min-h-0 grid-cols-1 gap-3 lg:grid-cols-3">
-          <Card className="min-h-0 overflow-hidden p-3.5">
+          <Card className="min-h-0 gap-0 overflow-hidden p-3.5">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-[var(--foreground)]">Overall Learning Progress</h3>
               <Link href="/my-progress" className="text-[11px] font-semibold text-[var(--accent)] hover:underline">
@@ -178,7 +178,10 @@ export default async function DashboardPage() {
               )}
             </div>
             <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
-              <div className="h-full rounded-full bg-indigo-500" style={{ width: `${overview.overallPercent}%` }} />
+              <div
+                className="h-full rounded-full bg-indigo-500"
+                style={{ width: `${Math.max(overview.overallPercent, 4)}%` }}
+              />
             </div>
             <p className="mt-1 text-[11px] text-[var(--foreground-muted)]">You&apos;re doing great! Keep going.</p>
 
@@ -222,7 +225,7 @@ export default async function DashboardPage() {
             </div>
           </Card>
 
-          <Card className="min-h-0 overflow-hidden p-4">
+          <Card className="min-h-0 gap-0 overflow-hidden p-4">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-[var(--foreground)]">Recent Activity</h3>
               <Link href="/my-progress" className="text-[11px] font-semibold text-[var(--accent)] hover:underline">
@@ -259,7 +262,7 @@ export default async function DashboardPage() {
             </ul>
           </Card>
 
-          <Card className="min-h-0 overflow-hidden p-4">
+          <Card className="min-h-0 gap-0 overflow-hidden p-4">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-[var(--foreground)]">Community Leaderboard</h3>
               <Link href="/leaderboard" className="text-[11px] font-semibold text-[var(--accent)] hover:underline">
@@ -298,7 +301,7 @@ export default async function DashboardPage() {
 
         {/* Row 3 */}
         <div className="grid min-h-0 grid-cols-1 gap-3 lg:grid-cols-3">
-          <Card className="min-h-0 overflow-hidden p-4">
+          <Card className="min-h-0 gap-0 overflow-hidden p-4">
             <h3 className="text-xs font-bold text-[var(--foreground)]">Weekly Learning Streak</h3>
             <p className="mt-1.5 text-xl font-bold text-[var(--foreground)]">
               {overview.streakDays} day{overview.streakDays === 1 ? "" : "s"}
@@ -320,7 +323,7 @@ export default async function DashboardPage() {
             </div>
           </Card>
 
-          <Card className="min-h-0 overflow-hidden p-4">
+          <Card className="min-h-0 gap-0 overflow-hidden p-4">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-[var(--foreground)]">Challenges</h3>
               <Link href="/challenges" className="text-[11px] font-semibold text-[var(--accent)] hover:underline">
@@ -339,7 +342,7 @@ export default async function DashboardPage() {
             </div>
           </Card>
 
-          <Card className="min-h-0 overflow-hidden p-4">
+          <Card className="min-h-0 gap-0 overflow-hidden p-4">
             <h3 className="text-xs font-bold text-[var(--foreground)]">Explore Next</h3>
             <Link
               href={overview.nextSuggestion ? `/learn/${overview.nextSuggestion.moduleCode}` : "/challenges"}
