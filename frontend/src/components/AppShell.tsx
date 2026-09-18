@@ -21,10 +21,11 @@ export default function AppShell({
 }) {
   const pathname = usePathname();
 
-  // The Circuit Builder page renders its own IBM Composer-style app bar
-  // (hamburger, nav drawer, everything) and needs the full viewport for
-  // its no-scroll layout, so it opts out of the sidebar shell entirely.
-  if (pathname === "/circuit-builder") {
+  // The Circuit Builder page renders its own IBM Composer-style app bar and
+  // needs the full viewport for its no-scroll layout; the homepage is a
+  // marketing/landing page with its own horizontal navbar, not an app
+  // screen. Both opt out of the admin-style sidebar shell entirely.
+  if (pathname === "/circuit-builder" || pathname === "/") {
     return <div className="flex-1">{children}</div>;
   }
 

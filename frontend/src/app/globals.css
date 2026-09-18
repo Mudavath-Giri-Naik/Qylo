@@ -63,6 +63,18 @@
   --code-comment: #8a91a0;
   --code-punct: #8a91a0;
 
+  /* Marketing palette (landing page bento cards, tag pills, marquee) --
+     bright, solid, editorial-style colors distinct from the app's own
+     functional surface tokens above. Blue reuses the brand --accent. */
+  --marketing-bg: #f2f1f8;
+  --marketing-green: #2fb67c;
+  --marketing-green-fg: #f4fff9;
+  --marketing-yellow: #f6c343;
+  --marketing-yellow-fg: #1a1500;
+  --marketing-pink: #f3a8d6;
+  --marketing-pink-fg: #3a0f28;
+  --marketing-ink: #0f1115;
+
   /* shadcn/ui semantic tokens, mapped onto the tokens above rather than
      shadcn's own defaults, so old and new components stay visually
      consistent and dark mode is derived, not duplicated. */
@@ -142,6 +154,15 @@
   --code-comment: #6b7383;
   --code-punct: #6b7383;
 
+  --marketing-bg: #14161d;
+  --marketing-green: #2fb67c;
+  --marketing-green-fg: #f4fff9;
+  --marketing-yellow: #f6c343;
+  --marketing-yellow-fg: #1a1500;
+  --marketing-pink: #d383b0;
+  --marketing-pink-fg: #2a0a1c;
+  --marketing-ink: #eef1f6;
+
   --destructive: #e8636a;
   --destructive-foreground: #1a0a0b;
 
@@ -207,7 +228,22 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
 }
 
 body {
