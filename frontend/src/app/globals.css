@@ -1,10 +1,20 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 @plugin "@tailwindcss/typography";
 
 /* Toggle-driven dark mode: `dark:` classes activate off [data-theme="dark"]
    on the root, not the OS preference -- the theme toggle is the only source
    of truth. See src/components/ThemeToggle.tsx and the init script in
-   layout.tsx that stamps data-theme before first paint. */
+   layout.tsx that stamps data-theme before first paint.
+
+   shadcn/ui's own convention is a `.dark` class via next-themes; since
+   Tailwind's `dark:` variant is one global rule, shadcn's own components
+   pick up this same data-theme mechanism automatically without needing
+   next-themes at all. Everything shadcn-flavored below (--primary, --card,
+   --sidebar-*, etc.) is deliberately tied back to the existing --surface /
+   --foreground / --accent tokens so dark mode "just works" for it too,
+   instead of shipping a second, parallel color system. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root {
@@ -52,6 +62,40 @@
   --code-call: #2a78d6;
   --code-comment: #8a91a0;
   --code-punct: #8a91a0;
+
+  /* shadcn/ui semantic tokens, mapped onto the tokens above rather than
+     shadcn's own defaults, so old and new components stay visually
+     consistent and dark mode is derived, not duplicated. */
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-foreground);
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--foreground-muted);
+  --destructive: #d33a3a;
+  --destructive-foreground: #ffffff;
+  --input: var(--border);
+  --ring: var(--accent);
+  --radius: 0.625rem;
+
+  --chart-1: #2a78d6;
+  --chart-2: #1baf7a;
+  --chart-3: #9c3f83;
+  --chart-4: #e0a233;
+  --chart-5: #d3455c;
+
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--accent-foreground);
+  --sidebar-accent: var(--surface-hover);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--accent);
 }
 
 :root[data-theme="dark"] {
@@ -97,6 +141,15 @@
   --code-call: #6fa8f5;
   --code-comment: #6b7383;
   --code-punct: #6b7383;
+
+  --destructive: #e8636a;
+  --destructive-foreground: #1a0a0b;
+
+  --chart-1: #4c93ec;
+  --chart-2: #3fcf9a;
+  --chart-3: #c15fac;
+  --chart-4: #f0bb5e;
+  --chart-5: #ec6b81;
 }
 
 @theme inline {
@@ -108,26 +161,59 @@
   --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
-
-/* Tailwind's preflight resets native buttons to cursor: default -- restore
-   the hand cursor on every clickable button site-wide. */
-button:not(:disabled) {
-  cursor: pointer;
-}
-
-.tok-keyword { color: var(--code-keyword); font-weight: 600; }
-.tok-string { color: var(--code-string); }
-.tok-number { color: var(--code-number); }
-.tok-call { color: var(--code-call); }
-.tok-comment { color: var(--code-comment); font-style: italic; }
-.tok-punct { color: var(--code-punct); }
 
 :lang(hi) {
   font-family: var(--font-noto-devanagari), Arial, Helvetica, sans-serif;
@@ -158,3 +244,16 @@ button:not(:disabled) {
   background: var(--border-strong);
   border-radius: 999px;
 }
+
+/* Tailwind's preflight resets native buttons to cursor: default -- restore
+   the hand cursor on every clickable button site-wide. */
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+.tok-keyword { color: var(--code-keyword); font-weight: 600; }
+.tok-string { color: var(--code-string); }
+.tok-number { color: var(--code-number); }
+.tok-call { color: var(--code-call); }
+.tok-comment { color: var(--code-comment); font-style: italic; }
+.tok-punct { color: var(--code-punct); }
