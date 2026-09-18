@@ -36,8 +36,8 @@ export default function CourseGrid({ courses }: { courses: CourseCardData[] }) {
   });
 
   return (
-    <div>
-      <div className="mt-6 flex flex-wrap items-center justify-end gap-2">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="mt-3 flex shrink-0 flex-wrap items-center justify-end gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="rounded-lg">
@@ -95,7 +95,7 @@ export default function CourseGrid({ courses }: { courses: CourseCardData[] }) {
       {filtered.length === 0 ? (
         <p className="mt-16 text-center text-sm text-[var(--foreground-muted)]">No courses match those filters.</p>
       ) : (
-        <div className={view === "grid" ? "mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4" : "mt-6 flex flex-col gap-3"}>
+        <div className={view === "grid" ? "mt-4 grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-4" : "mt-4 flex flex-col gap-2.5"}>
           {filtered.map((course) => (
             <CourseCard key={course.code} course={course} compact={view === "list"} />
           ))}
@@ -114,17 +114,17 @@ function CourseCard({ course, compact }: { course: CourseCardData; compact: bool
 
   return (
     <div
-      className={`flex overflow-hidden rounded-2xl border border-[var(--border)] p-5 ${compact ? "flex-row items-center gap-5" : "flex-col"}`}
+      className={`flex overflow-hidden rounded-xl border border-[var(--border)] p-3.5 ${compact ? "flex-row items-center gap-4" : "flex-col"}`}
       style={{ background: theme.bg }}
     >
       <div className={compact ? "flex shrink-0 items-center gap-4" : ""}>
         <div className="flex items-start justify-between">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ background: theme.iconBg }}>
-            <Icon className="h-5 w-5" style={{ color: theme.iconFg }} />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style={{ background: theme.iconBg }}>
+            <Icon className="h-4 w-4" style={{ color: theme.iconFg }} />
           </div>
           {!compact && (
             <span
-              className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
+              className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
               style={{ background: badge.bg, color: badge.fg }}
             >
               {meta.difficulty}
@@ -134,35 +134,35 @@ function CourseCard({ course, compact }: { course: CourseCardData; compact: bool
       </div>
 
       <div className={compact ? "min-w-0 flex-1" : "flex flex-1 flex-col"}>
-        <div className={compact ? "flex items-center gap-2" : "mt-4"}>
-          <h3 className="text-lg font-bold text-[var(--foreground)]">{course.title}</h3>
+        <div className={compact ? "flex items-center gap-2" : "mt-2.5"}>
+          <h3 className="text-sm font-bold text-[var(--foreground)]">{course.title}</h3>
           {compact && (
             <span
-              className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold"
+              className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold"
               style={{ background: badge.bg, color: badge.fg }}
             >
               {meta.difficulty}
             </span>
           )}
         </div>
-        <p className="text-xs text-[var(--foreground-muted)]">{meta.category}</p>
-        {!compact && <p className="mt-2 line-clamp-2 flex-1 text-sm text-[var(--foreground-muted)]">{course.description}</p>}
+        <p className="text-[11px] text-[var(--foreground-muted)]">{meta.category}</p>
+        {!compact && <p className="mt-1.5 line-clamp-2 text-xs text-[var(--foreground-muted)]">{course.description}</p>}
 
-        <div className={compact ? "mt-2 flex items-center gap-4" : "mt-4"}>
+        <div className={compact ? "mt-1.5 flex items-center gap-4" : "mt-2.5"}>
           <div className={compact ? "flex w-40 shrink-0 flex-col gap-1" : ""}>
-            <div className="flex items-center justify-between text-xs text-[var(--foreground-muted)]">
+            <div className="flex items-center justify-between text-[11px] text-[var(--foreground-muted)]">
               <span>Progress</span>
               <span className="font-semibold text-[var(--foreground)]">{course.percent}%</span>
             </div>
-            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
+            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
               <div className="h-full rounded-full" style={{ width: `${course.percent}%`, background: theme.bar }} />
             </div>
           </div>
         </div>
 
-        <div className={compact ? "flex shrink-0 items-center gap-4" : "mt-3 flex items-center justify-between"}>
-          <div className="flex items-center gap-3 text-xs text-[var(--foreground-muted)]">
-            <span className="flex items-center gap-1.5">
+        <div className={compact ? "flex shrink-0 items-center gap-4" : "mt-2.5 flex items-center justify-between"}>
+          <div className="flex items-center gap-2.5 text-[11px] text-[var(--foreground-muted)]">
+            <span className="flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full" style={{ background: theme.iconFg }} />
               {course.lessons} lessons
             </span>
@@ -173,7 +173,7 @@ function CourseCard({ course, compact }: { course: CourseCardData; compact: bool
           </div>
           <Link
             href={course.href}
-            className="shrink-0 rounded-lg bg-[var(--marketing-ink)] px-3.5 py-1.5 text-xs font-semibold text-[var(--background)] transition-opacity hover:opacity-90"
+            className="shrink-0 rounded-lg bg-[var(--marketing-ink)] px-3 py-1 text-[11px] font-semibold text-[var(--background)] transition-opacity hover:opacity-90"
           >
             {buttonLabel}
           </Link>
