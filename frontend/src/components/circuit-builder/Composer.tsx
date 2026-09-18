@@ -417,7 +417,7 @@ export default function Composer({
   const selectedGate = selectedGateIndex !== null ? circuit.gates[selectedGateIndex] : null;
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-[var(--background)]">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-[var(--background)]">
       {/* Top app bar */}
       <header className="z-30 shrink-0 border-b border-[var(--border)] bg-[var(--composer-bar)]">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5">

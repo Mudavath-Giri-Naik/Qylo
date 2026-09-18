@@ -2,7 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, CircuitBoard, LayoutDashboard, LogOut, Trophy } from "lucide-react";
+import {
+  Award,
+  BarChart3,
+  BookOpen,
+  CircuitBoard,
+  Cpu,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  Sparkle,
+  TrendingUp,
+  Trophy,
+  Users,
+} from "lucide-react";
 import { logoutAction } from "@/app/auth/actions";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
@@ -24,11 +37,17 @@ interface NavLink {
 }
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  "/dashboard": LayoutDashboard,
+  "/instructor-dashboard": LayoutDashboard,
   "/learn": BookOpen,
   "/circuit-builder": CircuitBoard,
   "/challenges": Trophy,
-  "/dashboard": LayoutDashboard,
-  "/instructor-dashboard": LayoutDashboard,
+  "/community": Users,
+  "/leaderboard": BarChart3,
+  "/my-progress": TrendingUp,
+  "/hardware-access": Cpu,
+  "/certificates": Award,
+  "/settings": Settings,
 };
 
 export default function AppSidebar({
@@ -70,6 +89,14 @@ export default function AppSidebar({
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <div className="group-data-[collapsible=icon]:hidden relative overflow-hidden rounded-xl border border-[var(--border)] p-3" style={{ background: "linear-gradient(150deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%)" }}>
+          <div className="flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground)]">
+            Turn ideas into quantum reality.
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--marketing-green)]" />
+          </div>
+          <p className="mt-1 text-xs text-[var(--foreground-muted)]">Learn. Build. Run. Collaborate.</p>
+          <Sparkle aria-hidden className="pointer-events-none absolute -bottom-2 -right-2 h-10 w-10 text-[var(--accent)]/15" />
+        </div>
         <div className="flex items-center justify-between gap-2 px-1">
           <ThemeToggle />
           {loggedIn ? (

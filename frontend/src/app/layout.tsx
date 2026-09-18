@@ -58,12 +58,18 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
 
   const links = user
     ? [
-        { href: "/learn", label: "Learn" },
-        { href: "/circuit-builder", label: "Circuit Builder" },
-        { href: "/challenges", label: "Challenges" },
         role === "instructor"
           ? { href: "/instructor-dashboard", label: "Instructor Dashboard" }
           : { href: "/dashboard", label: "Dashboard" },
+        { href: "/learn", label: "Learn" },
+        { href: "/circuit-builder", label: "Quantum Circuits" },
+        { href: "/challenges", label: "Challenges" },
+        { href: "/community", label: "Community" },
+        { href: "/leaderboard", label: "Leaderboard" },
+        { href: "/my-progress", label: "My Progress" },
+        { href: "/hardware-access", label: "Hardware Access" },
+        { href: "/certificates", label: "Certificates" },
+        { href: "/settings", label: "Settings" },
       ]
     : [];
 
@@ -82,7 +88,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
         <SmoothScroll />
         <TooltipProvider>
-          <AppShell loggedIn={!!user} links={links}>
+          <AppShell loggedIn={!!user} userEmail={user?.email ?? null} links={links}>
             {children}
           </AppShell>
         </TooltipProvider>

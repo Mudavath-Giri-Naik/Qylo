@@ -8,6 +8,12 @@ const PROTECTED_ROUTES = [
   "/learn",
   "/circuit-builder",
   "/challenges",
+  "/community",
+  "/leaderboard",
+  "/my-progress",
+  "/hardware-access",
+  "/certificates",
+  "/settings",
 ];
 
 export async function updateSession(request: NextRequest) {
