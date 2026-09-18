@@ -125,8 +125,7 @@ function CourseCard({ course, compact }: { course: CourseCardData; compact: bool
 
   return (
     <div
-      className={`flex overflow-hidden rounded-xl border border-[var(--border)] p-3.5 ${compact ? "flex-row items-center gap-4" : "flex-col"}`}
-      style={{ background: theme.bg }}
+      className={`flex overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3.5 ${compact ? "flex-row items-center gap-4" : "flex-col"}`}
     >
       <div className={compact ? "flex shrink-0 items-center gap-4" : ""}>
         <div className="flex items-start justify-between">
