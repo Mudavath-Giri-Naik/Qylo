@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Caveat } from "next/font/google";
+import { Sparkle } from "lucide-react";
 import MarketingNavbar from "@/components/MarketingNavbar";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import { Avatar, AvatarImage, AvatarGroup } from "@/components/ui/avatar";
@@ -296,6 +297,51 @@ export default function Home() {
               </RevealOnScroll>
             ))}
           </div>
+        </section>
+
+        {/* Closing CTA */}
+        <section className="mx-auto max-w-5xl px-6 pb-24">
+          <RevealOnScroll>
+            <div
+              className="relative overflow-hidden rounded-3xl px-6 py-16 text-center sm:px-16 sm:py-20"
+              style={{ background: "var(--marketing-green)", color: "#000000" }}
+            >
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(135deg, transparent 25%, rgba(255,255,255,0.16) 38%, transparent 50%, rgba(255,255,255,0.1) 65%, transparent 78%)",
+                }}
+              />
+              <Sparkle aria-hidden className="pointer-events-none absolute bottom-8 left-8 h-10 w-10 text-black/10 sm:h-14 sm:w-14" />
+              <Sparkle aria-hidden className="pointer-events-none absolute bottom-10 right-10 h-7 w-7 text-black/15 sm:h-9 sm:w-9" />
+
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="flex items-center gap-3">
+                  <AvatarRow />
+                  <span className="text-sm font-semibold">Join a growing community of learners</span>
+                </div>
+
+                <h2 className="mt-6 max-w-2xl text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl">
+                  Take the Next Step in Your Quantum Journey
+                </h2>
+
+                <p className="mt-5 max-w-xl text-base sm:text-lg">
+                  Unlock real quantum skills with hands-on circuits, live simulation, and an AI tutor by your side.
+                </p>
+
+                <div className="mt-8">
+                  <Link
+                    href="/learn"
+                    className="inline-flex items-center gap-2 rounded-full bg-[var(--marketing-ink)] px-7 py-3.5 text-sm font-bold text-[var(--background)] transition-opacity hover:opacity-90"
+                  >
+                    <span aria-hidden>↳</span> Start Learning Now
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </RevealOnScroll>
         </section>
       </main>
     </>
