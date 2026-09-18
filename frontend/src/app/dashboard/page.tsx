@@ -84,7 +84,7 @@ export default async function DashboardPage() {
             </div>
           </Card>
 
-          <Card className="min-h-0 gap-0 overflow-hidden p-4">
+          <Card className="min-h-0 gap-0 overflow-hidden p-3.5">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-[var(--foreground)]">Current Learning Path</h3>
               <Link href="/learn" className="text-[11px] font-semibold text-[var(--accent)] hover:underline">
@@ -92,7 +92,7 @@ export default async function DashboardPage() {
               </Link>
             </div>
 
-            <div className="mt-2.5 rounded-xl border border-[var(--border)] p-3">
+            <div className="mt-2 rounded-xl border border-[var(--border)] p-2.5">
               {overview.currentModule ? (
                 <>
                   <p className="truncate text-xs font-semibold text-[var(--foreground)]">{overview.currentModule.title}</p>
@@ -121,7 +121,7 @@ export default async function DashboardPage() {
           </Card>
 
           <Card
-            className="min-h-0 gap-0 overflow-hidden p-4"
+            className="min-h-0 gap-0 overflow-hidden p-3.5"
             style={{ background: "color-mix(in srgb, var(--marketing-green) 10%, var(--surface))" }}
           >
             <div className="flex items-center justify-between">
@@ -131,7 +131,7 @@ export default async function DashboardPage() {
               </Link>
             </div>
 
-            <div className="mt-2.5 rounded-xl bg-[var(--surface)] p-3">
+            <div className="mt-2 rounded-xl bg-[var(--surface)] p-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-[var(--foreground)]">IBM Quantum</span>
                 <span className="flex items-center gap-1 text-[11px] font-semibold text-[var(--marketing-green)]">
@@ -140,18 +140,18 @@ export default async function DashboardPage() {
               </div>
               <Link
                 href="/circuit-builder"
-                className="mt-2 block rounded-lg bg-[var(--marketing-green)] px-3 py-1.5 text-center text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                className="mt-1.5 block rounded-lg bg-[var(--marketing-green)] px-3 py-1 text-center text-xs font-semibold text-white transition-opacity hover:opacity-90"
               >
                 Launch Composer
               </Link>
             </div>
 
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <div className="rounded-xl bg-[var(--surface)] p-2">
+            <div className="mt-1.5 grid grid-cols-2 gap-2">
+              <div className="rounded-xl bg-[var(--surface)] p-1.5">
                 <p className="text-sm font-bold text-[var(--foreground)]">{overview.circuitsThisMonth}</p>
                 <p className="text-[10px] text-[var(--foreground-muted)]">Runs this month</p>
               </div>
-              <div className="rounded-xl bg-[var(--surface)] p-2">
+              <div className="rounded-xl bg-[var(--surface)] p-1.5">
                 <p className="text-sm font-bold text-[var(--foreground)]">95%</p>
                 <p className="text-[10px] text-[var(--foreground-muted)]">Success rate</p>
               </div>
@@ -178,14 +178,11 @@ export default async function DashboardPage() {
               )}
             </div>
             <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
-              <div
-                className="h-full rounded-full bg-indigo-500"
-                style={{ width: `${Math.max(overview.overallPercent, 4)}%` }}
-              />
+              <div className="h-full rounded-full bg-indigo-500" style={{ width: `${overview.overallPercent}%` }} />
             </div>
             <p className="mt-1 text-[11px] text-[var(--foreground-muted)]">You&apos;re doing great! Keep going.</p>
 
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="mt-3 grid grid-cols-2 gap-2">
               <div className="flex items-center gap-2.5 rounded-xl bg-blue-500/10 p-2.5">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/15 text-blue-600 dark:text-blue-400">
                   <BookOpen className="h-4.5 w-4.5" />
@@ -342,11 +339,11 @@ export default async function DashboardPage() {
             </div>
           </Card>
 
-          <Card className="min-h-0 gap-0 overflow-hidden p-4">
+          <Card className="min-h-0 gap-0 overflow-hidden p-3.5">
             <h3 className="text-xs font-bold text-[var(--foreground)]">Explore Next</h3>
             <Link
               href={overview.nextSuggestion ? `/learn/${overview.nextSuggestion.moduleCode}` : "/challenges"}
-              className="mt-2 flex items-center justify-between rounded-xl border border-[var(--border)] p-2.5 transition-colors hover:bg-[var(--surface-hover)]"
+              className="mt-1.5 flex items-center justify-between rounded-xl border border-[var(--border)] p-2.5 transition-colors hover:bg-[var(--surface-hover)]"
             >
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold text-[var(--accent)]">
