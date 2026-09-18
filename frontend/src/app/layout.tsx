@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono, Noto_Sans_Devanagari, Noto_Sans_Telugu } from "next/font/google";
 import { createClient } from "@/lib/supabase/server";
 import AppShell from "@/components/AppShell";
+import SmoothScroll from "@/components/SmoothScroll";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
@@ -79,6 +80,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </Script>
       </head>
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
+        <SmoothScroll />
         <TooltipProvider>
           <AppShell loggedIn={!!user} links={links}>
             {children}

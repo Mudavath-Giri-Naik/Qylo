@@ -93,20 +93,20 @@ export default function Home() {
         <section className="relative overflow-hidden bg-[var(--marketing-bg)]">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-[0.35]"
+            className="pointer-events-none absolute inset-x-0 top-1/2 bottom-0 opacity-[0.35]"
             style={{
               backgroundImage:
                 "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)",
               backgroundSize: "56px 56px",
-              maskImage: "radial-gradient(ellipse 70% 60% at 50% 30%, black 40%, transparent 90%)",
+              maskImage: "radial-gradient(ellipse 80% 70% at 50% 100%, black 40%, transparent 95%)",
             }}
           />
 
           {/* eslint-disable @next/next/no-img-element -- decorative, local SVGs with spaces in their filenames; next/image blocks local SVGs by default */}
-          <img src="/Connected%20world-rafiki.svg" alt="" aria-hidden width={150} height={150} className="pointer-events-none absolute right-[6%] top-20 hidden opacity-90 sm:block" />
-          <img src="/Research%20paper-rafiki.svg" alt="" aria-hidden width={130} height={130} className="pointer-events-none absolute right-[2%] top-[56%] hidden opacity-90 md:block" />
-          <img src="/Team-rafiki.svg" alt="" aria-hidden width={140} height={140} className="pointer-events-none absolute left-[2%] top-[54%] hidden opacity-90 md:block" />
-          <img src="/Online%20learning-rafiki.svg" alt="" aria-hidden width={130} height={130} className="pointer-events-none absolute left-[4%] top-24 hidden opacity-90 lg:block" />
+          <img src="/Connected%20world-rafiki.svg" alt="" aria-hidden width={145} height={145} className="pointer-events-none absolute right-[3%] top-20 hidden opacity-90 sm:block" />
+          <img src="/Research%20paper-rafiki.svg" alt="" aria-hidden width={105} height={105} className="pointer-events-none absolute right-[3%] top-[360px] hidden opacity-90 md:block" />
+          <img src="/Team-rafiki.svg" alt="" aria-hidden width={105} height={105} className="pointer-events-none absolute left-[3%] top-[360px] hidden opacity-90 md:block" />
+          <img src="/Online%20learning-rafiki.svg" alt="" aria-hidden width={105} height={105} className="pointer-events-none absolute left-[3%] top-[132px] hidden opacity-90 lg:block" />
           {/* eslint-enable @next/next/no-img-element */}
 
           <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 pb-20 pt-20 text-center">
@@ -121,18 +121,18 @@ export default function Home() {
 
             <RevealOnScroll delay={0.08}>
               <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] tracking-tight text-[var(--marketing-ink)] sm:text-7xl">
-                Learn. Build.
+                Learn. Build. Master
                 <br />
                 <span className="inline-flex items-center gap-3">
                   <OrbitIcon className="h-10 w-10 shrink-0 text-[var(--marketing-green)] sm:h-14 sm:w-14" />
-                  Master with Qylo
+                  with Qylo
                 </span>
               </h1>
             </RevealOnScroll>
 
             <RevealOnScroll delay={0.16}>
-              <p className="mt-6 max-w-2xl text-balance text-base text-[var(--foreground-muted)] sm:text-lg">
-                Master quantum computing through real circuits, live simulation, and an AI tutor at every step.
+              <p className="mt-6 max-w-3xl text-base text-[var(--foreground-muted)] sm:whitespace-nowrap sm:text-lg">
+                Master quantum computing with real circuits and an AI tutor by your side.
               </p>
             </RevealOnScroll>
 
@@ -151,16 +151,16 @@ export default function Home() {
           {/* Bento feature grid */}
           <div className="relative mx-auto max-w-5xl px-6 pb-24">
             <RevealOnScroll delay={0.1}>
-              <div className="grid grid-cols-1 grid-rows-2 gap-4 sm:grid-cols-3">
+              <div className="grid grid-cols-1 grid-rows-2 sm:grid-cols-3">
                 <div
-                  className="flex flex-col justify-between rounded-3xl p-6 sm:col-start-1 sm:row-start-1"
+                  className="flex flex-col justify-between p-6 sm:col-start-1 sm:row-start-1"
                   style={{ background: "var(--marketing-green)", color: "var(--marketing-green-fg)" }}
                 >
                   <AvatarRow />
                   <p className="mt-6 text-lg font-bold leading-snug">AI Tutor &amp; Live Guidance</p>
                 </div>
 
-                <div className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface-2)] sm:col-start-2 sm:row-span-2 sm:row-start-1">
+                <div className="relative overflow-hidden bg-[var(--surface-2)] sm:col-start-2 sm:row-span-2 sm:row-start-1">
                   <svg viewBox="0 0 300 220" className="h-full w-full" preserveAspectRatio="xMidYMid slice" aria-hidden>
                     <rect width="300" height="220" fill="var(--surface-2)" />
                     {[60, 110, 160].map((y) => (
@@ -183,7 +183,7 @@ export default function Home() {
                 </div>
 
                 <div
-                  className="flex flex-col justify-between rounded-3xl p-6 sm:col-start-3 sm:row-span-2 sm:row-start-1"
+                  className="flex flex-col justify-between p-6 sm:col-start-3 sm:row-span-2 sm:row-start-1"
                   style={{ background: "var(--marketing-yellow)", color: "var(--marketing-yellow-fg)" }}
                 >
                   <p className="text-lg font-bold leading-snug">
@@ -192,7 +192,7 @@ export default function Home() {
                 </div>
 
                 <div
-                  className="flex flex-col justify-between rounded-3xl p-6 sm:col-start-1 sm:row-start-2"
+                  className="flex flex-col justify-between p-6 sm:col-start-1 sm:row-start-2"
                   style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
                 >
                   <GraduationCapIcon className="h-8 w-8" />

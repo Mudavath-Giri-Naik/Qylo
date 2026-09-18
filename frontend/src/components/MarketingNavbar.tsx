@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const LINKS = [
@@ -45,32 +46,42 @@ function useHideOnScroll() {
 
 export default function MarketingNavbar() {
   const hidden = useHideOnScroll();
+  const pathname = usePathname();
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)]/90 backdrop-blur-md transition-transform duration-300 ${
+      className={`sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)] transition-transform duration-300 ${
         hidden ? "-translate-y-full" : "translate-y-0"
       }`}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+      <nav className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-8 py-4 md:px-10">
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <QyloMark />
           <span className="text-lg font-bold tracking-tight text-[var(--foreground)]">Qylo</span>
         </Link>
 
-        <div className="hidden items-center gap-8 text-sm font-medium text-[var(--foreground)] md:flex">
-          {LINKS.map((link) => (
-            <Link key={link.href} href={link.href} className="transition-colors hover:text-[var(--accent)]">
-              {link.label}
-            </Link>
-          ))}
+        <div className="hidden items-center justify-center gap-9 text-sm text-[var(--foreground-muted)] md:flex">
+          {LINKS.map((link) => {
+            const active = link.href === "/" ? pathname === "/" : pathname?.startsWith(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`transition-colors hover:text-[var(--foreground)] ${
+                  active ? "font-semibold text-[var(--foreground)]" : "font-medium"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
-          <ThemeToggle />
+          <ThemeToggle className="bg-[var(--surface-2)]" />
           <Link
             href="/signup"
-            className="rounded-full bg-[var(--marketing-ink)] px-5 py-2.5 text-sm font-semibold text-[var(--background)] transition-opacity hover:opacity-90"
+            className="rounded-full bg-[var(--marketing-ink)] px-5 py-2.5 text-sm font-bold text-[var(--background)] transition-opacity hover:opacity-90"
           >
             Sign Up
           </Link>
