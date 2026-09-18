@@ -1,4 +1,3 @@
-import LanguageSwitcher from "@/components/learn/LanguageSwitcher";
 import CourseGrid, { type CourseCardData } from "@/components/learn/CourseGrid";
 import { createClient } from "@/lib/supabase/server";
 import { getDashboardData } from "@/lib/dashboard/queries";
@@ -46,17 +45,7 @@ export default async function LearnPage({ searchParams }: PageProps<"/learn">) {
 
   return (
     <main className="mx-auto flex max-w-7xl flex-col px-6 py-5 lg:h-[calc(100vh-4rem)] lg:overflow-hidden">
-      <div className="flex shrink-0 flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">All Courses</h1>
-          <p className="mt-0.5 text-sm text-[var(--foreground-muted)]">
-            Learn quantum computing from basics to advanced. Build. Simulate. Run on real hardware.
-          </p>
-        </div>
-        <LanguageSwitcher current={lang} />
-      </div>
-
-      <CourseGrid courses={courses} />
+      <CourseGrid courses={courses} lang={lang} />
     </main>
   );
 }

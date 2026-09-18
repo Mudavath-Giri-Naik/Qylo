@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Clock, Grid3x3, List } from "lucide-react";
+import type { LessonLanguage } from "@/lib/learn/modules";
 import { DIFFICULTY_BADGE, MODULE_META, THEME_STYLES, type Difficulty } from "@/lib/learn/moduleMeta";
+import LanguageSwitcher from "@/components/learn/LanguageSwitcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +25,7 @@ export interface CourseCardData {
   href: string;
 }
 
-export default function CourseGrid({ courses }: { courses: CourseCardData[] }) {
+export default function CourseGrid({ courses, lang }: { courses: CourseCardData[]; lang: LessonLanguage }) {
   const [levelFilter, setLevelFilter] = useState<Difficulty | "All">("All");
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
   const [view, setView] = useState<"grid" | "list">("grid");
@@ -37,58 +39,67 @@ export default function CourseGrid({ courses }: { courses: CourseCardData[] }) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="mt-3 flex shrink-0 flex-wrap items-center justify-end gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="rounded-lg">
-              {levelFilter === "All" ? "All Levels" : levelFilter}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuRadioGroup value={levelFilter} onValueChange={(v) => setLevelFilter(v as Difficulty | "All")}>
-              <DropdownMenuRadioItem value="All">All Levels</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="Beginner">Beginner</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="Intermediate">Intermediate</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="Advanced">Advanced</DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">All Courses</h1>
+          <p className="mt-0.5 text-sm text-[var(--foreground-muted)]">
+            Learn quantum computing from basics to advanced. Build. Simulate. Run on real hardware.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <LanguageSwitcher current={lang} />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="rounded-lg">
+                {levelFilter === "All" ? "All Levels" : levelFilter}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuRadioGroup value={levelFilter} onValueChange={(v) => setLevelFilter(v as Difficulty | "All")}>
+                <DropdownMenuRadioItem value="All">All Levels</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="Beginner">Beginner</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="Intermediate">Intermediate</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="Advanced">Advanced</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="rounded-lg">
-              {categoryFilter === "All" ? "All Categories" : categoryFilter}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuRadioGroup value={categoryFilter} onValueChange={setCategoryFilter}>
-              <DropdownMenuRadioItem value="All">All Categories</DropdownMenuRadioItem>
-              {categories.map((cat) => (
-                <DropdownMenuRadioItem key={cat} value={cat}>
-                  {cat}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="rounded-lg">
+                {categoryFilter === "All" ? "All Categories" : categoryFilter}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuRadioGroup value={categoryFilter} onValueChange={setCategoryFilter}>
+                <DropdownMenuRadioItem value="All">All Categories</DropdownMenuRadioItem>
+                {categories.map((cat) => (
+                  <DropdownMenuRadioItem key={cat} value={cat}>
+                    {cat}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        <div className="flex items-center gap-1 rounded-lg border border-[var(--border)] p-1">
-          <Button
-            variant={view === "grid" ? "secondary" : "ghost"}
-            size="icon"
-            aria-pressed={view === "grid"}
-            onClick={() => setView("grid")}
-          >
-            <Grid3x3 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={view === "list" ? "secondary" : "ghost"}
-            size="icon"
-            aria-pressed={view === "list"}
-            onClick={() => setView("list")}
-          >
-            <List className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-1 rounded-lg border border-[var(--border)] p-1">
+            <Button
+              variant={view === "grid" ? "secondary" : "ghost"}
+              size="icon"
+              aria-pressed={view === "grid"}
+              onClick={() => setView("grid")}
+            >
+              <Grid3x3 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={view === "list" ? "secondary" : "ghost"}
+              size="icon"
+              aria-pressed={view === "list"}
+              onClick={() => setView("list")}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
