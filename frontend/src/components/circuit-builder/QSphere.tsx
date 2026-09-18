@@ -83,48 +83,52 @@ export default function QSphere({
   const maxProbability = Math.max(...points.map((p) => p.probability), 1e-9);
 
   return (
-    <div className="flex w-full flex-col items-center gap-2">
-      <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[320px]" role="img" aria-label="Q-sphere">
-        <circle cx={cx} cy={cy} r={R} fill="var(--chart-series-1)" fillOpacity={0.05} stroke="var(--chart-baseline)" strokeWidth={1} />
-        <ellipse cx={cx} cy={cy} rx={R} ry={equatorRy} fill="none" stroke="var(--chart-grid)" strokeWidth={1} strokeDasharray="3 3" />
-        <line
-          x1={project(0, 0, -1.15).x}
-          y1={project(0, 0, -1.15).y}
-          x2={project(0, 0, 1.15).x}
-          y2={project(0, 0, 1.15).y}
-          stroke="var(--chart-ink-muted)"
-          strokeWidth={1}
-        />
+    <div className="flex h-full w-full flex-col items-center gap-2">
+      <div className="flex min-h-0 w-full flex-1 items-center justify-center">
+        <div className="aspect-square h-full max-h-[320px] max-w-full">
+          <svg viewBox={`0 0 ${size} ${size}`} className="h-full w-full" role="img" aria-label="Q-sphere">
+            <circle cx={cx} cy={cy} r={R} fill="var(--chart-series-1)" fillOpacity={0.05} stroke="var(--chart-baseline)" strokeWidth={1} />
+            <ellipse cx={cx} cy={cy} rx={R} ry={equatorRy} fill="none" stroke="var(--chart-grid)" strokeWidth={1} strokeDasharray="3 3" />
+            <line
+              x1={project(0, 0, -1.15).x}
+              y1={project(0, 0, -1.15).y}
+              x2={project(0, 0, 1.15).x}
+              y2={project(0, 0, 1.15).y}
+              stroke="var(--chart-ink-muted)"
+              strokeWidth={1}
+            />
 
-        {points.map((p) => {
-          const tip = project(p.x, p.y, p.z);
-          const radius = 3 + 7 * Math.sqrt(p.probability / maxProbability);
-          const color = phaseColor(p.phaseDeg);
-          const label = [showState ? `|${p.bitstring}⟩` : null, showPhase ? `${p.phaseDeg.toFixed(0)}°` : null]
-            .filter(Boolean)
-            .join(" ");
-          return (
-            <g key={p.bitstring}>
-              <title>{`|${p.bitstring}⟩: ${(p.probability * 100).toFixed(1)}%, phase ${p.phaseDeg.toFixed(0)}°`}</title>
-              <line x1={cx} y1={cy} x2={tip.x} y2={tip.y} stroke={color} strokeWidth={1.5} strokeOpacity={0.6} />
-              <circle cx={tip.x} cy={tip.y} r={radius} fill={color} stroke="var(--surface)" strokeWidth={1.5} />
-              {label && (
-                <text
-                  x={tip.x}
-                  y={tip.y - radius - 4}
-                  textAnchor="middle"
-                  fontSize={9}
-                  fontFamily="var(--font-geist-mono)"
-                  fill="var(--chart-ink-secondary)"
-                >
-                  {label}
-                </text>
-              )}
-            </g>
-          );
-        })}
-        <circle cx={cx} cy={cy} r={2} fill="var(--chart-ink-muted)" />
-      </svg>
+            {points.map((p) => {
+              const tip = project(p.x, p.y, p.z);
+              const radius = 3 + 7 * Math.sqrt(p.probability / maxProbability);
+              const color = phaseColor(p.phaseDeg);
+              const label = [showState ? `|${p.bitstring}⟩` : null, showPhase ? `${p.phaseDeg.toFixed(0)}°` : null]
+                .filter(Boolean)
+                .join(" ");
+              return (
+                <g key={p.bitstring}>
+                  <title>{`|${p.bitstring}⟩: ${(p.probability * 100).toFixed(1)}%, phase ${p.phaseDeg.toFixed(0)}°`}</title>
+                  <line x1={cx} y1={cy} x2={tip.x} y2={tip.y} stroke={color} strokeWidth={1.5} strokeOpacity={0.6} />
+                  <circle cx={tip.x} cy={tip.y} r={radius} fill={color} stroke="var(--surface)" strokeWidth={1.5} />
+                  {label && (
+                    <text
+                      x={tip.x}
+                      y={tip.y - radius - 4}
+                      textAnchor="middle"
+                      fontSize={9}
+                      fontFamily="var(--font-geist-mono)"
+                      fill="var(--chart-ink-secondary)"
+                    >
+                      {label}
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+            <circle cx={cx} cy={cy} r={2} fill="var(--chart-ink-muted)" />
+          </svg>
+        </div>
+      </div>
 
       <div className="flex w-full max-w-[320px] shrink-0 items-end justify-between gap-3 px-1">
         <div

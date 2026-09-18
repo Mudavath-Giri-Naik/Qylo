@@ -665,7 +665,7 @@ export default function Composer({
           <span className="w-full text-left text-[10px] text-[var(--foreground-subtle)]">
             {runResult ? t("backendResult") : t("instantPreview")}
           </span>
-          <div className="mt-1 flex min-h-0 flex-1 items-center justify-center overflow-hidden">
+          <div className="mt-1 flex min-h-0 w-full flex-1 justify-center overflow-hidden">
             {displayBlochVector ? (
               <BlochSphere vector={displayBlochVector} />
             ) : (
