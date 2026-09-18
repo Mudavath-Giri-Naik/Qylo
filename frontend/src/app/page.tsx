@@ -151,8 +151,8 @@ export default function Home() {
                 <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-2)] sm:col-start-2 sm:row-span-2 sm:row-start-1">
                   {/* eslint-disable-next-line @next/next/no-img-element -- local photo, fills the card via object-cover */}
                   <img src="/instructor-photo.webp" alt="" aria-hidden className="h-full w-full object-cover" />
-                  <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-[var(--surface)]/95 p-4 shadow-[var(--shadow-md)] backdrop-blur">
-                    <p className="text-sm font-semibold text-[var(--foreground)]">
+                  <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-[var(--surface)]/95 p-6 shadow-[var(--shadow-md)] backdrop-blur">
+                    <p className="text-base font-semibold text-[var(--foreground)]">
                       Learn at your own pace, anywhere, anytime.
                     </p>
                   </div>
@@ -167,7 +167,7 @@ export default function Home() {
                   <p className="relative z-10 text-2xl font-bold leading-snug">
                     Every learner deserves clear, hands-on quantum education.
                   </p>
-                  <div className="relative z-10 mt-6 h-20 w-20 self-end">
+                  <div className="relative z-10 mt-6 h-20 w-20 self-center">
                     {/* eslint-disable-next-line @next/next/no-img-element -- local photo, decorative */}
                     <img
                       src="/student-photo.png"
@@ -176,7 +176,7 @@ export default function Home() {
                       className="h-full w-full rounded-2xl object-cover shadow-[var(--shadow-md)]"
                     />
                     {/* eslint-disable-next-line @next/next/no-img-element -- decorative badge, local PNG */}
-                    <img src="/sparkle-badge.png" alt="" aria-hidden className="absolute -right-2 -top-2 h-7 w-7" />
+                    <img src="/sparkle-badge.png" alt="" aria-hidden className="absolute -right-2 -top-2 h-7 w-7 rotate-90" />
                   </div>
                 </div>
 
