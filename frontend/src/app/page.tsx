@@ -205,7 +205,7 @@ export default function Home() {
 
           <div className="group relative mt-8 overflow-hidden">
             <div className="animate-marquee flex w-max gap-4 group-hover:[animation-play-state:paused]">
-              {[...MODULES, ...MODULES].map((m, i) => {
+              {[...MODULES, ...MODULES, ...MODULES, ...MODULES, ...MODULES, ...MODULES].map((m, i) => {
                 const style = PILL_STYLES[i % PILL_STYLES.length];
                 return (
                   <span
