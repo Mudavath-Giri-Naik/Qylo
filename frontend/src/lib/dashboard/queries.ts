@@ -249,3 +249,32 @@ export async function getDashboardOverview(userId: string): Promise<DashboardOve
     nextSuggestion,
   };
 }
+
+export interface SidebarStats {
+  qubitsExecuted: number;
+  dailyQubits: number[];
+}
+
+export async function getSidebarStats(): Promise<SidebarStats> {
+  const supabase = await createClient();
+  const weekAgo = new Date(Date.now() - 7 * DAY_MS);
+
+  const { data: circuits } = await supabase
+    .from("circuits")
+    .select("circuit_json, created_at")
+    .gte("created_at", weekAgo.toISOString());
+
+  const dailyQubits = Array(7).fill(0) as number[];
+  let qubitsExecuted = 0;
+
+  for (const c of circuits ?? []) {
+    const numQubits = (c.circuit_json as { num_qubits?: number } | null)?.num_qubits ?? 0;
+    qubitsExecuted += numQubits;
+
+    const daysAgo = Math.floor((Date.now() - new Date(c.created_at).getTime()) / DAY_MS);
+    const bucket = 6 - Math.min(6, Math.max(0, daysAgo));
+    dailyQubits[bucket] += numQubits;
+  }
+
+  return { qubitsExecuted, dailyQubits };
+}

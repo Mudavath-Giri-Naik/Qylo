@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { Bell, ChevronDown, LogOut, Search, Settings, Zap } from "lucide-react";
 import { logoutAction } from "@/app/auth/actions";
 import AppSidebar from "@/components/AppSidebar";
+import type { SidebarStats } from "@/lib/dashboard/queries";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -100,11 +101,13 @@ export default function AppShell({
   loggedIn,
   userEmail,
   links,
+  sidebarStats,
   children,
 }: {
   loggedIn: boolean;
   userEmail: string | null;
   links: NavLink[];
+  sidebarStats: SidebarStats | null;
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -117,7 +120,7 @@ export default function AppShell({
 
   return (
     <SidebarProvider>
-      <AppSidebar loggedIn={loggedIn} links={links} />
+      <AppSidebar loggedIn={loggedIn} links={links} stats={sidebarStats} />
       <SidebarInset>
         {isComposer ? (
           <header className="flex h-12 shrink-0 items-center border-b border-[var(--border)] px-3">

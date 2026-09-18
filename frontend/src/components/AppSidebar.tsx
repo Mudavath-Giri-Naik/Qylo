@@ -11,12 +11,12 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
-  Sparkle,
   TrendingUp,
   Trophy,
   Users,
 } from "lucide-react";
 import { logoutAction } from "@/app/auth/actions";
+import type { SidebarStats } from "@/lib/dashboard/queries";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
   Sidebar,
@@ -53,9 +53,11 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
 export default function AppSidebar({
   loggedIn,
   links,
+  stats,
 }: {
   loggedIn: boolean;
   links: NavLink[];
+  stats: SidebarStats | null;
 }) {
   const pathname = usePathname();
 
@@ -89,14 +91,33 @@ export default function AppSidebar({
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <div className="group-data-[collapsible=icon]:hidden relative overflow-hidden rounded-xl border border-[var(--border)] p-3" style={{ background: "linear-gradient(150deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%)" }}>
-          <div className="flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground)]">
-            Turn ideas into quantum reality.
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--marketing-green)]" />
+        {stats && (
+          <div
+            className="group-data-[collapsible=icon]:hidden relative overflow-hidden rounded-xl border border-[var(--border)] p-3"
+            style={{ background: "linear-gradient(150deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%)" }}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[var(--foreground)]">Qubits Executed</span>
+              <span className="flex items-center gap-1 text-[10px] font-semibold text-[var(--marketing-green)]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--marketing-green)]" /> Live
+              </span>
+            </div>
+            <p className="mt-1 text-2xl font-bold text-[var(--foreground)]">{stats.qubitsExecuted.toLocaleString()}</p>
+            <p className="text-[11px] text-[var(--foreground-muted)]">Circuits run by learners this week</p>
+            <div className="mt-2 flex h-8 items-end gap-1">
+              {stats.dailyQubits.map((value, i) => {
+                const max = Math.max(1, ...stats.dailyQubits);
+                return (
+                  <span
+                    key={i}
+                    className="flex-1 rounded-sm bg-indigo-500/70"
+                    style={{ height: `${Math.max(10, (value / max) * 100)}%` }}
+                  />
+                );
+              })}
+            </div>
           </div>
-          <p className="mt-1 text-xs text-[var(--foreground-muted)]">Learn. Build. Run. Collaborate.</p>
-          <Sparkle aria-hidden className="pointer-events-none absolute -bottom-2 -right-2 h-10 w-10 text-[var(--accent)]/15" />
-        </div>
+        )}
         <div className="flex items-center justify-between gap-2 px-1">
           <ThemeToggle />
           {loggedIn ? (

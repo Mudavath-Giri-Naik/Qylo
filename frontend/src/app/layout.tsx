@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono, Noto_Sans_Devanagari, Noto_Sans_Telugu } from "next/font/google";
 import { createClient } from "@/lib/supabase/server";
+import { getSidebarStats } from "@/lib/dashboard/queries";
 import AppShell from "@/components/AppShell";
 import SmoothScroll from "@/components/SmoothScroll";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -51,9 +52,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   } = await supabase.auth.getUser();
 
   let role: "learner" | "instructor" | null = null;
+  let sidebarStats = null;
   if (user) {
-    const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
+    const [{ data: profile }, stats] = await Promise.all([
+      supabase.from("users").select("role").eq("id", user.id).single(),
+      getSidebarStats(),
+    ]);
     role = profile?.role ?? null;
+    sidebarStats = stats;
   }
 
   const links = user
@@ -88,7 +94,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
         <SmoothScroll />
         <TooltipProvider>
-          <AppShell loggedIn={!!user} userEmail={user?.email ?? null} links={links}>
+          <AppShell loggedIn={!!user} userEmail={user?.email ?? null} links={links} sidebarStats={sidebarStats}>
             {children}
           </AppShell>
         </TooltipProvider>
