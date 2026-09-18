@@ -10,7 +10,7 @@ const defaultT = makeTranslator("en");
 const CELL_WIDTH = 64;
 const ROW_HEIGHT = 56;
 const LABEL_WIDTH = 44;
-const MIN_COLUMNS = 10;
+const MIN_COLUMNS = 6;
 
 function MinusIcon() {
   return (

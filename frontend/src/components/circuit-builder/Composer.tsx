@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { runCircuit, type RunResult } from "@/lib/circuit/api";
@@ -208,6 +208,56 @@ export default function Composer({
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [savedCircuitId, setSavedCircuitId] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Draggable widths for the bottom row (Probabilities | Q-sphere | Code),
+  // as percentages of that row's width. Code starts narrower than an even
+  // split; dragging the dividers between any two adjacent panels redistributes
+  // just that pair, in percent so it stays correct across screen sizes.
+  const [colWidths, setColWidths] = useState<[number, number, number]>([42, 28, 30]);
+  const bottomRowRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ divider: 0 | 1; startX: number; startWidths: [number, number, number] } | null>(null);
+
+  useEffect(() => {
+    function handleMove(e: PointerEvent) {
+      const drag = dragRef.current;
+      const container = bottomRowRef.current;
+      if (!drag || !container || container.offsetWidth <= 0) return;
+      const deltaPercent = ((e.clientX - drag.startX) / container.offsetWidth) * 100;
+      const MIN = 15;
+      const [a, b, c] = drag.startWidths;
+      const next: [number, number, number] = [a, b, c];
+      if (drag.divider === 0) {
+        const pairTotal = a + b;
+        const newA = Math.max(MIN, Math.min(pairTotal - MIN, a + deltaPercent));
+        next[0] = newA;
+        next[1] = pairTotal - newA;
+      } else {
+        const pairTotal = b + c;
+        const newB = Math.max(MIN, Math.min(pairTotal - MIN, b + deltaPercent));
+        next[1] = newB;
+        next[2] = pairTotal - newB;
+      }
+      setColWidths(next);
+    }
+    function handleUp() {
+      dragRef.current = null;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    }
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp);
+    return () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+    };
+  }, []);
+
+  function startColumnDrag(divider: 0 | 1, e: React.PointerEvent) {
+    e.preventDefault();
+    dragRef.current = { divider, startX: e.clientX, startWidths: colWidths };
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  }
 
   // Instant client-side preview: recomputed synchronously on every circuit
   // edit (pure math, no network), so probabilities/Q-sphere never lag behind
@@ -522,7 +572,7 @@ export default function Composer({
             </label>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-auto">
+          <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
             <CircuitCanvas
               circuit={circuit}
               pendingControl={pendingControl}
@@ -569,9 +619,23 @@ export default function Composer({
         </div>
       </div>
 
-      {/* Bottom: probabilities | Q-sphere (narrow) | code editor (tall) */}
-      <div className="grid min-h-0 flex-[6] grid-cols-1 border-t border-[var(--border)] lg:grid-cols-[1fr_240px_1fr]">
-        <div className="flex min-h-0 flex-col overflow-hidden border-b border-[var(--border)] p-3 lg:border-b-0 lg:border-r">
+      {/* Bottom: probabilities | Q-sphere | code editor -- widths are
+          draggable via the two dividers, code starts narrower than an even
+          split. The grid-template-columns only applies at lg+ (arbitrary
+          property reading the CSS vars set below); below that it's grid-cols-1
+          and stacks full-width, so dragging has no effect on small screens. */}
+      <div
+        ref={bottomRowRef}
+        className="grid min-h-0 flex-[6] grid-cols-1 border-t border-[var(--border)] lg:[grid-template-columns:var(--col-a)_6px_var(--col-b)_6px_var(--col-c)]"
+        style={
+          {
+            "--col-a": `${colWidths[0]}%`,
+            "--col-b": `${colWidths[1]}%`,
+            "--col-c": `${colWidths[2]}%`,
+          } as React.CSSProperties
+        }
+      >
+        <div className="flex min-h-0 flex-col overflow-hidden border-b border-[var(--border)] p-3 lg:border-b-0">
           <div className="flex shrink-0 items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">{t("probabilities")}</p>
             <span className="text-[10px] text-[var(--foreground-subtle)]">
@@ -583,7 +647,16 @@ export default function Composer({
             <Histogram counts={displayCounts} mode={runResult ? "shots" : "probability"} t={t} />
           </div>
         </div>
-        <div className="flex min-h-0 flex-col items-center overflow-hidden border-b border-[var(--border)] p-3 lg:border-b-0 lg:border-r">
+
+        <div
+          onPointerDown={(e) => startColumnDrag(0, e)}
+          className="hidden items-center justify-center lg:flex"
+          style={{ cursor: "col-resize" }}
+        >
+          <div className="h-full w-px bg-[var(--border)] transition-colors hover:bg-[var(--accent)]" />
+        </div>
+
+        <div className="flex min-h-0 flex-col items-center overflow-hidden border-b border-[var(--border)] p-3 lg:border-b-0">
           <div className="flex w-full shrink-0 items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
               {displayBlochVector ? t("blochSphere") : t("qsphere")}
@@ -600,6 +673,15 @@ export default function Composer({
             )}
           </div>
         </div>
+
+        <div
+          onPointerDown={(e) => startColumnDrag(1, e)}
+          className="hidden items-center justify-center lg:flex"
+          style={{ cursor: "col-resize" }}
+        >
+          <div className="h-full w-px bg-[var(--border)] transition-colors hover:bg-[var(--accent)]" />
+        </div>
+
         <div className="flex min-h-0 flex-col overflow-hidden">
           <CodeView circuit={circuit} onApplyCircuit={handleApplyCircuit} compact t={t} />
         </div>
