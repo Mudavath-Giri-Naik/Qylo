@@ -7,9 +7,9 @@ import { makeTranslator, type Translate } from "@/lib/i18n/composer";
 
 const defaultT = makeTranslator("en");
 
-const CELL_WIDTH = 64;
-const ROW_HEIGHT = 56;
-const LABEL_WIDTH = 44;
+const CELL_WIDTH = 60;
+const ROW_HEIGHT = 46;
+const LABEL_WIDTH = 40;
 const MIN_COLUMNS = 6;
 
 function MinusIcon() {

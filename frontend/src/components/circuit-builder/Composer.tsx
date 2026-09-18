@@ -536,7 +536,7 @@ export default function Composer({
       </header>
 
       {/* Top: operations | canvas (wide) */}
-      <div className="grid min-h-0 flex-[5] grid-cols-1 lg:grid-cols-[300px_1fr]">
+      <div className="grid min-h-0 flex-[6] grid-cols-1 lg:grid-cols-[300px_1fr]">
         <div className="flex min-h-0 flex-col overflow-hidden border-b border-[var(--border)] p-2.5 lg:border-b-0 lg:border-r">
           <GatePalette pendingControl={pendingControl} compact t={t} />
         </div>
@@ -572,7 +572,7 @@ export default function Composer({
             </label>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
+          <div className="min-h-0 flex-1 overflow-hidden">
             <CircuitCanvas
               circuit={circuit}
               pendingControl={pendingControl}
@@ -626,7 +626,7 @@ export default function Composer({
           and stacks full-width, so dragging has no effect on small screens. */}
       <div
         ref={bottomRowRef}
-        className="grid min-h-0 flex-[6] grid-cols-1 border-t border-[var(--border)] lg:[grid-template-columns:var(--col-a)_6px_var(--col-b)_6px_var(--col-c)]"
+        className="grid min-h-0 flex-[5] grid-cols-1 border-t border-[var(--border)] lg:[grid-template-columns:var(--col-a)_6px_var(--col-b)_6px_var(--col-c)]"
         style={
           {
             "--col-a": `${colWidths[0]}%`,
