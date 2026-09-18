@@ -66,7 +66,7 @@
   /* Marketing palette (landing page bento cards, tag pills, marquee) --
      bright, solid, editorial-style colors distinct from the app's own
      functional surface tokens above. Blue reuses the brand --accent. */
-  --marketing-bg: #f2f1f8;
+  --marketing-bg: #ffffff;
   --marketing-green: #2fb67c;
   --marketing-green-fg: #f4fff9;
   --marketing-yellow: #f6c343;

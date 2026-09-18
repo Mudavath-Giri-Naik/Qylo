@@ -59,17 +59,6 @@ function GraduationCapIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-function OrbitIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" {...props}>
-      <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
-      <ellipse cx="12" cy="12" rx="10" ry="4.2" />
-      <ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)" />
-      <ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)" />
-    </svg>
-  );
-}
-
 function AvatarRow() {
   return (
     <AvatarGroup>
@@ -124,7 +113,8 @@ export default function Home() {
                 Learn. Build. Master
                 <br />
                 <span className="inline-flex items-center gap-3">
-                  <OrbitIcon className="h-10 w-10 shrink-0 text-[var(--marketing-green)] sm:h-14 sm:w-14" />
+                  {/* eslint-disable-next-line @next/next/no-img-element -- decorative icon, local PNG */}
+                  <img src="/pinwheel-icon.png" alt="" aria-hidden className="h-10 w-10 shrink-0 sm:h-14 sm:w-14" />
                   with Qylo
                 </span>
               </h1>
@@ -151,30 +141,18 @@ export default function Home() {
           {/* Bento feature grid */}
           <div className="relative mx-auto max-w-5xl px-6 pb-24">
             <RevealOnScroll delay={0.1}>
-              <div className="grid grid-cols-1 grid-rows-2 sm:grid-cols-3">
+              <div className="grid grid-cols-1 grid-rows-2 gap-4 sm:grid-cols-3">
                 <div
-                  className="flex flex-col justify-between p-6 sm:col-start-1 sm:row-start-1"
+                  className="flex flex-col justify-between rounded-3xl p-6 sm:col-start-1 sm:row-start-1"
                   style={{ background: "var(--marketing-green)", color: "var(--marketing-green-fg)" }}
                 >
                   <AvatarRow />
                   <p className="mt-6 text-lg font-bold leading-snug">AI Tutor &amp; Live Guidance</p>
                 </div>
 
-                <div className="relative overflow-hidden bg-[var(--surface-2)] sm:col-start-2 sm:row-span-2 sm:row-start-1">
-                  <svg viewBox="0 0 300 220" className="h-full w-full" preserveAspectRatio="xMidYMid slice" aria-hidden>
-                    <rect width="300" height="220" fill="var(--surface-2)" />
-                    {[60, 110, 160].map((y) => (
-                      <line key={y} x1="30" y1={y} x2="270" y2={y} stroke="var(--composer-wire, var(--border-strong))" strokeWidth="2" />
-                    ))}
-                    {[
-                      { x: 80, y: 60, c: "var(--gate-h-solid, var(--accent))" },
-                      { x: 150, y: 110, c: "var(--marketing-pink)" },
-                      { x: 210, y: 160, c: "var(--accent)" },
-                      { x: 190, y: 60, c: "var(--marketing-yellow)" },
-                    ].map((g, i) => (
-                      <rect key={i} x={g.x - 16} y={g.y - 16} width="32" height="32" rx="8" fill={g.c} />
-                    ))}
-                  </svg>
+                <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-2)] sm:col-start-2 sm:row-span-2 sm:row-start-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- local photo, fills the card via object-cover */}
+                  <img src="/instructor-photo.webp" alt="" aria-hidden className="h-full w-full object-cover" />
                   <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-[var(--surface)]/95 p-4 shadow-[var(--shadow-md)] backdrop-blur">
                     <p className="text-sm font-semibold text-[var(--foreground)]">
                       Learn at your own pace, anywhere, anytime.
@@ -183,19 +161,27 @@ export default function Home() {
                 </div>
 
                 <div
-                  className="flex flex-col justify-between p-6 sm:col-start-3 sm:row-span-2 sm:row-start-1"
+                  className="relative flex flex-col justify-between overflow-hidden rounded-3xl p-6 sm:col-start-3 sm:row-span-2 sm:row-start-1"
                   style={{ background: "var(--marketing-yellow)", color: "var(--marketing-yellow-fg)" }}
                 >
                   <p className="text-lg font-bold leading-snug">
                     Every learner deserves clear, hands-on quantum education.
                   </p>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- local photo, decorative */}
+                  <img
+                    src="/student-photo.png"
+                    alt=""
+                    aria-hidden
+                    className="mt-6 h-20 w-20 self-end rounded-2xl object-cover shadow-[var(--shadow-md)]"
+                  />
                 </div>
 
                 <div
-                  className="flex flex-col justify-between p-6 sm:col-start-1 sm:row-start-2"
+                  className="flex flex-col justify-between rounded-3xl p-6 sm:col-start-1 sm:row-start-2"
                   style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
                 >
-                  <GraduationCapIcon className="h-8 w-8" />
+                  {/* eslint-disable-next-line @next/next/no-img-element -- decorative icon, local PNG */}
+                  <img src="/badge-icon.png" alt="" aria-hidden className="h-8 w-8" />
                   <p className="mt-6 text-lg font-bold leading-snug">Real Qiskit Simulation, Real Results</p>
                 </div>
               </div>
