@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Caveat } from "next/font/google";
 import MarketingNavbar from "@/components/MarketingNavbar";
 import RevealOnScroll from "@/components/RevealOnScroll";
-import { Avatar, AvatarFallback, AvatarGroup } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarGroup } from "@/components/ui/avatar";
 import { MODULES, moduleDescription, moduleTitle } from "@/lib/learn/modules";
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["600", "700"] });
@@ -44,11 +44,7 @@ const PILL_STYLES = [
   { bg: "var(--accent)", fg: "var(--accent-foreground)" },
 ];
 
-const AVATAR_FALLBACKS = [
-  { label: "Q", bg: "var(--accent)" },
-  { label: "∑", bg: "var(--marketing-green)" },
-  { label: "π", bg: "var(--marketing-pink)" },
-];
+const AVATAR_PHOTOS = ["/avatar-1.png", "/avatar-2.png", "/avatar-3.png", "/avatar-4.png"];
 
 function GraduationCapIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -62,11 +58,9 @@ function GraduationCapIcon(props: React.SVGProps<SVGSVGElement>) {
 function AvatarRow() {
   return (
     <AvatarGroup>
-      {AVATAR_FALLBACKS.map((a) => (
-        <Avatar key={a.label}>
-          <AvatarFallback style={{ background: a.bg, color: "#fff" }} className="font-semibold">
-            {a.label}
-          </AvatarFallback>
+      {AVATAR_PHOTOS.map((src) => (
+        <Avatar key={src}>
+          <AvatarImage src={src} alt="" />
         </Avatar>
       ))}
     </AvatarGroup>
@@ -167,13 +161,17 @@ export default function Home() {
                   <p className="text-lg font-bold leading-snug">
                     Every learner deserves clear, hands-on quantum education.
                   </p>
-                  {/* eslint-disable-next-line @next/next/no-img-element -- local photo, decorative */}
-                  <img
-                    src="/student-photo.png"
-                    alt=""
-                    aria-hidden
-                    className="mt-6 h-20 w-20 self-end rounded-2xl object-cover shadow-[var(--shadow-md)]"
-                  />
+                  <div className="relative mt-6 h-20 w-20 self-end">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- local photo, decorative */}
+                    <img
+                      src="/student-photo.png"
+                      alt=""
+                      aria-hidden
+                      className="h-full w-full rounded-2xl object-cover shadow-[var(--shadow-md)]"
+                    />
+                    {/* eslint-disable-next-line @next/next/no-img-element -- decorative badge, local PNG */}
+                    <img src="/sparkle-badge.png" alt="" aria-hidden className="absolute -right-2 -top-2 h-7 w-7" />
+                  </div>
                 </div>
 
                 <div
