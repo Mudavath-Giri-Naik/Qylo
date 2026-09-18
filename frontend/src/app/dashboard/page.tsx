@@ -42,7 +42,7 @@ export default async function DashboardPage() {
         <p className="text-xs text-[var(--foreground-muted)]">Your quantum learning journey starts here.</p>
       </div>
 
-      <div className="mt-3 grid min-h-0 flex-1 grid-rows-3 gap-3">
+      <div className="mt-3 grid min-h-0 flex-1 grid-rows-[4fr_4fr_3fr] gap-3">
         {/* Row 1 */}
         <div className="grid min-h-0 grid-cols-1 gap-3 lg:grid-cols-4">
           <Card className="relative min-h-0 overflow-hidden p-5 lg:col-span-2">
@@ -161,7 +161,7 @@ export default async function DashboardPage() {
 
         {/* Row 2 */}
         <div className="grid min-h-0 grid-cols-1 gap-3 lg:grid-cols-3">
-          <Card className="min-h-0 overflow-hidden p-4">
+          <Card className="min-h-0 overflow-hidden p-3.5">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-[var(--foreground)]">Overall Learning Progress</h3>
               <Link href="/my-progress" className="text-[11px] font-semibold text-[var(--accent)] hover:underline">
@@ -181,8 +181,8 @@ export default async function DashboardPage() {
               <div className="h-full rounded-full bg-[var(--accent)]" style={{ width: `${overview.overallPercent}%` }} />
             </div>
 
-            <div className="mt-2.5 grid grid-cols-2 gap-2">
-              <div className="flex items-center gap-2 rounded-xl bg-blue-500/10 p-2">
+            <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+              <div className="flex items-center gap-2 rounded-xl bg-blue-500/10 p-1.5">
                 <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-blue-500/15 text-blue-600 dark:text-blue-400">
                   <BookOpen className="h-3.5 w-3.5" />
                 </div>
@@ -191,7 +191,7 @@ export default async function DashboardPage() {
                   <p className="truncate text-[10px] text-[var(--foreground-muted)]">Courses</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded-xl bg-[var(--marketing-green)]/10 p-2">
+              <div className="flex items-center gap-2 rounded-xl bg-[var(--marketing-green)]/10 p-1.5">
                 <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[var(--marketing-green)]/15 text-[var(--marketing-green)]">
                   <Award className="h-3.5 w-3.5" />
                 </div>
@@ -200,7 +200,7 @@ export default async function DashboardPage() {
                   <p className="truncate text-[10px] text-[var(--foreground-muted)]">Certificates</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded-xl bg-orange-500/10 p-2">
+              <div className="flex items-center gap-2 rounded-xl bg-orange-500/10 p-1.5">
                 <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-orange-500/15 text-orange-600 dark:text-orange-400">
                   <Target className="h-3.5 w-3.5" />
                 </div>
@@ -209,7 +209,7 @@ export default async function DashboardPage() {
                   <p className="truncate text-[10px] text-[var(--foreground-muted)]">Attempted</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded-xl bg-[var(--marketing-pink)]/10 p-2">
+              <div className="flex items-center gap-2 rounded-xl bg-[var(--marketing-pink)]/10 p-1.5">
                 <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[var(--marketing-pink)]/20 text-[var(--marketing-pink)]">
                   <Trophy className="h-3.5 w-3.5" />
                 </div>
