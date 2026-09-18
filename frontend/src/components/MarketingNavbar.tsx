@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -19,9 +22,36 @@ function QyloMark() {
   );
 }
 
+/** Hides the navbar on scroll-down, reveals it on scroll-up. setState only
+ * ever happens inside the scroll event callback, never synchronously in the
+ * effect body, so this doesn't trip react-hooks/set-state-in-effect. */
+function useHideOnScroll() {
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
+
+  useEffect(() => {
+    function onScroll() {
+      const y = window.scrollY;
+      const goingDown = y > lastY.current;
+      setHidden(goingDown && y > 96);
+      lastY.current = y;
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return hidden;
+}
+
 export default function MarketingNavbar() {
+  const hidden = useHideOnScroll();
+
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)]/90 backdrop-blur-md">
+    <header
+      className={`sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)]/90 backdrop-blur-md transition-transform duration-300 ${
+        hidden ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <QyloMark />

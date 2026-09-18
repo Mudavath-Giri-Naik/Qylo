@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Caveat } from "next/font/google";
 import MarketingNavbar from "@/components/MarketingNavbar";
 import RevealOnScroll from "@/components/RevealOnScroll";
+import { Avatar, AvatarFallback, AvatarGroup } from "@/components/ui/avatar";
 import { MODULES, moduleDescription, moduleTitle } from "@/lib/learn/modules";
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["600", "700"] });
@@ -43,22 +44,17 @@ const PILL_STYLES = [
   { bg: "var(--accent)", fg: "var(--accent-foreground)" },
 ];
 
+const AVATAR_FALLBACKS = [
+  { label: "Q", bg: "var(--accent)" },
+  { label: "∑", bg: "var(--marketing-green)" },
+  { label: "π", bg: "var(--marketing-pink)" },
+];
+
 function GraduationCapIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <path d="M22 10L12 5 2 10l10 5 10-5z" />
       <path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5" />
-    </svg>
-  );
-}
-
-function RocketIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z" />
-      <path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z" />
-      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
-      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
     </svg>
   );
 }
@@ -74,11 +70,17 @@ function OrbitIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-function ChatIcon(props: React.SVGProps<SVGSVGElement>) {
+function AvatarRow() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-    </svg>
+    <AvatarGroup>
+      {AVATAR_FALLBACKS.map((a) => (
+        <Avatar key={a.label}>
+          <AvatarFallback style={{ background: a.bg, color: "#fff" }} className="font-semibold">
+            {a.label}
+          </AvatarFallback>
+        </Avatar>
+      ))}
+    </AvatarGroup>
   );
 }
 
@@ -100,24 +102,26 @@ export default function Home() {
             }}
           />
 
-          <OrbitIcon aria-hidden className="pointer-events-none absolute right-[8%] top-28 h-16 w-16 text-[var(--accent)]/50 sm:right-[12%]" />
-          <RocketIcon aria-hidden className="pointer-events-none absolute right-[4%] top-[58%] hidden h-12 w-12 -rotate-12 text-[var(--marketing-green)]/70 md:block" />
-          <GraduationCapIcon aria-hidden className="pointer-events-none absolute left-[8%] top-[55%] hidden h-11 w-11 text-[var(--marketing-green)]/60 md:block" />
-          <ChatIcon aria-hidden className="pointer-events-none absolute left-[4%] top-32 hidden h-10 w-10 text-[var(--marketing-pink)]/70 lg:block" />
+          {/* eslint-disable @next/next/no-img-element -- decorative, local SVGs with spaces in their filenames; next/image blocks local SVGs by default */}
+          <img src="/Connected%20world-rafiki.svg" alt="" aria-hidden width={150} height={150} className="pointer-events-none absolute right-[6%] top-20 hidden opacity-90 sm:block" />
+          <img src="/Research%20paper-rafiki.svg" alt="" aria-hidden width={130} height={130} className="pointer-events-none absolute right-[2%] top-[56%] hidden opacity-90 md:block" />
+          <img src="/Team-rafiki.svg" alt="" aria-hidden width={140} height={140} className="pointer-events-none absolute left-[2%] top-[54%] hidden opacity-90 md:block" />
+          <img src="/Online%20learning-rafiki.svg" alt="" aria-hidden width={130} height={130} className="pointer-events-none absolute left-[4%] top-24 hidden opacity-90 lg:block" />
+          {/* eslint-enable @next/next/no-img-element */}
 
           <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 pb-20 pt-20 text-center">
             <RevealOnScroll>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-xs font-medium text-[var(--foreground-muted)] shadow-[var(--shadow-sm)]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-                AI tutor + real Qiskit simulation
-              </span>
+              <div className="flex items-center gap-3">
+                <AvatarRow />
+                <span className="text-sm font-medium text-[var(--foreground-muted)]">
+                  AI tutor + real Qiskit simulation
+                </span>
+              </div>
             </RevealOnScroll>
 
             <RevealOnScroll delay={0.08}>
               <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] tracking-tight text-[var(--marketing-ink)] sm:text-7xl">
-                Learn.
-                <br />
-                Build.
+                Learn. Build.
                 <br />
                 <span className="inline-flex items-center gap-3">
                   <OrbitIcon className="h-10 w-10 shrink-0 text-[var(--marketing-green)] sm:h-14 sm:w-14" />
@@ -152,13 +156,7 @@ export default function Home() {
                   className="flex flex-col justify-between rounded-3xl p-6 sm:col-start-1 sm:row-start-1"
                   style={{ background: "var(--marketing-green)", color: "var(--marketing-green-fg)" }}
                 >
-                  <div className="flex -space-x-2">
-                    {["A", "B", "C"].map((l) => (
-                      <span key={l} className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[var(--marketing-green)] bg-white/90 text-xs font-semibold text-[var(--marketing-ink)]">
-                        {l}
-                      </span>
-                    ))}
-                  </div>
+                  <AvatarRow />
                   <p className="mt-6 text-lg font-bold leading-snug">AI Tutor &amp; Live Guidance</p>
                 </div>
 
@@ -214,15 +212,13 @@ export default function Home() {
           </RevealOnScroll>
 
           <div className="group relative mt-8 overflow-hidden">
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[var(--background)] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[var(--background)] to-transparent" />
             <div className="animate-marquee flex w-max gap-4 group-hover:[animation-play-state:paused]">
               {[...MODULES, ...MODULES].map((m, i) => {
                 const style = PILL_STYLES[i % PILL_STYLES.length];
                 return (
                   <span
                     key={`${m.code}-${i}`}
-                    className="shrink-0 rounded-full px-6 py-3 text-sm font-semibold"
+                    className="shrink-0 px-6 py-3 text-sm font-semibold"
                     style={{ background: style.bg, color: style.fg }}
                   >
                     {moduleTitle(m, "en")}
