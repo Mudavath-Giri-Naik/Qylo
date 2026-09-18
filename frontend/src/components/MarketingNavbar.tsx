@@ -12,17 +12,6 @@ const LINKS = [
   { href: "/challenges", label: "Challenges" },
 ];
 
-function QyloMark() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden>
-      <circle cx="13" cy="13" r="3.2" fill="var(--accent)" />
-      <ellipse cx="13" cy="13" rx="11" ry="4.6" stroke="var(--accent)" strokeWidth="1.6" />
-      <ellipse cx="13" cy="13" rx="11" ry="4.6" stroke="var(--accent)" strokeWidth="1.6" transform="rotate(60 13 13)" />
-      <ellipse cx="13" cy="13" rx="11" ry="4.6" stroke="var(--accent)" strokeWidth="1.6" transform="rotate(120 13 13)" />
-    </svg>
-  );
-}
-
 /** Hides the navbar on scroll-down, reveals it on scroll-up. setState only
  * ever happens inside the scroll event callback, never synchronously in the
  * effect body, so this doesn't trip react-hooks/set-state-in-effect. */
@@ -55,8 +44,7 @@ export default function MarketingNavbar() {
       }`}
     >
       <nav className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-8 py-4 md:px-10">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
-          <QyloMark />
+        <Link href="/" className="flex shrink-0 items-center">
           <span className="text-lg font-bold tracking-tight text-[var(--foreground)]">Qylo</span>
         </Link>
 

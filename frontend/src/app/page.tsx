@@ -137,11 +137,15 @@ export default function Home() {
             <RevealOnScroll delay={0.1}>
               <div className="grid grid-cols-1 grid-rows-2 gap-4 sm:grid-cols-3">
                 <div
-                  className="flex flex-col justify-between rounded-3xl p-6 sm:col-start-1 sm:row-start-1"
-                  style={{ background: "var(--marketing-green)", color: "var(--marketing-green-fg)" }}
+                  className="relative flex flex-col justify-between overflow-hidden rounded-3xl p-6 sm:col-start-1 sm:row-start-1"
+                  style={{ background: "var(--marketing-green)", color: "#000000" }}
                 >
-                  <AvatarRow />
-                  <p className="mt-6 text-lg font-bold leading-snug">AI Tutor &amp; Live Guidance</p>
+                  <div aria-hidden className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-white/25" />
+                  <div aria-hidden className="pointer-events-none absolute -bottom-10 -left-8 h-24 w-24 rounded-full bg-black/5" />
+                  <div className="relative z-10">
+                    <AvatarRow />
+                  </div>
+                  <p className="relative z-10 mt-6 text-2xl font-bold leading-snug">AI Tutor &amp; Live Guidance</p>
                 </div>
 
                 <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-2)] sm:col-start-2 sm:row-span-2 sm:row-start-1">
@@ -156,12 +160,14 @@ export default function Home() {
 
                 <div
                   className="relative flex flex-col justify-between overflow-hidden rounded-3xl p-6 sm:col-start-3 sm:row-span-2 sm:row-start-1"
-                  style={{ background: "var(--marketing-yellow)", color: "var(--marketing-yellow-fg)" }}
+                  style={{ background: "var(--marketing-yellow)", color: "#000000" }}
                 >
-                  <p className="text-lg font-bold leading-snug">
+                  <div aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-white/25" />
+                  <div aria-hidden className="pointer-events-none absolute -bottom-12 -left-10 h-28 w-28 rounded-full bg-black/5" />
+                  <p className="relative z-10 text-2xl font-bold leading-snug">
                     Every learner deserves clear, hands-on quantum education.
                   </p>
-                  <div className="relative mt-6 h-20 w-20 self-end">
+                  <div className="relative z-10 mt-6 h-20 w-20 self-end">
                     {/* eslint-disable-next-line @next/next/no-img-element -- local photo, decorative */}
                     <img
                       src="/student-photo.png"
@@ -175,12 +181,14 @@ export default function Home() {
                 </div>
 
                 <div
-                  className="flex flex-col justify-between rounded-3xl p-6 sm:col-start-1 sm:row-start-2"
-                  style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                  className="relative flex flex-col justify-between overflow-hidden rounded-3xl p-6 sm:col-start-1 sm:row-start-2"
+                  style={{ background: "var(--accent)", color: "#000000" }}
                 >
+                  <div aria-hidden className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-white/20" />
+                  <div aria-hidden className="pointer-events-none absolute -bottom-10 -left-8 h-24 w-24 rounded-full bg-black/10" />
                   {/* eslint-disable-next-line @next/next/no-img-element -- decorative icon, local PNG */}
-                  <img src="/badge-icon.png" alt="" aria-hidden className="h-8 w-8" />
-                  <p className="mt-6 text-lg font-bold leading-snug">Real Qiskit Simulation, Real Results</p>
+                  <img src="/badge-icon.png" alt="" aria-hidden className="relative z-10 h-8 w-8" />
+                  <p className="relative z-10 mt-6 text-2xl font-bold leading-snug">Real Qiskit Simulation, Real Results</p>
                 </div>
               </div>
             </RevealOnScroll>
