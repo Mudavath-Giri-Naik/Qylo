@@ -65,7 +65,9 @@ export default function AppSidebar({
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <Link href="/" className="flex items-center gap-2 px-2 py-1.5 text-base font-semibold tracking-tight">
-          Qylo
+          {/* eslint-disable-next-line @next/next/no-img-element -- decorative brand mark, local PNG */}
+          <img src="/ai.png" alt="" aria-hidden className="h-5 w-5 shrink-0 dark:invert" />
+          <span className="group-data-[collapsible=icon]:hidden">Qylo</span>
         </Link>
       </SidebarHeader>
       <SidebarContent>
