@@ -210,8 +210,8 @@ export default function Home() {
                 return (
                   <span
                     key={`${m.code}-${i}`}
-                    className="shrink-0 px-6 py-3 text-sm font-semibold"
-                    style={{ background: style.bg, color: style.fg }}
+                    className="shrink-0 px-8 py-4 text-lg font-extrabold"
+                    style={{ background: style.bg, color: "#000000" }}
                   >
                     {moduleTitle(m, "en")}
                   </span>
