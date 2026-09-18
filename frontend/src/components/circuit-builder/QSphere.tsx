@@ -59,7 +59,7 @@ export default function QSphere({
   statevector: [number, number][];
   numQubits: number;
   /** Drops the state list below the sphere (matches the reference composer,
-   * which shows only the sphere + phase legend) and shrinks the footprint. */
+   * which shows only the sphere + phase legend). */
   compact?: boolean;
   t?: Translate;
 }) {
@@ -67,13 +67,12 @@ export default function QSphere({
   const [showPhase, setShowPhase] = useState(false);
   const points = computePoints(statevector, numQubits);
 
-  const size = 200;
+  const size = 260;
   const cx = size / 2;
   const cy = size / 2;
-  const R = 66;
+  const R = 88;
   const depthX = 0.42;
   const depthY = 0.22;
-  const maxWidth = compact ? 190 : 280;
 
   const project = (x: number, y: number, z: number) => ({
     x: cx + R * x + R * depthX * y,
@@ -84,8 +83,8 @@ export default function QSphere({
   const maxProbability = Math.max(...points.map((p) => p.probability), 1e-9);
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <svg viewBox={`0 0 ${size} ${size}`} className="w-full" style={{ maxWidth }} role="img" aria-label="Q-sphere">
+    <div className="flex w-full flex-col items-center gap-2">
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[320px]" role="img" aria-label="Q-sphere">
         <circle cx={cx} cy={cy} r={R} fill="var(--chart-series-1)" fillOpacity={0.05} stroke="var(--chart-baseline)" strokeWidth={1} />
         <ellipse cx={cx} cy={cy} rx={R} ry={equatorRy} fill="none" stroke="var(--chart-grid)" strokeWidth={1} strokeDasharray="3 3" />
         <line
@@ -99,7 +98,7 @@ export default function QSphere({
 
         {points.map((p) => {
           const tip = project(p.x, p.y, p.z);
-          const radius = 2.5 + 5.5 * Math.sqrt(p.probability / maxProbability);
+          const radius = 3 + 7 * Math.sqrt(p.probability / maxProbability);
           const color = phaseColor(p.phaseDeg);
           const label = [showState ? `|${p.bitstring}⟩` : null, showPhase ? `${p.phaseDeg.toFixed(0)}°` : null]
             .filter(Boolean)
@@ -112,9 +111,9 @@ export default function QSphere({
               {label && (
                 <text
                   x={tip.x}
-                  y={tip.y - radius - 3}
+                  y={tip.y - radius - 4}
                   textAnchor="middle"
-                  fontSize={8}
+                  fontSize={9}
                   fontFamily="var(--font-geist-mono)"
                   fill="var(--chart-ink-secondary)"
                 >
@@ -127,31 +126,31 @@ export default function QSphere({
         <circle cx={cx} cy={cy} r={2} fill="var(--chart-ink-muted)" />
       </svg>
 
-      <div className="flex w-full flex-wrap items-center justify-between gap-3" style={{ maxWidth }}>
+      <div className="flex w-full max-w-[320px] shrink-0 items-end justify-between gap-3 px-1">
         <div
-          className="relative h-11 w-11 shrink-0 rounded-full"
+          className="relative h-12 w-12 shrink-0 rounded-full"
           style={{
             background:
               "conic-gradient(from 90deg, hsl(0,72%,52%), hsl(90,72%,52%), hsl(180,72%,52%), hsl(270,72%,52%), hsl(360,72%,52%))",
           }}
         >
           <div className="absolute inset-[4px] rounded-full bg-[var(--surface)]" />
-          <span className="absolute left-1/2 top-[-11px] -translate-x-1/2 text-[8px] text-[var(--foreground-subtle)]">π/2</span>
-          <span className="absolute right-[-13px] top-1/2 -translate-y-1/2 text-[8px] text-[var(--foreground-subtle)]">0</span>
-          <span className="absolute left-1/2 bottom-[-11px] -translate-x-1/2 text-[8px] text-[var(--foreground-subtle)]">3π/2</span>
-          <span className="absolute left-[-13px] top-1/2 -translate-y-1/2 text-[8px] text-[var(--foreground-subtle)]">π</span>
+          <span className="absolute left-1/2 top-[-12px] -translate-x-1/2 text-[8px] text-[var(--foreground-subtle)]">π/2</span>
+          <span className="absolute right-[-14px] top-1/2 -translate-y-1/2 text-[8px] text-[var(--foreground-subtle)]">0</span>
+          <span className="absolute left-1/2 bottom-[-12px] -translate-x-1/2 text-[8px] text-[var(--foreground-subtle)]">3π/2</span>
+          <span className="absolute left-[-14px] top-1/2 -translate-y-1/2 text-[8px] text-[var(--foreground-subtle)]">π</span>
           <span className="absolute inset-0 flex items-center justify-center text-[7px] font-medium text-[var(--foreground-muted)]">
             {t("phaseAngle").split(" ")[0]}
           </span>
         </div>
 
-        <div className="flex flex-col gap-1 text-[10px] text-[var(--foreground-muted)]">
+        <div className="flex shrink-0 flex-col items-start gap-1 text-right text-[10px] text-[var(--foreground-muted)]">
           <span className="font-semibold text-[var(--foreground-subtle)]">{t("labels")}</span>
-          <label className="flex items-center gap-1.5">
+          <label className="flex items-center gap-1.5 whitespace-nowrap">
             <input type="checkbox" checked={showState} onChange={(e) => setShowState(e.target.checked)} className="accent-[var(--accent)]" />
             {t("state")}
           </label>
-          <label className="flex items-center gap-1.5">
+          <label className="flex items-center gap-1.5 whitespace-nowrap">
             <input type="checkbox" checked={showPhase} onChange={(e) => setShowPhase(e.target.checked)} className="accent-[var(--accent)]" />
             {t("phaseAngle")}
           </label>

@@ -213,7 +213,7 @@ export default function Composer({
   // as percentages of that row's width. Code starts narrower than an even
   // split; dragging the dividers between any two adjacent panels redistributes
   // just that pair, in percent so it stays correct across screen sizes.
-  const [colWidths, setColWidths] = useState<[number, number, number]>([42, 28, 30]);
+  const [colWidths, setColWidths] = useState<[number, number, number]>([38, 32, 30]);
   const bottomRowRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ divider: 0 | 1; startX: number; startWidths: [number, number, number] } | null>(null);
 
