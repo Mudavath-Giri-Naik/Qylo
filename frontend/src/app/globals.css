@@ -113,7 +113,7 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --background: #0a0d13;
+  --background: #09090b;
   --surface: #10141c;
   --surface-2: #171c26;
   --surface-hover: #1e2430;

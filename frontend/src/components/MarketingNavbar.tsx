@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -15,9 +16,18 @@ const LINKS = [
 
 // Not sticky on purpose: the navbar scrolls away with the hero instead of
 // pinning to the top, so it's only visible back at the top of the page.
-export default function MarketingNavbar() {
+export default function MarketingNavbar({
+  loggedIn,
+  userName,
+  userAvatarUrl,
+}: {
+  loggedIn: boolean;
+  userName: string | null;
+  userAvatarUrl: string | null;
+}) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const initial = userName ? userName[0]!.toUpperCase() : "?";
 
   return (
     <header className="relative z-40 bg-transparent">
@@ -46,19 +56,32 @@ export default function MarketingNavbar() {
         </div>
 
         <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
-          <Link
-            href="/login"
-            className="hidden text-sm font-medium text-white/90 transition-colors hover:text-white sm:inline"
-          >
-            Log in
-          </Link>
+          {!loggedIn && (
+            <Link
+              href="/login"
+              className="hidden text-sm font-medium text-white/90 transition-colors hover:text-white sm:inline"
+            >
+              Log in
+            </Link>
+          )}
           <ThemeToggle className="border-white/30 bg-white/10 text-white hover:bg-white/20" />
-          <Link
-            href="/signup"
-            className="rounded-full bg-white px-3.5 py-2 text-xs font-bold text-[var(--accent)] shadow-sm transition-opacity hover:opacity-90 sm:px-5 sm:py-2.5 sm:text-sm"
-          >
-            Get Started
-          </Link>
+          {loggedIn ? (
+            <Link href="/profile" aria-label="Profile" className="shrink-0">
+              <Avatar className="h-9 w-9 ring-2 ring-white/50">
+                {userAvatarUrl && <AvatarImage src={userAvatarUrl} alt="" />}
+                <AvatarFallback className="bg-white text-sm font-bold text-[var(--accent)]">
+                  {initial}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+          ) : (
+            <Link
+              href="/signup"
+              className="rounded-full bg-white px-3.5 py-2 text-xs font-bold text-[var(--accent)] shadow-sm transition-opacity hover:opacity-90 sm:px-5 sm:py-2.5 sm:text-sm"
+            >
+              Get Started
+            </Link>
+          )}
           <button
             type="button"
             onClick={() => setMobileOpen((v) => !v)}

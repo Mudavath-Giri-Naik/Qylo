@@ -7,6 +7,8 @@ import RevealOnScroll from "@/components/RevealOnScroll";
 import { Avatar, AvatarImage, AvatarGroup } from "@/components/ui/avatar";
 import { MODULES, moduleTitle } from "@/lib/learn/modules";
 import { MODULE_INSTRUCTOR } from "@/lib/learn/presentation";
+import { createClient } from "@/lib/supabase/server";
+import { oauthAvatarUrl, oauthFullName } from "@/lib/auth/profile";
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["600", "700"] });
 
@@ -93,7 +95,12 @@ function AvatarRow({ avatarClassName }: { avatarClassName?: string }) {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <>
       {/* Hero -- cloud shader sits behind the navbar, intro block, and the
@@ -111,7 +118,11 @@ export default function Home() {
           />
         </div>
 
-        <MarketingNavbar />
+        <MarketingNavbar
+          loggedIn={!!user}
+          userName={oauthFullName(user) ?? user?.email ?? null}
+          userAvatarUrl={oauthAvatarUrl(user)}
+        />
 
         <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 pb-20 pt-14 text-center">
           <RevealOnScroll>
