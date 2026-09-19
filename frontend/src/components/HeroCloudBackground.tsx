@@ -24,8 +24,12 @@ export default function HeroCloudBackground({ className }: { className?: string 
     <CloudShader
       className={className}
       cloudColor={isDark ? "#c9d3e6" : "#fbf8f2"}
-      skyTopColor={isDark ? "#0a1024" : "#3876ba"}
-      skyBottomColor={isDark ? "#233258" : "#8cbfe8"}
+      // Kept off pure/near-black on purpose: the hero is tall enough now
+      // (it stretches down past the floating dashboard preview) that a
+      // near-black top color reads as a solid black band once the vertical
+      // gradient is stretched over that height, rather than "night sky".
+      skyTopColor={isDark ? "#182449" : "#3876ba"}
+      skyBottomColor={isDark ? "#2c3d68" : "#8cbfe8"}
     />
   );
 }

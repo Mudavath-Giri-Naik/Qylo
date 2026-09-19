@@ -304,6 +304,12 @@ export const CloudShader = ({
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
+      // A momentarily-hidden tab or an in-progress layout pass can report
+      // 0 here; committing that would zero out (and clear) the canvas and
+      // leave it stuck black once the animation loop resumes. Skip it and
+      // keep the last known-good size instead -- the observer fires again
+      // once a real size is available.
+      if (width === 0 || height === 0) return;
       const w = Math.max(1, Math.floor(width * dpr));
       const h = Math.max(1, Math.floor(height * dpr));
       if (canvas.width !== w || canvas.height !== h) {

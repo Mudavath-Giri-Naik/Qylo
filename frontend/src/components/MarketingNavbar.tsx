@@ -22,7 +22,11 @@ export default function MarketingNavbar() {
   return (
     <header className="relative z-40 bg-transparent">
       <nav className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-4 sm:px-8 md:px-10">
-        <Link href="/" className="flex shrink-0 items-center">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element -- decorative brand mark, local PNG */}
+            <img src="/pinwheel-icon.png" alt="" aria-hidden className="h-5 w-5" />
+          </span>
           <span className="text-lg font-bold tracking-tight text-white">Qylo</span>
         </Link>
 
@@ -42,12 +46,18 @@ export default function MarketingNavbar() {
         </div>
 
         <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
+          <Link
+            href="/login"
+            className="hidden text-sm font-medium text-white/90 transition-colors hover:text-white sm:inline"
+          >
+            Log in
+          </Link>
           <ThemeToggle className="border-white/30 bg-white/10 text-white hover:bg-white/20" />
           <Link
             href="/signup"
-            className="rounded-full bg-[var(--marketing-ink)] px-3.5 py-2 text-xs font-bold text-[var(--background)] transition-opacity hover:opacity-90 sm:px-5 sm:py-2.5 sm:text-sm"
+            className="rounded-full bg-white px-3.5 py-2 text-xs font-bold text-[var(--accent)] shadow-sm transition-opacity hover:opacity-90 sm:px-5 sm:py-2.5 sm:text-sm"
           >
-            Sign Up
+            Get Started
           </Link>
           <button
             type="button"

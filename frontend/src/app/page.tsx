@@ -6,7 +6,8 @@ import MarketingNavbar from "@/components/MarketingNavbar";
 import HeroCloudBackground from "@/components/HeroCloudBackground";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import { Avatar, AvatarImage, AvatarGroup } from "@/components/ui/avatar";
-import { MODULES, moduleDescription, moduleTitle } from "@/lib/learn/modules";
+import { MODULES, moduleTitle } from "@/lib/learn/modules";
+import { MODULE_INSTRUCTOR } from "@/lib/learn/presentation";
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["600", "700"] });
 
@@ -46,10 +47,27 @@ const STEPS = [
 ];
 
 const MODULE_TAGS: Record<string, [string, string]> = {
-  "QT-M1": ["Qubits", "Fundamentals"],
-  "QT-M2": ["Diagrams", "Gates"],
-  "QT-M3": ["Algorithms", "Theory"],
-  "QT-M4": ["NISQ", "Hybrid"],
+  "QT-M1": ["Quantum Computing", "Fundamentals"],
+  "QT-M2": ["Circuit Design", "Quantum Gates"],
+  "QT-M3": ["Algorithms", "Quantum Theory"],
+  "QT-M4": ["NISQ", "Hybrid Algorithms"],
+};
+
+// Short, single-line blurbs for the module cards -- separate from the
+// fuller moduleDescription() used on the course detail hero, which reads
+// better at that length but is too long for this card layout.
+const MODULE_CARD_BLURB: Record<string, string> = {
+  "QT-M1": "Master qubits and gates for real quantum programs.",
+  "QT-M2": "Master circuit design for reliable quantum programs.",
+  "QT-M3": "Master landmark algorithms for real quantum speedups.",
+  "QT-M4": "Master hybrid algorithms for today's quantum hardware.",
+};
+
+const MODULE_IMAGES: Record<string, string> = {
+  "QT-M1": "/first.png",
+  "QT-M2": "/second.png",
+  "QT-M3": "/third.png",
+  "QT-M4": "/fourth.png",
 };
 
 const PILL_STYLES = [
@@ -58,6 +76,12 @@ const PILL_STYLES = [
   { bg: "var(--marketing-pink)", fg: "var(--marketing-pink-fg)" },
   { bg: "var(--accent)", fg: "var(--accent-foreground)" },
 ];
+
+const CARD_ACCENT_STYLES = [
+  { bg: "var(--accent)", fg: "var(--accent-foreground)" },
+  { bg: "var(--marketing-pink)", fg: "var(--marketing-pink-fg)" },
+];
+const CARD_CATEGORY_STYLE = { bg: "var(--marketing-yellow)", fg: "var(--marketing-yellow-fg)" };
 
 const AVATAR_PHOTOS = ["/avatar-1.png", "/avatar-2.png", "/avatar-3.png", "/avatar-4.png"];
 
@@ -113,14 +137,10 @@ export default function Home() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={0.08}>
-            <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] tracking-tight text-[var(--marketing-ink)] sm:text-7xl">
+            <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] tracking-tight text-white drop-shadow-sm sm:text-7xl">
               Learn. Build. Master
               <br />
-              <span className="inline-flex items-center gap-3">
-                {/* eslint-disable-next-line @next/next/no-img-element -- decorative icon, local PNG */}
-                <img src="/pinwheel-icon.png" alt="" aria-hidden className="h-10 w-10 shrink-0 sm:h-14 sm:w-14" />
-                with Qylo
-              </span>
+              with Qylo
             </h1>
           </RevealOnScroll>
 
@@ -131,21 +151,42 @@ export default function Home() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={0.24}>
-            <div className="mt-9">
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
               <Link
                 href="/learn"
-                className="inline-flex items-center gap-2 rounded-full bg-[var(--marketing-yellow)] px-7 py-3.5 text-sm font-semibold text-[var(--marketing-yellow-fg)] shadow-[var(--shadow-md)] transition-transform hover:scale-[1.03]"
+                className="rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[var(--accent)] shadow-[var(--shadow-md)] transition-transform hover:scale-[1.03]"
               >
-                <span aria-hidden>↳</span> Explore All Modules
+                Explore All Modules
+              </Link>
+              <Link
+                href="/circuit-builder"
+                className="rounded-full border border-white/40 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+              >
+                Try Circuit Builder
               </Link>
             </div>
+            <p className="mt-4 text-xs text-white/70">Free to get started · No credit card required</p>
           </RevealOnScroll>
         </div>
 
-        {/* Bento feature grid -- still inside the cloud wrapper */}
-        <div className="relative mx-auto max-w-5xl px-6 pb-24">
-          <RevealOnScroll delay={0.1}>
-            <div className="grid grid-cols-1 grid-rows-2 gap-4 sm:grid-cols-3">
+        {/* Floating product preview -- shown at its full natural aspect
+            ratio (no fixed-height crop) so the whole dashboard is visible */}
+        <div className="relative mx-auto mt-2 max-w-7xl px-6 pb-24">
+          <RevealOnScroll delay={0.32}>
+            <div className="rounded-2xl border border-white/30 bg-white/10 p-2 shadow-2xl backdrop-blur-md sm:p-3">
+              {/* eslint-disable-next-line @next/next/no-img-element -- local screenshot, sized via CSS like the other content photos in this file */}
+              <img src="/dashboard.png" alt="Qylo dashboard preview" className="h-auto w-full rounded-xl" />
+            </div>
+          </RevealOnScroll>
+        </div>
+      </div>
+
+      <main className="overflow-x-hidden">
+        {/* Bento feature grid -- moved below the hero, back on the normal page background */}
+        <section className="relative overflow-hidden bg-[var(--marketing-bg)] py-20">
+          <div className="relative mx-auto max-w-5xl px-6">
+            <RevealOnScroll delay={0.1}>
+              <div className="grid grid-cols-1 grid-rows-2 gap-4 sm:grid-cols-3">
                 <div
                   className="relative flex flex-col justify-between overflow-hidden rounded-3xl p-6 sm:col-start-1 sm:row-start-1"
                   style={{ background: "var(--marketing-green)", color: "#000000" }}
@@ -202,10 +243,9 @@ export default function Home() {
                 </div>
               </div>
             </RevealOnScroll>
-        </div>
-      </div>
+          </div>
+        </section>
 
-      <main className="overflow-x-hidden">
         {/* Module marquee */}
         <section className="bg-[var(--background)] py-20">
           <RevealOnScroll>
@@ -251,8 +291,9 @@ export default function Home() {
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
             {MODULES.map((m, i) => {
               const tags = MODULE_TAGS[m.code] ?? ["Quantum", "Qylo"];
-              const style = PILL_STYLES[i % PILL_STYLES.length];
-              const style2 = PILL_STYLES[(i + 1) % PILL_STYLES.length];
+              const accent = CARD_ACCENT_STYLES[i % CARD_ACCENT_STYLES.length];
+              const author = MODULE_INSTRUCTOR[m.code]?.name ?? "Qylo AI";
+              const image = MODULE_IMAGES[m.code];
               return (
                 <RevealOnScroll key={m.code} delay={i * 0.06}>
                   <Link
@@ -260,29 +301,32 @@ export default function Home() {
                     className="block h-full rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow hover:shadow-[var(--shadow-md)]"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-sm text-[var(--foreground-subtle)]">By: Qylo AI</span>
+                      <span className="text-sm font-semibold text-[var(--foreground)]">By: {author}</span>
                       <div className="flex shrink-0 gap-2">
-                        <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: style.bg, color: style.fg }}>
+                        <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: accent.bg, color: accent.fg }}>
                           {tags[0]}
                         </span>
-                        <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: style2.bg, color: style2.fg }}>
+                        <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: CARD_CATEGORY_STYLE.bg, color: CARD_CATEGORY_STYLE.fg }}>
                           {tags[1]}
                         </span>
                       </div>
                     </div>
 
-                    <div
-                      className="mt-4 flex h-40 items-center justify-center rounded-xl text-sm font-mono font-semibold"
-                      style={{ background: `color-mix(in srgb, ${style.bg} 20%, var(--surface-2))`, color: "var(--foreground)" }}
-                    >
-                      {m.code}
+                    <div className="mt-5 flex items-stretch gap-5">
+                      <div className="h-32 w-32 shrink-0 overflow-hidden rounded-xl sm:h-36 sm:w-36">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- local photo, sized via CSS like the other content photos in this file */}
+                        <img src={image} alt="" aria-hidden className="h-full w-full object-cover" />
+                      </div>
+                      <div className="flex min-w-0 flex-1 flex-col justify-between">
+                        <div>
+                          <h3 className="text-xl font-bold text-[var(--foreground)]">{moduleTitle(m, "en")}</h3>
+                          <p className="mt-2 text-sm text-[var(--foreground-muted)]">{MODULE_CARD_BLURB[m.code]}</p>
+                        </div>
+                        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground)]">
+                          <span aria-hidden>↳</span> Learn More
+                        </span>
+                      </div>
                     </div>
-
-                    <h3 className="mt-4 text-xl font-bold text-[var(--foreground)]">{moduleTitle(m, "en")}</h3>
-                    <p className="mt-2 text-sm text-[var(--foreground-muted)]">{moduleDescription(m, "en")}</p>
-                    <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground)]">
-                      <span aria-hidden>↳</span> Learn More
-                    </span>
                   </Link>
                 </RevealOnScroll>
               );
