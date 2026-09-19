@@ -1,0 +1,71 @@
+<svg viewBox="0 0 1200 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Qylo — Learn. Build. Master. Quantum computing, powered by AI.">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070b16"/>
+      <stop offset="45%" stop-color="#0f1b3d"/>
+      <stop offset="75%" stop-color="#17346b"/>
+      <stop offset="100%" stop-color="#2a5da8"/>
+    </linearGradient>
+    <linearGradient id="wordmark" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="45%" stop-color="#60a5fa"/>
+      <stop offset="75%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#a7f3d0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4c93ec" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#4c93ec" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="badgeFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="320" fill="url(#sky)"/>
+  <circle cx="1000" cy="70" r="260" fill="url(#glow)"/>
+
+  <!-- faint atom orbit motif, top right -->
+  <g transform="translate(1030,90)" opacity="0.55" fill="none" stroke="#7dd3fc" stroke-width="1.4">
+    <ellipse rx="150" ry="58"/>
+    <ellipse rx="150" ry="58" transform="rotate(60)"/>
+    <ellipse rx="150" ry="58" transform="rotate(120)"/>
+  </g>
+  <circle cx="1030" cy="90" r="7" fill="#7dd3fc"/>
+
+  <!-- quantum circuit trace, bottom -->
+  <g stroke="#3a4a6b" stroke-width="2" fill="none" opacity="0.9">
+    <line x1="0" y1="268" x2="1200" y2="268"/>
+    <line x1="0" y1="288" x2="1200" y2="288"/>
+  </g>
+  <g font-family="'Segoe UI', ui-monospace, monospace" font-size="15" font-weight="700">
+    <rect x="120" y="253" width="30" height="30" rx="6" fill="#2fb67c"/>
+    <text x="135" y="273" fill="#062018" text-anchor="middle">H</text>
+
+    <rect x="210" y="273" width="30" height="30" rx="6" fill="#f6c343"/>
+    <text x="225" y="293" fill="#241a00" text-anchor="middle">X</text>
+
+    <circle cx="315" cy="268" r="7" fill="#f3a8d6"/>
+    <circle cx="315" cy="288" r="10" fill="none" stroke="#f3a8d6" stroke-width="2.5"/>
+    <line x1="315" y1="275" x2="315" y2="278" stroke="#f3a8d6" stroke-width="2.5"/>
+
+    <rect x="400" y="253" width="30" height="30" rx="6" fill="#4c93ec"/>
+    <text x="415" y="273" fill="#03101f" text-anchor="middle">R</text>
+  </g>
+
+  <!-- brand mark -->
+  <g transform="translate(120,96)">
+    <rect width="72" height="72" rx="18" fill="url(#badgeFill)"/>
+    <path d="M36 16 L52 26 V46 L36 56 L20 46 V26 Z" fill="none" stroke="#062018" stroke-width="3.5" stroke-linejoin="round"/>
+    <circle cx="36" cy="36" r="6" fill="#062018"/>
+  </g>
+
+  <text x="212" y="150" font-family="'Segoe UI', Arial, sans-serif" font-size="88" font-weight="800" fill="url(#wordmark)">Qylo</text>
+
+  <text x="122" y="210" font-family="'Segoe UI', Arial, sans-serif" font-size="27" font-weight="600" fill="#e6edf7">
+    Learn. Build. Master.
+  </text>
+  <text x="122" y="242" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#9db4d9">
+    An AI-powered, hands-on quantum computing learning platform
+  </text>
+</svg>
