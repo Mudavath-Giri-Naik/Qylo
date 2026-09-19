@@ -4,12 +4,7 @@
 
 <br/>
 
-![Stars](https://img.shields.io/github/stars/Mudavath-Giri-Naik/Qylo?style=for-the-badge&color=fbbf24&labelColor=0d1117)
-![Last Commit](https://img.shields.io/github/last-commit/Mudavath-Giri-Naik/Qylo?style=for-the-badge&color=34d399&labelColor=0d1117)
-![Repo Size](https://img.shields.io/github/repo-size/Mudavath-Giri-Naik/Qylo?style=for-the-badge&color=60a5fa&labelColor=0d1117)
 ![SIH](https://img.shields.io/badge/Smart_India_Hackathon-SIH26140-f97316?style=for-the-badge&labelColor=0d1117)
-
-<br/>
 
 ![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
