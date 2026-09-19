@@ -1,4 +1,3 @@
-import type { Viewport } from "next";
 import Link from "next/link";
 import { Caveat } from "next/font/google";
 import { Sparkle } from "lucide-react";
@@ -10,18 +9,6 @@ import { MODULES, moduleTitle } from "@/lib/learn/modules";
 import { MODULE_INSTRUCTOR } from "@/lib/learn/presentation";
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["600", "700"] });
-
-// Pins the layout viewport to desktop width so phones render the full
-// desktop design (nav links, multi-column grids, floating illustrations)
-// and auto-zoom it to fit the screen, rather than reflowing to a mobile
-// layout -- this page is meant to look identical to desktop, just smaller.
-export const viewport: Viewport = {
-  width: 1280,
-  // Explicitly cleared: Next always defaults initialScale to 1, which would
-  // force a 1:1 pixel crop instead of letting the browser auto-compute a
-  // fit-to-width zoom for the wider-than-device layout viewport above.
-  initialScale: undefined,
-};
 
 const STEPS = [
   {
@@ -94,11 +81,11 @@ function GraduationCapIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-function AvatarRow() {
+function AvatarRow({ avatarClassName }: { avatarClassName?: string }) {
   return (
     <AvatarGroup>
       {AVATAR_PHOTOS.map((src) => (
-        <Avatar key={src}>
+        <Avatar key={src} className={avatarClassName}>
           <AvatarImage src={src} alt="" />
         </Avatar>
       ))}
@@ -128,8 +115,8 @@ export default function Home() {
 
         <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 pb-20 pt-14 text-center">
           <RevealOnScroll>
-            <div className="flex items-center gap-3">
-              <AvatarRow />
+            <div className="hidden items-center gap-3 sm:flex">
+              <AvatarRow avatarClassName="size-8" />
               <span className="text-sm font-medium text-white drop-shadow-sm">
                 AI tutor + real Qiskit simulation
               </span>
@@ -137,7 +124,7 @@ export default function Home() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={0.08}>
-            <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] tracking-tight text-white drop-shadow-sm sm:text-7xl">
+            <h1 className="mt-6 text-3xl font-extrabold leading-[1.1] tracking-tight text-white drop-shadow-sm sm:text-7xl sm:leading-[1.05]">
               Learn. Build. Master
               <br />
               with Qylo
@@ -145,7 +132,12 @@ export default function Home() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={0.16}>
-            <p className="mt-6 max-w-3xl text-base text-white drop-shadow-sm sm:whitespace-nowrap sm:text-lg">
+            <p className="mt-6 max-w-3xl text-base text-white drop-shadow-sm sm:hidden">
+              Master quantum computing with real circuits and an AI tutor by your side. Build working
+              quantum programs, run them on real Qiskit simulation, and get step-by-step guidance from
+              an AI tutor that adapts to exactly where you are in your learning journey.
+            </p>
+            <p className="mt-6 hidden max-w-3xl text-base text-white drop-shadow-sm sm:block sm:whitespace-nowrap sm:text-lg">
               Master quantum computing with real circuits and an AI tutor by your side.
             </p>
           </RevealOnScroll>
@@ -171,7 +163,16 @@ export default function Home() {
 
         {/* Floating product preview -- shown at its full natural aspect
             ratio (no fixed-height crop) so the whole dashboard is visible */}
-        <div className="relative mx-auto mt-2 max-w-7xl px-6 pb-24">
+        <div className="relative mx-auto mt-2 max-w-7xl px-2 pb-24 sm:px-6">
+          <RevealOnScroll>
+            <div className="mb-4 flex items-center justify-center gap-2 sm:hidden">
+              <AvatarRow avatarClassName="size-6" />
+              <span className="text-xs font-medium text-white drop-shadow-sm">
+                AI tutor + real Qiskit simulation
+              </span>
+            </div>
+          </RevealOnScroll>
+
           <RevealOnScroll delay={0.32}>
             <div className="rounded-2xl border border-white/30 bg-white/10 p-2 shadow-2xl backdrop-blur-md sm:p-3">
               {/* eslint-disable-next-line @next/next/no-img-element -- local screenshot, sized via CSS like the other content photos in this file */}
@@ -186,7 +187,7 @@ export default function Home() {
         <section className="relative overflow-hidden bg-[var(--marketing-bg)] py-20">
           <div className="relative mx-auto max-w-5xl px-6">
             <RevealOnScroll delay={0.1}>
-              <div className="grid grid-cols-1 grid-rows-2 gap-4 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-rows-2 sm:grid-cols-3">
                 <div
                   className="relative flex flex-col justify-between overflow-hidden rounded-3xl p-6 sm:col-start-1 sm:row-start-1"
                   style={{ background: "var(--marketing-green)", color: "#000000" }}
@@ -312,8 +313,8 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="mt-5 flex items-stretch gap-5">
-                      <div className="h-32 w-32 shrink-0 overflow-hidden rounded-xl sm:h-36 sm:w-36">
+                    <div className="mt-5 flex flex-col items-stretch gap-4 sm:flex-row sm:gap-5">
+                      <div className="h-40 w-full shrink-0 overflow-hidden rounded-xl sm:h-36 sm:w-36">
                         {/* eslint-disable-next-line @next/next/no-img-element -- local photo, sized via CSS like the other content photos in this file */}
                         <img src={image} alt="" aria-hidden className="h-full w-full object-cover" />
                       </div>
@@ -322,7 +323,7 @@ export default function Home() {
                           <h3 className="text-xl font-bold text-[var(--foreground)]">{moduleTitle(m, "en")}</h3>
                           <p className="mt-2 text-sm text-[var(--foreground-muted)]">{MODULE_CARD_BLURB[m.code]}</p>
                         </div>
-                        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground)]">
+                        <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground)] sm:mt-0">
                           <span aria-hidden>↳</span> Learn More
                         </span>
                       </div>
