@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { signUpAction, type AuthActionState } from "@/app/auth/actions";
+import { AuthOptionWheel } from "@/components/auth/AuthOptionWheel";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -77,14 +78,8 @@ export default function SignupPage() {
                 </FieldDescription>
               </FieldGroup>
             </form>
-            <div className="relative hidden bg-muted md:block">
-              {/* eslint-disable-next-line @next/next/no-img-element -- local screenshot, fills the panel via object-cover */}
-              <img
-                src="/dashboard.png"
-                alt=""
-                aria-hidden
-                className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.6]"
-              />
+            <div className="hidden bg-muted md:block">
+              <AuthOptionWheel />
             </div>
           </CardContent>
         </Card>
