@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono, Noto_Sans_Devanagari, Noto_Sans_Telugu } from "next/font/google";
 import { createClient } from "@/lib/supabase/server";
 import { getSidebarStats } from "@/lib/dashboard/queries";
+import { oauthAvatarUrl, oauthFullName } from "@/lib/auth/profile";
 import AppShell from "@/components/AppShell";
 import SmoothScroll from "@/components/SmoothScroll";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -94,7 +95,15 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
         <SmoothScroll />
         <TooltipProvider>
-          <AppShell loggedIn={!!user} userId={user?.id ?? null} userEmail={user?.email ?? null} links={links} sidebarStats={sidebarStats}>
+          <AppShell
+            loggedIn={!!user}
+            userId={user?.id ?? null}
+            userEmail={user?.email ?? null}
+            userName={oauthFullName(user)}
+            userAvatarUrl={oauthAvatarUrl(user)}
+            links={links}
+            sidebarStats={sidebarStats}
+          >
             {children}
           </AppShell>
         </TooltipProvider>

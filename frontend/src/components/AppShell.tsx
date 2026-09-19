@@ -62,6 +62,8 @@ export default function AppShell({
   loggedIn,
   userId,
   userEmail,
+  userName,
+  userAvatarUrl,
   links,
   sidebarStats,
   children,
@@ -69,6 +71,8 @@ export default function AppShell({
   loggedIn: boolean;
   userId: string | null;
   userEmail: string | null;
+  userName: string | null;
+  userAvatarUrl: string | null;
   links: NavLink[];
   sidebarStats: SidebarStats | null;
   children: ReactNode;
@@ -83,7 +87,15 @@ export default function AppShell({
 
   return (
     <SidebarProvider>
-      <AppSidebar loggedIn={loggedIn} userId={userId} userEmail={userEmail} links={links} stats={sidebarStats} />
+      <AppSidebar
+        loggedIn={loggedIn}
+        userId={userId}
+        userEmail={userEmail}
+        userName={userName}
+        userAvatarUrl={userAvatarUrl}
+        links={links}
+        stats={sidebarStats}
+      />
       <SidebarInset className={isComposer ? "lg:h-svh lg:overflow-hidden" : undefined}>
         {isComposer ? (
           <header className="flex h-12 shrink-0 items-center border-b border-[var(--border)] px-3">

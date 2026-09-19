@@ -32,7 +32,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -113,20 +113,24 @@ export default function AppSidebar({
   loggedIn,
   userId,
   userEmail,
+  userName,
+  userAvatarUrl,
   links,
   stats,
 }: {
   loggedIn: boolean;
   userId: string | null;
   userEmail: string | null;
+  userName: string | null;
+  userAvatarUrl: string | null;
   links: NavLink[];
   stats: SidebarStats | null;
 }) {
   const pathname = usePathname();
   const routeWidget = ROUTE_WIDGETS[pathname];
-  const defaults = defaultLocalProfile(userEmail ?? "", null);
+  const defaults = defaultLocalProfile(userEmail ?? "", null, userName, userAvatarUrl);
   const { profile } = useLocalProfile(userId ?? "anonymous", defaults);
-  const initial = userEmail ? userEmail[0]!.toUpperCase() : "?";
+  const initial = profile.displayName ? profile.displayName[0]!.toUpperCase() : "?";
 
   return (
     <Sidebar collapsible="icon">
@@ -237,6 +241,7 @@ export default function AppSidebar({
                       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                     >
                       <Avatar className="h-8 w-8 rounded-lg">
+                        {profile.avatarUrl && <AvatarImage src={profile.avatarUrl} alt="" />}
                         <AvatarFallback className="rounded-lg font-semibold text-[var(--accent-foreground)]" style={{ background: profile.avatarColor ?? "var(--accent)" }}>
                           {initial}
                         </AvatarFallback>
@@ -252,6 +257,7 @@ export default function AppSidebar({
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex items-center gap-2">
                         <Avatar className="h-8 w-8 rounded-lg">
+                          {profile.avatarUrl && <AvatarImage src={profile.avatarUrl} alt="" />}
                           <AvatarFallback className="rounded-lg font-semibold text-[var(--accent-foreground)]" style={{ background: profile.avatarColor ?? "var(--accent)" }}>
                             {initial}
                           </AvatarFallback>

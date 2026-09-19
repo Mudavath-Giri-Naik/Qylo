@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getInstructorClasses, getClassDashboard } from "@/lib/instructor/queries";
+import { firstName, oauthFullName } from "@/lib/auth/profile";
 import CreateClassForm from "@/components/instructor/CreateClassForm";
 
 export default async function InstructorDashboardPage({
@@ -13,6 +14,7 @@ export default async function InstructorDashboardPage({
   if (!user) return null;
 
   const classes = await getInstructorClasses(user.id);
+  const greetingName = firstName(oauthFullName(user)) ?? user.email;
   const resolvedSearchParams = await searchParams;
   const classParam = Array.isArray(resolvedSearchParams.class)
     ? resolvedSearchParams.class[0]
@@ -26,7 +28,7 @@ export default async function InstructorDashboardPage({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-[var(--foreground)]">
-            Welcome{user.email ? `, ${user.email}` : ""}
+            Welcome{greetingName ? `, ${greetingName}` : ""}
           </h1>
           <p className="mt-1 text-[var(--foreground-muted)]">
             Manage your classes and see how students are doing.

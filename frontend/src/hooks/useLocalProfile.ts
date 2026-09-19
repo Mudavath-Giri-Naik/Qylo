@@ -10,6 +10,7 @@ export interface LocalProfile {
   tags: string[];
   interests: string[];
   avatarColor: string | null;
+  avatarUrl: string | null;
   github: string;
   linkedin: string;
   completedSteps: {
@@ -33,18 +34,24 @@ function humanizeEmail(email: string): string {
   return words.map((w) => w[0]!.toUpperCase() + w.slice(1).toLowerCase()).join(" ");
 }
 
-export function defaultLocalProfile(email: string, role: "learner" | "instructor" | null): LocalProfile {
+export function defaultLocalProfile(
+  email: string,
+  role: "learner" | "instructor" | null,
+  oauthName?: string | null,
+  oauthAvatarUrl?: string | null
+): LocalProfile {
   return {
-    displayName: humanizeEmail(email),
+    displayName: oauthName?.trim() || humanizeEmail(email),
     headline: "Quantum computing learner",
     bio: "Exploring quantum computing and building cool things with qubits.",
     tagline: "Small steps in superposition lead to big possibilities.",
     tags: [role === "instructor" ? "Instructor" : "Quantum Learner"],
     interests: [],
     avatarColor: null,
+    avatarUrl: oauthAvatarUrl ?? null,
     github: "",
     linkedin: "",
-    completedSteps: { avatar: false, bio: false, institution: false, social: false },
+    completedSteps: { avatar: !!oauthAvatarUrl, bio: false, institution: false, social: false },
   };
 }
 

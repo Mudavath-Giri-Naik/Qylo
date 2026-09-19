@@ -3,6 +3,7 @@ import { getDashboardData, getDashboardOverview } from "@/lib/dashboard/queries"
 import { buildAchievements } from "@/lib/dashboard/achievements";
 import { getFirstCircuitDate } from "@/lib/dashboard/insights";
 import { rankWithYou } from "@/lib/community/sampleCommunity";
+import { oauthAvatarUrl, oauthFullName } from "@/lib/auth/profile";
 import ProfileView from "@/components/profile/ProfileView";
 
 export default async function ProfilePage() {
@@ -39,6 +40,8 @@ export default async function ProfilePage() {
     <ProfileView
       userId={user.id}
       email={user.email ?? ""}
+      oauthName={oauthFullName(user)}
+      oauthAvatarUrl={oauthAvatarUrl(user)}
       role={profileRow?.role ?? null}
       preferredLanguage={profileRow?.preferred_language ?? "en"}
       memberSince={user.created_at}

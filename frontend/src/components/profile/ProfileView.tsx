@@ -24,7 +24,7 @@ import { MODULE_META, DIFFICULTY_BADGE } from "@/lib/learn/moduleMeta";
 import { defaultLocalProfile, useLocalProfile } from "@/hooks/useLocalProfile";
 import EditProfileModal from "@/components/profile/EditProfileModal";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarBadge, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 const TABS = ["Overview", "Achievements", "Certificates", "Activity", "Settings"] as const;
@@ -33,6 +33,8 @@ type Tab = (typeof TABS)[number];
 export interface ProfileViewProps {
   userId: string;
   email: string;
+  oauthName: string | null;
+  oauthAvatarUrl: string | null;
   role: "learner" | "instructor" | null;
   preferredLanguage: string;
   memberSince: string;
@@ -132,6 +134,8 @@ function mostRecentAchievement(
 export default function ProfileView({
   userId,
   email,
+  oauthName,
+  oauthAvatarUrl,
   role,
   preferredLanguage,
   memberSince,
@@ -149,11 +153,14 @@ export default function ProfileView({
   const [tab, setTab] = useState<Tab>("Overview");
   const [editing, setEditing] = useState(false);
 
-  const defaults = useMemo(() => defaultLocalProfile(email, role), [email, role]);
+  const defaults = useMemo(
+    () => defaultLocalProfile(email, role, oauthName, oauthAvatarUrl),
+    [email, role, oauthName, oauthAvatarUrl]
+  );
   const { profile, update } = useLocalProfile(userId, defaults);
 
   const handle = "@" + (email.split("@")[0] ?? "user").toLowerCase().replace(/[^a-z0-9]/g, "");
-  const initial = email ? email[0]!.toUpperCase() : "?";
+  const initial = profile.displayName ? profile.displayName[0]!.toUpperCase() : "?";
   const skillChips = useMemo(() => deriveSkillChips(modules, overview), [modules, overview]);
   const recentAchievement = useMemo(
     () => mostRecentAchievement(achievements, firstCircuitAt, lastSolvedAt, overview.streakDays),
@@ -199,6 +206,7 @@ export default function ProfileView({
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex min-w-0 flex-1 items-start gap-4">
             <Avatar className="h-16 w-16">
+              {profile.avatarUrl && <AvatarImage src={profile.avatarUrl} alt="" />}
               <AvatarFallback className="text-lg font-semibold text-[var(--accent-foreground)]" style={{ background: avatarBackground }}>
                 {initial}
               </AvatarFallback>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Award, BookOpen, Boxes, Sparkle, Target, Trophy, Zap } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getDashboardOverview } from "@/lib/dashboard/queries";
+import { firstName, oauthFullName } from "@/lib/auth/profile";
 import { Card } from "@/components/ui/card";
 
 const SAMPLE_LEADERBOARD = [
@@ -33,7 +34,7 @@ export default async function DashboardPage() {
   if (!user) return null;
 
   const overview = await getDashboardOverview(user.id);
-  const displayName = user.email ? user.email.split("@")[0] : "there";
+  const displayName = firstName(oauthFullName(user)) ?? (user.email ? user.email.split("@")[0] : "there");
 
   return (
     <main className="mx-auto flex max-w-7xl flex-col px-4 py-3 sm:px-6 lg:h-[calc(100vh-4rem)] lg:overflow-hidden">
