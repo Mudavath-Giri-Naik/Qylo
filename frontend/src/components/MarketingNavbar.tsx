@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const LINKS = [
@@ -12,52 +13,27 @@ const LINKS = [
   { href: "/challenges", label: "Challenges" },
 ];
 
-/** Hides the navbar on scroll-down, reveals it on scroll-up. setState only
- * ever happens inside the scroll event callback, never synchronously in the
- * effect body, so this doesn't trip react-hooks/set-state-in-effect. */
-function useHideOnScroll() {
-  const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
-
-  useEffect(() => {
-    function onScroll() {
-      const y = window.scrollY;
-      const goingDown = y > lastY.current;
-      setHidden(goingDown && y > 96);
-      lastY.current = y;
-    }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return hidden;
-}
-
+// Not sticky on purpose: the navbar scrolls away with the hero instead of
+// pinning to the top, so it's only visible back at the top of the page.
 export default function MarketingNavbar() {
-  const hidden = useHideOnScroll();
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header
-      className={`sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)] transition-transform duration-300 ${
-        hidden ? "-translate-y-full" : "translate-y-0"
-      }`}
-    >
-      <nav className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-8 py-4 md:px-10">
+    <header className="relative z-40 bg-transparent">
+      <nav className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-4 sm:px-8 md:px-10">
         <Link href="/" className="flex shrink-0 items-center">
-          <span className="text-lg font-bold tracking-tight text-[var(--foreground)]">Qylo</span>
+          <span className="text-lg font-bold tracking-tight text-white">Qylo</span>
         </Link>
 
-        <div className="hidden items-center justify-center gap-9 text-sm text-[var(--foreground-muted)] md:flex">
+        <div className="hidden items-center justify-center gap-9 text-sm text-white/80 md:flex">
           {LINKS.map((link) => {
             const active = link.href === "/" ? pathname === "/" : pathname?.startsWith(link.href);
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`transition-colors hover:text-[var(--foreground)] ${
-                  active ? "font-semibold text-[var(--foreground)]" : "font-medium"
-                }`}
+                className={`transition-colors hover:text-white ${active ? "font-semibold text-white" : "font-medium"}`}
               >
                 {link.label}
               </Link>
@@ -65,16 +41,45 @@ export default function MarketingNavbar() {
           })}
         </div>
 
-        <div className="flex shrink-0 items-center gap-3">
-          <ThemeToggle className="bg-[var(--surface-2)]" />
+        <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
+          <ThemeToggle className="border-white/30 bg-white/10 text-white hover:bg-white/20" />
           <Link
             href="/signup"
-            className="rounded-full bg-[var(--marketing-ink)] px-5 py-2.5 text-sm font-bold text-[var(--background)] transition-opacity hover:opacity-90"
+            className="rounded-full bg-[var(--marketing-ink)] px-3.5 py-2 text-xs font-bold text-[var(--background)] transition-opacity hover:opacity-90 sm:px-5 sm:py-2.5 sm:text-sm"
           >
             Sign Up
           </Link>
+          <button
+            type="button"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white hover:bg-white/20 md:hidden"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
       </nav>
+
+      {mobileOpen && (
+        <div className="flex flex-col gap-1 border-t border-[var(--border)] bg-[var(--surface)] px-4 py-3 md:hidden">
+          {LINKS.map((link) => {
+            const active = link.href === "/" ? pathname === "/" : pathname?.startsWith(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className={`rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-[var(--surface-hover)] ${
+                  active ? "font-semibold text-[var(--foreground)]" : "font-medium text-[var(--foreground-muted)]"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </header>
   );
 }

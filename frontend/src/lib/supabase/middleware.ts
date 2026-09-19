@@ -14,6 +14,7 @@ const PROTECTED_ROUTES = [
   "/hardware-access",
   "/certificates",
   "/settings",
+  "/profile",
 ];
 
 export async function updateSession(request: NextRequest) {

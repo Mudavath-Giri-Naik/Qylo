@@ -1,12 +1,26 @@
+import type { Viewport } from "next";
 import Link from "next/link";
 import { Caveat } from "next/font/google";
 import { Sparkle } from "lucide-react";
 import MarketingNavbar from "@/components/MarketingNavbar";
+import HeroCloudBackground from "@/components/HeroCloudBackground";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import { Avatar, AvatarImage, AvatarGroup } from "@/components/ui/avatar";
 import { MODULES, moduleDescription, moduleTitle } from "@/lib/learn/modules";
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["600", "700"] });
+
+// Pins the layout viewport to desktop width so phones render the full
+// desktop design (nav links, multi-column grids, floating illustrations)
+// and auto-zoom it to fit the screen, rather than reflowing to a mobile
+// layout -- this page is meant to look identical to desktop, just smaller.
+export const viewport: Viewport = {
+  width: 1280,
+  // Explicitly cleared: Next always defaults initialScale to 1, which would
+  // force a 1:1 pixel crop instead of letting the browser auto-compute a
+  // fit-to-width zoom for the wider-than-device layout viewport above.
+  initialScale: undefined,
+};
 
 const STEPS = [
   {
@@ -71,72 +85,67 @@ function AvatarRow() {
 export default function Home() {
   return (
     <>
-      <MarketingNavbar />
-      <main className="overflow-x-hidden">
-        {/* Hero */}
-        <section className="relative overflow-hidden bg-[var(--marketing-bg)]">
+      {/* Hero -- cloud shader sits behind the navbar, intro block, and the
+          bento cards below it, all in one continuous sky. It lives in its
+          own clipped layer; the navbar stays a direct child of this
+          `relative` (not `overflow-hidden`) wrapper so its `sticky` still
+          works (an overflow-hidden ancestor would break sticky). */}
+      <div className="relative">
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <HeroCloudBackground className="h-full w-full" />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-1/2 bottom-0 opacity-[0.35]"
-            style={{
-              backgroundImage:
-                "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)",
-              backgroundSize: "56px 56px",
-              maskImage: "radial-gradient(ellipse 80% 70% at 50% 100%, black 40%, transparent 95%)",
-            }}
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-64 sm:h-80"
+            style={{ background: "linear-gradient(to bottom, transparent, var(--background))" }}
           />
+        </div>
 
-          {/* eslint-disable @next/next/no-img-element -- decorative, local SVGs with spaces in their filenames; next/image blocks local SVGs by default */}
-          <img src="/Connected%20world-rafiki.svg" alt="" aria-hidden width={145} height={145} className="animate-float pointer-events-none absolute right-[3%] top-20 hidden opacity-90 sm:block" style={{ animationDelay: "0s" }} />
-          <img src="/Research%20paper-rafiki.svg" alt="" aria-hidden width={105} height={105} className="animate-float pointer-events-none absolute right-[12%] top-[360px] hidden opacity-90 md:block" style={{ animationDelay: "1.5s" }} />
-          <img src="/Team-rafiki.svg" alt="" aria-hidden width={105} height={105} className="animate-float pointer-events-none absolute left-[12%] top-[360px] hidden opacity-90 md:block" style={{ animationDelay: "3s" }} />
-          <img src="/Online%20learning-rafiki.svg" alt="" aria-hidden width={105} height={105} className="animate-float pointer-events-none absolute left-[3%] top-[132px] hidden opacity-90 lg:block" style={{ animationDelay: "4.5s" }} />
-          {/* eslint-enable @next/next/no-img-element */}
+        <MarketingNavbar />
 
-          <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 pb-20 pt-20 text-center">
-            <RevealOnScroll>
-              <div className="flex items-center gap-3">
-                <AvatarRow />
-                <span className="text-sm font-medium text-[var(--foreground-muted)]">
-                  AI tutor + real Qiskit simulation
-                </span>
-              </div>
-            </RevealOnScroll>
+        <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 pb-20 pt-14 text-center">
+          <RevealOnScroll>
+            <div className="flex items-center gap-3">
+              <AvatarRow />
+              <span className="text-sm font-medium text-white drop-shadow-sm">
+                AI tutor + real Qiskit simulation
+              </span>
+            </div>
+          </RevealOnScroll>
 
-            <RevealOnScroll delay={0.08}>
-              <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] tracking-tight text-[var(--marketing-ink)] sm:text-7xl">
-                Learn. Build. Master
-                <br />
-                <span className="inline-flex items-center gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- decorative icon, local PNG */}
-                  <img src="/pinwheel-icon.png" alt="" aria-hidden className="h-10 w-10 shrink-0 sm:h-14 sm:w-14" />
-                  with Qylo
-                </span>
-              </h1>
-            </RevealOnScroll>
+          <RevealOnScroll delay={0.08}>
+            <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] tracking-tight text-[var(--marketing-ink)] sm:text-7xl">
+              Learn. Build. Master
+              <br />
+              <span className="inline-flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element -- decorative icon, local PNG */}
+                <img src="/pinwheel-icon.png" alt="" aria-hidden className="h-10 w-10 shrink-0 sm:h-14 sm:w-14" />
+                with Qylo
+              </span>
+            </h1>
+          </RevealOnScroll>
 
-            <RevealOnScroll delay={0.16}>
-              <p className="mt-6 max-w-3xl text-base text-[var(--foreground-muted)] sm:whitespace-nowrap sm:text-lg">
-                Master quantum computing with real circuits and an AI tutor by your side.
-              </p>
-            </RevealOnScroll>
+          <RevealOnScroll delay={0.16}>
+            <p className="mt-6 max-w-3xl text-base text-white drop-shadow-sm sm:whitespace-nowrap sm:text-lg">
+              Master quantum computing with real circuits and an AI tutor by your side.
+            </p>
+          </RevealOnScroll>
 
-            <RevealOnScroll delay={0.24}>
-              <div className="mt-9">
-                <Link
-                  href="/learn"
-                  className="inline-flex items-center gap-2 rounded-full bg-[var(--marketing-yellow)] px-7 py-3.5 text-sm font-semibold text-[var(--marketing-yellow-fg)] shadow-[var(--shadow-md)] transition-transform hover:scale-[1.03]"
-                >
-                  <span aria-hidden>↳</span> Explore All Modules
-                </Link>
-              </div>
-            </RevealOnScroll>
-          </div>
+          <RevealOnScroll delay={0.24}>
+            <div className="mt-9">
+              <Link
+                href="/learn"
+                className="inline-flex items-center gap-2 rounded-full bg-[var(--marketing-yellow)] px-7 py-3.5 text-sm font-semibold text-[var(--marketing-yellow-fg)] shadow-[var(--shadow-md)] transition-transform hover:scale-[1.03]"
+              >
+                <span aria-hidden>↳</span> Explore All Modules
+              </Link>
+            </div>
+          </RevealOnScroll>
+        </div>
 
-          {/* Bento feature grid */}
-          <div className="relative mx-auto max-w-5xl px-6 pb-24">
-            <RevealOnScroll delay={0.1}>
-              <div className="grid grid-cols-1 grid-rows-2 gap-4 sm:grid-cols-3">
+        {/* Bento feature grid -- still inside the cloud wrapper */}
+        <div className="relative mx-auto max-w-5xl px-6 pb-24">
+          <RevealOnScroll delay={0.1}>
+            <div className="grid grid-cols-1 grid-rows-2 gap-4 sm:grid-cols-3">
                 <div
                   className="relative flex flex-col justify-between overflow-hidden rounded-3xl p-6 sm:col-start-1 sm:row-start-1"
                   style={{ background: "var(--marketing-green)", color: "#000000" }}
@@ -193,9 +202,10 @@ export default function Home() {
                 </div>
               </div>
             </RevealOnScroll>
-          </div>
-        </section>
+        </div>
+      </div>
 
+      <main className="overflow-x-hidden">
         {/* Module marquee */}
         <section className="bg-[var(--background)] py-20">
           <RevealOnScroll>
@@ -249,9 +259,9 @@ export default function Home() {
                     href={`/learn/${m.code}`}
                     className="block h-full rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow hover:shadow-[var(--shadow-md)]"
                   >
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="text-sm text-[var(--foreground-subtle)]">By: Qylo AI</span>
-                      <div className="flex gap-2">
+                      <div className="flex shrink-0 gap-2">
                         <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: style.bg, color: style.fg }}>
                           {tags[0]}
                         </span>

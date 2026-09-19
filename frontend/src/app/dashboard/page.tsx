@@ -36,13 +36,13 @@ export default async function DashboardPage() {
   const displayName = user.email ? user.email.split("@")[0] : "there";
 
   return (
-    <main className="mx-auto flex h-[calc(100vh-4rem)] max-w-7xl flex-col overflow-hidden px-6 py-3">
+    <main className="mx-auto flex max-w-7xl flex-col px-4 py-3 sm:px-6 lg:h-[calc(100vh-4rem)] lg:overflow-hidden">
       <div className="shrink-0">
         <h1 className="text-xl font-bold tracking-tight text-[var(--foreground)]">Dashboard</h1>
         <p className="text-xs text-[var(--foreground-muted)]">Your quantum learning journey starts here.</p>
       </div>
 
-      <div className="mt-3 grid min-h-0 flex-1 grid-rows-[4fr_6fr_3fr] gap-3">
+      <div className="mt-3 grid min-h-0 flex-1 gap-4 lg:grid-rows-[4fr_6fr_3fr] lg:gap-3">
         {/* Row 1 */}
         <div className="grid min-h-0 grid-cols-1 gap-3 lg:grid-cols-4">
           <Card className="relative min-h-0 gap-0 overflow-hidden p-5 lg:col-span-2">

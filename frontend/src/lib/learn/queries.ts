@@ -51,6 +51,19 @@ export async function getModuleLessons(
     }));
 }
 
+/** Lesson ids the user has completed in this module. */
+export async function getModuleProgress(userId: string, moduleCode: string): Promise<Set<string>> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("progress")
+    .select("lesson_id")
+    .eq("user_id", userId)
+    .eq("module_code", moduleCode)
+    .eq("status", "completed");
+
+  return new Set((data ?? []).map((row) => row.lesson_id).filter((id): id is string => id !== null));
+}
+
 /** A single lesson by module + position, falling back to English if untranslated. */
 export async function getLesson(
   moduleCode: string,

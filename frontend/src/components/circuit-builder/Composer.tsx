@@ -417,7 +417,7 @@ export default function Composer({
   const selectedGate = selectedGateIndex !== null ? circuit.gates[selectedGateIndex] : null;
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-[var(--background)]">
+    <div className="flex w-full flex-col bg-[var(--background)] lg:h-full lg:overflow-hidden">
       {/* Top app bar */}
       <header className="z-30 shrink-0 border-b border-[var(--border)] bg-[var(--composer-bar)]">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5">
@@ -536,12 +536,12 @@ export default function Composer({
       </header>
 
       {/* Top: operations | canvas (wide) */}
-      <div className="grid min-h-0 flex-[6] grid-cols-1 lg:grid-cols-[300px_1fr]">
-        <div className="flex min-h-0 flex-col overflow-hidden border-b border-[var(--border)] p-2.5 lg:border-b-0 lg:border-r">
+      <div className="grid grid-cols-1 lg:min-h-0 lg:flex-[6] lg:grid-cols-[300px_1fr]">
+        <div className="flex flex-col overflow-visible border-b border-[var(--border)] p-2.5 lg:min-h-0 lg:overflow-hidden lg:border-b-0 lg:border-r">
           <GatePalette pendingControl={pendingControl} compact t={t} />
         </div>
 
-        <div className="flex min-h-0 flex-col gap-2 overflow-hidden p-2.5">
+        <div className="flex flex-col gap-2 overflow-visible p-2.5 lg:min-h-0 lg:overflow-hidden">
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" onClick={undo} disabled={historyState.past.length === 0} title={t("undo")} className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--foreground-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30">
               <UndoIcon />
@@ -572,7 +572,7 @@ export default function Composer({
             </label>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-hidden">
+          <div className="overflow-visible lg:min-h-0 lg:flex-1 lg:overflow-hidden">
             <CircuitCanvas
               circuit={circuit}
               pendingControl={pendingControl}
@@ -626,7 +626,7 @@ export default function Composer({
           and stacks full-width, so dragging has no effect on small screens. */}
       <div
         ref={bottomRowRef}
-        className="grid min-h-0 flex-[5] grid-cols-1 border-t border-[var(--border)] lg:[grid-template-columns:var(--col-a)_6px_var(--col-b)_6px_var(--col-c)]"
+        className="grid grid-cols-1 border-t border-[var(--border)] lg:min-h-0 lg:flex-[5] lg:[grid-template-columns:var(--col-a)_6px_var(--col-b)_6px_var(--col-c)]"
         style={
           {
             "--col-a": `${colWidths[0]}%`,
@@ -635,14 +635,14 @@ export default function Composer({
           } as React.CSSProperties
         }
       >
-        <div className="flex min-h-0 flex-col overflow-hidden border-b border-[var(--border)] p-3 lg:border-b-0">
+        <div className="flex flex-col overflow-visible border-b border-[var(--border)] p-3 lg:min-h-0 lg:overflow-hidden lg:border-b-0">
           <div className="flex shrink-0 items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">{t("probabilities")}</p>
             <span className="text-[10px] text-[var(--foreground-subtle)]">
               {runResult ? `Qiskit Aer · ${t("shotsCount", { n: Object.values(runResult.counts).reduce((a, b) => a + b, 0) })}` : t("instantPreview")}
             </span>
           </div>
-          <div className="mt-2 min-h-0 flex-1 overflow-hidden">
+          <div className="mt-2 overflow-visible lg:min-h-0 lg:flex-1 lg:overflow-hidden">
             {runError && <p className="text-sm text-red-600 dark:text-red-400">{runError}</p>}
             <Histogram counts={displayCounts} mode={runResult ? "shots" : "probability"} t={t} />
           </div>
@@ -656,7 +656,7 @@ export default function Composer({
           <div className="h-full w-px bg-[var(--border)] transition-colors hover:bg-[var(--accent)]" />
         </div>
 
-        <div className="flex min-h-0 flex-col items-center overflow-hidden border-b border-[var(--border)] p-3 lg:border-b-0">
+        <div className="flex flex-col items-center overflow-visible border-b border-[var(--border)] p-3 lg:min-h-0 lg:overflow-hidden lg:border-b-0">
           <div className="flex w-full shrink-0 items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground-subtle)]">
               {displayBlochVector ? t("blochSphere") : t("qsphere")}
@@ -665,7 +665,7 @@ export default function Composer({
           <span className="w-full text-left text-[10px] text-[var(--foreground-subtle)]">
             {runResult ? t("backendResult") : t("instantPreview")}
           </span>
-          <div className="mt-1 flex min-h-0 w-full flex-1 justify-center overflow-hidden">
+          <div className="mt-1 flex w-full justify-center overflow-visible lg:min-h-0 lg:flex-1 lg:overflow-hidden">
             {displayBlochVector ? (
               <BlochSphere vector={displayBlochVector} />
             ) : (
@@ -682,7 +682,7 @@ export default function Composer({
           <div className="h-full w-px bg-[var(--border)] transition-colors hover:bg-[var(--accent)]" />
         </div>
 
-        <div className="flex min-h-0 flex-col overflow-hidden">
+        <div className="flex min-h-[280px] flex-col overflow-visible lg:min-h-0 lg:overflow-hidden">
           <CodeView circuit={circuit} onApplyCircuit={handleApplyCircuit} compact t={t} />
         </div>
       </div>

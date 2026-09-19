@@ -22,3 +22,14 @@ export function groupByModule(challenges: Challenge[]): Map<string, Challenge[]>
   }
   return map;
 }
+
+export async function getPassedChallengeIds(userId: string): Promise<Set<string>> {
+  const supabase = await createClient();
+  const { data } = await supabase.from("submissions").select("challenge_id, score").eq("user_id", userId);
+
+  const passed = new Set<string>();
+  for (const s of data ?? []) {
+    if ((s.score ?? 0) >= 70) passed.add(s.challenge_id);
+  }
+  return passed;
+}

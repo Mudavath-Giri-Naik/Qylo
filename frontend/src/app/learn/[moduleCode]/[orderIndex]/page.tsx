@@ -98,7 +98,7 @@ export default async function LessonPage({
           </nav>
         </div>
 
-        <div className="lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)]">
+        <div className="h-[480px] lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)]">
           <AgentChat
             title="Ask the tutor"
             moduleCode={moduleCode}

@@ -94,7 +94,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
         <SmoothScroll />
         <TooltipProvider>
-          <AppShell loggedIn={!!user} userEmail={user?.email ?? null} links={links} sidebarStats={sidebarStats}>
+          <AppShell loggedIn={!!user} userId={user?.id ?? null} userEmail={user?.email ?? null} links={links} sidebarStats={sidebarStats}>
             {children}
           </AppShell>
         </TooltipProvider>

@@ -31,7 +31,7 @@ export default function SmoothScroll() {
       cancelAnimationFrame(frameId);
       lenis.destroy();
     };
-  }, [disabled]);
+  }, [disabled, pathname]);
 
   return null;
 }

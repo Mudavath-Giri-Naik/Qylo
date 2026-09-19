@@ -1,12 +1,22 @@
-import { Users } from "lucide-react";
-import ComingSoon from "@/components/dashboard/ComingSoon";
+import { createClient } from "@/lib/supabase/server";
+import { getDashboardOverview } from "@/lib/dashboard/queries";
+import CommunityBoard from "@/components/community/CommunityBoard";
 
-export default function CommunityPage() {
-  return (
-    <ComingSoon
-      icon={Users}
-      title="Community"
-      description="Discussions, study groups, and peer Q&A are on the way."
-    />
-  );
+export default async function CommunityPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let you = { points: 0, challenges: 0, circuits: 0 };
+  if (user) {
+    const overview = await getDashboardOverview(user.id);
+    you = {
+      points: overview.challengesSolved * 250 + overview.circuitsBuilt * 60,
+      challenges: overview.challengesSolved,
+      circuits: overview.circuitsBuilt,
+    };
+  }
+
+  return <CommunityBoard you={you} />;
 }

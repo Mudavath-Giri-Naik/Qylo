@@ -3,18 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { Bell, ChevronDown, LogOut, Search, Settings, Zap } from "lucide-react";
-import { logoutAction } from "@/app/auth/actions";
+import { Bell, Search, Zap } from "lucide-react";
 import AppSidebar from "@/components/AppSidebar";
 import type { SidebarStats } from "@/lib/dashboard/queries";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -25,29 +22,27 @@ interface NavLink {
   label: string;
 }
 
-function TopBar({ userEmail }: { userEmail: string | null }) {
-  const initial = userEmail ? userEmail[0]!.toUpperCase() : "?";
-
+function TopBar() {
   return (
-    <header className="flex h-16 shrink-0 items-center gap-3 border-b border-[var(--border)] px-4">
+    <header className="flex h-14 shrink-0 items-center gap-2 border-b border-[var(--border)] px-3 sm:h-16 sm:gap-3 sm:px-4">
       <SidebarTrigger />
 
-      <div className="relative w-full max-w-md">
+      <div className="relative hidden min-w-0 flex-1 max-w-md md:block">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground-subtle)]" />
         <Input placeholder="Search courses, algorithms, challenges..." className="h-9 rounded-lg pl-9" />
       </div>
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
         <Button asChild variant="secondary" className="rounded-full">
           <Link href="/hardware-access">
             <Zap className="h-4 w-4" />
-            Run on Hardware
+            <span className="hidden sm:inline">Run on Hardware</span>
           </Link>
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative rounded-full">
+            <Button variant="ghost" size="icon" className="relative shrink-0 rounded-full">
               <Bell className="h-4 w-4" />
               <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-red-500" />
             </Button>
@@ -58,40 +53,6 @@ function TopBar({ userEmail }: { userEmail: string | null }) {
             <p className="px-2 py-3 text-sm text-[var(--foreground-muted)]">You&apos;re all caught up.</p>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="flex items-center gap-1 rounded-full p-1 transition-colors hover:bg-[var(--surface-hover)]"
-            >
-              <Avatar size="sm">
-                <AvatarFallback className="bg-[var(--accent)] font-semibold text-[var(--accent-foreground)]">
-                  {initial}
-                </AvatarFallback>
-              </Avatar>
-              <ChevronDown className="h-4 w-4 text-[var(--foreground-muted)]" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel className="truncate">{userEmail ?? "Account"}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/settings">
-                <Settings className="h-4 w-4" />
-                Settings
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <form action={logoutAction} className="w-full">
-                <button type="submit" className="flex w-full items-center gap-2 text-left">
-                  <LogOut className="h-4 w-4" />
-                  Log out
-                </button>
-              </form>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </header>
   );
@@ -99,12 +60,14 @@ function TopBar({ userEmail }: { userEmail: string | null }) {
 
 export default function AppShell({
   loggedIn,
+  userId,
   userEmail,
   links,
   sidebarStats,
   children,
 }: {
   loggedIn: boolean;
+  userId: string | null;
   userEmail: string | null;
   links: NavLink[];
   sidebarStats: SidebarStats | null;
@@ -120,16 +83,16 @@ export default function AppShell({
 
   return (
     <SidebarProvider>
-      <AppSidebar loggedIn={loggedIn} links={links} stats={sidebarStats} />
-      <SidebarInset>
+      <AppSidebar loggedIn={loggedIn} userId={userId} userEmail={userEmail} links={links} stats={sidebarStats} />
+      <SidebarInset className={isComposer ? "lg:h-svh lg:overflow-hidden" : undefined}>
         {isComposer ? (
           <header className="flex h-12 shrink-0 items-center border-b border-[var(--border)] px-3">
             <SidebarTrigger />
           </header>
         ) : (
-          <TopBar userEmail={userEmail} />
+          <TopBar />
         )}
-        <div className="flex-1">{children}</div>
+        <div className={isComposer ? "min-h-0 flex-1 lg:overflow-hidden" : "flex-1"}>{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
