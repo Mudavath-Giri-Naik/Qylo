@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono, Noto_Sans_Devanagari, Noto_Sans_Telugu } from "next/font/google";
 import { createClient } from "@/lib/supabase/server";
-import { getSidebarStats } from "@/lib/dashboard/queries";
+import { getNotifications, getSidebarStats, type AppNotification } from "@/lib/dashboard/queries";
 import { oauthAvatarUrl, oauthFullName } from "@/lib/auth/profile";
 import AppShell from "@/components/AppShell";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -54,13 +54,16 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
 
   let role: "learner" | "instructor" | null = null;
   let sidebarStats = null;
+  let notifications: AppNotification[] = [];
   if (user) {
-    const [{ data: profile }, stats] = await Promise.all([
+    const [{ data: profile }, stats, recent] = await Promise.all([
       supabase.from("users").select("role").eq("id", user.id).single(),
       getSidebarStats(),
+      getNotifications(user.id),
     ]);
     role = profile?.role ?? null;
     sidebarStats = stats;
+    notifications = recent;
   }
 
   const links = user
@@ -103,6 +106,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             userAvatarUrl={oauthAvatarUrl(user)}
             links={links}
             sidebarStats={sidebarStats}
+            notifications={notifications}
           >
             {children}
           </AppShell>

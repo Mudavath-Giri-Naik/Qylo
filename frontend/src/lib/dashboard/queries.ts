@@ -278,3 +278,65 @@ export async function getSidebarStats(): Promise<SidebarStats> {
 
   return { qubitsExecuted, dailyQubits };
 }
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  detail: string;
+  relative: string;
+  tone: "green" | "orange" | "blue";
+  href: string;
+}
+
+/** Recent real activity for the header's notification bell: the latest
+    challenge results plus a weekly circuits summary. Kept to a few light
+    reads since it runs on every page load. */
+export async function getNotifications(userId: string): Promise<AppNotification[]> {
+  const supabase = await createClient();
+  const weekAgo = new Date(Date.now() - 7 * DAY_MS).toISOString();
+
+  const [{ data: submissions }, { count: circuitsThisWeek }] = await Promise.all([
+    supabase
+      .from("submissions")
+      .select("id, challenge_id, score, timestamp")
+      .eq("user_id", userId)
+      .order("timestamp", { ascending: false })
+      .limit(4),
+    supabase
+      .from("circuits")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("created_at", weekAgo),
+  ]);
+
+  const challengeIds = [...new Set((submissions ?? []).map((s) => s.challenge_id))];
+  const { data: challenges } = challengeIds.length
+    ? await supabase.from("challenges").select("id, prompt").in("id", challengeIds)
+    : { data: [] };
+  const promptById = new Map((challenges ?? []).map((c) => [c.id, c.prompt as string]));
+
+  const items: AppNotification[] = (submissions ?? []).map((s) => {
+    const passed = (s.score ?? 0) >= 70;
+    return {
+      id: s.id,
+      title: passed ? "Challenge solved" : "Challenge attempt needs another try",
+      detail: promptById.get(s.challenge_id) ?? "A challenge",
+      relative: relativeTime(s.timestamp),
+      tone: passed ? "green" : "orange",
+      href: "/challenges",
+    };
+  });
+
+  if ((circuitsThisWeek ?? 0) > 0) {
+    items.push({
+      id: "circuits-this-week",
+      title: `${circuitsThisWeek} circuit${circuitsThisWeek === 1 ? "" : "s"} saved this week`,
+      detail: "Open the composer to run them again or try one on hardware.",
+      relative: "this week",
+      tone: "blue",
+      href: "/circuit-builder",
+    });
+  }
+
+  return items;
+}

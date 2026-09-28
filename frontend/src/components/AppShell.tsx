@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { Bell, Search, Zap } from "lucide-react";
 import AppSidebar from "@/components/AppSidebar";
-import type { SidebarStats } from "@/lib/dashboard/queries";
+import type { AppNotification, SidebarStats } from "@/lib/dashboard/queries";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -22,7 +23,13 @@ interface NavLink {
   label: string;
 }
 
-function TopBar() {
+const NOTIFICATION_DOT: Record<AppNotification["tone"], string> = {
+  green: "bg-[var(--marketing-green)]",
+  orange: "bg-orange-500",
+  blue: "bg-[var(--accent)]",
+};
+
+function TopBar({ notifications }: { notifications: AppNotification[] }) {
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 border-b border-[var(--border)] px-3 sm:h-16 sm:gap-3 sm:px-4">
       <SidebarTrigger />
@@ -44,13 +51,30 @@ function TopBar() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative shrink-0 rounded-full">
               <Bell className="h-4 w-4" />
-              <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-red-500" />
+              {notifications.length > 0 && (
+                <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-red-500" />
+              )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64">
+          <DropdownMenuContent align="end" className="w-80">
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <p className="px-2 py-3 text-sm text-[var(--foreground-muted)]">You&apos;re all caught up.</p>
+            {notifications.length === 0 ? (
+              <p className="px-2 py-3 text-sm text-[var(--foreground-muted)]">You&apos;re all caught up.</p>
+            ) : (
+              notifications.map((n) => (
+                <DropdownMenuItem key={n.id} asChild className="items-start gap-2.5 py-2">
+                  <Link href={n.href}>
+                    <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${NOTIFICATION_DOT[n.tone]}`} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-xs font-semibold text-[var(--foreground)]">{n.title}</span>
+                      <span className="block truncate text-xs text-[var(--foreground-muted)]">{n.detail}</span>
+                      <span className="block text-[10px] text-[var(--foreground-subtle)]">{n.relative}</span>
+                    </span>
+                  </Link>
+                </DropdownMenuItem>
+              ))
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -66,6 +90,7 @@ export default function AppShell({
   userAvatarUrl,
   links,
   sidebarStats,
+  notifications,
   children,
 }: {
   loggedIn: boolean;
@@ -75,6 +100,7 @@ export default function AppShell({
   userAvatarUrl: string | null;
   links: NavLink[];
   sidebarStats: SidebarStats | null;
+  notifications: AppNotification[];
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -102,7 +128,7 @@ export default function AppShell({
             <SidebarTrigger />
           </header>
         ) : (
-          <TopBar />
+          <TopBar notifications={notifications} />
         )}
         <div className={isComposer ? "min-h-0 flex-1 lg:overflow-hidden" : "flex-1"}>{children}</div>
       </SidebarInset>
