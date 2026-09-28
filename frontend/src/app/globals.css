@@ -549,12 +549,16 @@ button:not(:disabled) {
 /* Cojeev's base reset (imported above for the button effect) underlines and
    recolors every link site-wide by design -- undo that here so links keep
    this site's own explicit styling, matching Tailwind's original preflight.
-   Unlayered rules always win over `@layer` rules, so this doesn't need to
-   out-specificity anything. */
-a:any-link {
-  color: inherit;
-  text-decoration-line: inherit;
-}
-a:hover {
-  color: inherit;
+   Kept inside `@layer base` (after Cojeev's rules, so it wins that layer) --
+   an unlayered rule would also beat every Tailwind `text-*`/`underline`
+   utility on links, which left link-buttons like the course cards' "Start"
+   with invisible text. */
+@layer base {
+  a:any-link {
+    color: inherit;
+    text-decoration-line: inherit;
+  }
+  a:hover {
+    color: inherit;
+  }
 }
