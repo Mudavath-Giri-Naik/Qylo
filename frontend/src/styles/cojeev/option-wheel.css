@@ -2,12 +2,12 @@
 /* A half wheel: spokes pivot around a hub on the stage edge, so labels travel
    along a true arc (rotate() interpolates by angle) and a dashed ring turns
    with them. --hub-x is the hub's inset, --radius where labels start. */
-.v-option-wheel{--hub-x:28px;--radius:112px;width:100%;min-width:0;border-radius:24px;background:var(--v-beige);overflow:hidden;color:var(--v-ink)}
+.v-option-wheel{--hub-x:28px;--radius:76px;width:100%;min-width:0;border-radius:24px;background:var(--v-beige);overflow:hidden;color:var(--v-ink)}
 .v-option-wheel__stage{position:relative;height:330px;overflow:hidden;outline-offset:-5px;container-type:inline-size}
-.v-option-wheel__ring{position:absolute;top:50%;left:var(--hub-x);width:calc(var(--radius)*2 - 36px);height:calc(var(--radius)*2 - 36px);border-radius:50%;border:2px dashed color-mix(in oklab,var(--v-accent-ink) 45%,transparent);pointer-events:none;transition:transform .6s cubic-bezier(.22,1,.36,1)}
+.v-option-wheel__ring{position:absolute;top:50%;left:var(--hub-x);width:calc(var(--radius)*2 - 28px);height:calc(var(--radius)*2 - 28px);border-radius:50%;border:2px dashed color-mix(in oklab,var(--v-accent-ink) 45%,transparent);pointer-events:none;transition:transform .6s cubic-bezier(.22,1,.36,1)}
 .v-option-wheel__hub{position:absolute;top:50%;left:var(--hub-x);width:14px;height:14px;border-radius:50%;background:var(--v-accent-ink);transform:translate(-50%,-50%);box-shadow:0 0 0 6px color-mix(in oklab,var(--v-accent-ink) 18%,transparent)}
 .v-option-wheel__arm{position:absolute;top:50%;left:var(--hub-x);width:0;height:0;transform-origin:0 0;transition:transform .6s cubic-bezier(.22,1,.36,1),opacity .45s}
-.v-option-wheel__option{position:absolute;top:0;left:var(--radius);transform:translateY(-50%);max-width:calc(100cqw - var(--hub-x) - var(--radius) - 12px);font:clamp(17px,1.5vw,21px)/1.2 var(--font-display);padding:8px 14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;color:var(--v-text);border-radius:12px;transition:background .3s,color .3s}
+.v-option-wheel__option{position:absolute;top:0;left:var(--radius);transform:translateY(-50%);max-width:calc(100cqw - var(--hub-x) - var(--radius) - 12px);font:clamp(16px,1.4vw,20px)/1.2 var(--font-display);padding:8px 14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;color:var(--v-text);border-radius:12px;transition:background .3s,color .3s}
 .v-option-wheel__option[aria-selected=true]{background:var(--v-pink);color:var(--v-on-accent);font-weight:650}
 .v-option-wheel[data-side=right]{--hub-x:calc(100cqw - 28px)}
 .v-option-wheel[data-side=right] .v-option-wheel__option{left:auto;right:var(--radius);text-align:right}

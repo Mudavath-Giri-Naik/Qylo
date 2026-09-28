@@ -8,7 +8,7 @@ export type OptionWheelItem={id:string;label:string;description?:string};
 export type OptionWheelProps=Omit<React.ComponentProps<"div">,"onChange"> & {items:readonly OptionWheelItem[];defaultIndex?:number;selectedIndex?:number;onSelectionChange?:(index:number)=>void;side?:"left"|"right"};
 
 /** Angle between neighbouring spokes of the wheel, in degrees. */
-const STEP=28;
+const STEP=30;
 /** Spokes rendered around the selection: ±1 visible, ±2 fully faded so items
     enter and leave along the arc instead of popping in. */
 const SLOTS=[-2,-1,0,1,2];
