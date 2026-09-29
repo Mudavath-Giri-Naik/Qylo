@@ -1,5 +1,11 @@
 import os
 
+from dotenv import load_dotenv
+
+# Local runs read backend/.env; on Railway/Render the platform injects real
+# environment variables, which load_dotenv never overrides.
+load_dotenv()
+
 
 class Settings:
     frontend_url: str = os.getenv("FRONTEND_URL", "http://localhost:3000")

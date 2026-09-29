@@ -15,6 +15,17 @@ _RETRYABLE_STATUS_CODES = {429, 503}
 _MAX_ATTEMPTS = 3
 _RETRY_BACKOFF_SECONDS = 2
 
+# If the configured chat model stays overloaded through every retry (or has
+# been retired), answer with the next model instead of failing the request.
+# Hosted Gemini availability shifts minute to minute, so keep a few options.
+_FALLBACK_CHAT_MODELS = ["gemini-3.5-flash", "gemini-3-flash-preview", "gemini-flash-latest"]
+_FALLTHROUGH_STATUS_CODES = _RETRYABLE_STATUS_CODES | {404}
+
+# The model that last answered successfully is tried first for a few minutes,
+# so every request doesn't re-queue behind an overloaded model's retries.
+_STICKY_SECONDS = 300
+_last_good_model: tuple[str, float] | None = None
+
 _client: genai.Client | None = None
 
 
@@ -25,14 +36,14 @@ def _get_client() -> genai.Client:
     return _client
 
 
-def _with_retries(call):
+def _with_retries(call, attempts: int = _MAX_ATTEMPTS):
     last_error: Exception | None = None
-    for attempt in range(1, _MAX_ATTEMPTS + 1):
+    for attempt in range(1, attempts + 1):
         try:
             return call()
         except genai_errors.APIError as exc:
             last_error = exc
-            if getattr(exc, "code", None) not in _RETRYABLE_STATUS_CODES or attempt == _MAX_ATTEMPTS:
+            if getattr(exc, "code", None) not in _RETRYABLE_STATUS_CODES or attempt == attempts:
                 raise
             time.sleep(_RETRY_BACKOFF_SECONDS * attempt)
     raise last_error  # pragma: no cover - unreachable, satisfies type checkers
@@ -66,11 +77,24 @@ def generate(system_instruction: str, prompt: str, history: list[dict] | None = 
         contents.append(types.Content(role=role, parts=[types.Part(text=turn.get("content", ""))]))
     contents.append(types.Content(role="user", parts=[types.Part(text=prompt)]))
 
-    response = _with_retries(
-        lambda: _get_client().models.generate_content(
-            model=settings.gemini_chat_model,
-            contents=contents,
-            config=types.GenerateContentConfig(system_instruction=system_instruction),
-        )
-    )
-    return response.text or ""
+    global _last_good_model
+    sticky = [_last_good_model[0]] if _last_good_model and time.time() - _last_good_model[1] < _STICKY_SECONDS else []
+    models = list(dict.fromkeys([*sticky, settings.gemini_chat_model, *_FALLBACK_CHAT_MODELS]))
+    for index, model in enumerate(models):
+        try:
+            response = _with_retries(
+                lambda: _get_client().models.generate_content(
+                    model=model,
+                    contents=contents,
+                    config=types.GenerateContentConfig(system_instruction=system_instruction),
+                ),
+                # With other models to fall back on, don't sit through the
+                # full retry backoff on a busy one.
+                attempts=_MAX_ATTEMPTS if index == len(models) - 1 else 2,
+            )
+            _last_good_model = (model, time.time())
+            return response.text or ""
+        except genai_errors.APIError as exc:
+            if getattr(exc, "code", None) not in _FALLTHROUGH_STATUS_CODES or index == len(models) - 1:
+                raise
+    raise RuntimeError("unreachable")  # pragma: no cover

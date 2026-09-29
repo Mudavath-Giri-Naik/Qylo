@@ -1,8 +1,14 @@
+import logging
+import math
+import re
+import time
 from typing import Any, Optional, TypedDict
 
 from langgraph.graph import END, StateGraph
 
 from app.services import db, gemini, qdrant_store
+
+logger = logging.getLogger(__name__)
 
 LANGUAGE_NAMES = {"en": "English", "hi": "Hindi", "te": "Telugu"}
 
@@ -84,10 +90,61 @@ def format_circuit(circuit_json: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+_STOPWORDS = {
+    "the", "and", "for", "are", "was", "what", "how", "why", "does", "did", "can", "you", "your",
+    "this", "that", "with", "from", "into", "about", "explain", "briefly", "tell", "me", "is", "of",
+    "to", "in", "on", "an", "it", "do", "a", "be", "by", "or", "as", "at", "which", "when", "who",
+}
+
+
+def _keyword_context(question: str, module_code: str | None) -> tuple[str, list[dict]]:
+    """Fallback retrieval straight from the lessons table, for when the vector
+    store is unreachable (e.g. a suspended Qdrant cluster) or hasn't been
+    re-ingested since new lessons were added. Scores English lessons by word
+    overlap with the question, favouring the current module."""
+    words = {w for w in re.findall(r"[a-z0-9]+", question.lower()) if len(w) > 1 and w not in _STOPWORDS}
+    lessons = [l for l in db.get_all_lessons() if l.get("language") == "en"]
+    texts = [(l["title"].lower(), l["body_markdown"].lower()) for l in lessons]
+
+    # Rare words ("t2", "bb84", "decoherence") say far more about which lesson
+    # is relevant than words every lesson uses ("qubit", "state").
+    weight = {
+        w: math.log((len(texts) + 1) / (1 + sum(w in title or w in body for title, body in texts)))
+        for w in words
+    }
+
+    def score(index: int) -> float:
+        title, body = texts[index]
+        s = sum(weight[w] * (3 * (w in title) + min(body.count(w), 5)) for w in words)
+        return s + (2 if module_code and lessons[index]["module_code"] == module_code else 0)
+
+    ranked = [lessons[i] for i in sorted(range(len(lessons)), key=score, reverse=True)[:3]]
+
+    context = "\n\n---\n\n".join(f"# {l['title']}\n\n{l['body_markdown'][:4000]}" for l in ranked)
+    sources = [{"module_code": l["module_code"], "title": l["title"]} for l in ranked]
+    return context, sources
+
+
+# After a vector-store failure, skip it for a while instead of paying the
+# embedding + connection cost on every question.
+_VECTOR_RETRY_SECONDS = 300
+_vector_down_until = 0.0
+
+
 def _retrieve_context(question: str, module_code: str | None) -> tuple[str, list[dict]]:
-    query_vector = gemini.embed_text(question, task_type="RETRIEVAL_QUERY")
-    hits = qdrant_store.search(query_vector, limit=5, module_code=module_code)
+    global _vector_down_until
+    if time.time() < _vector_down_until:
+        return _keyword_context(question, module_code)
+    try:
+        query_vector = gemini.embed_text(question, task_type="RETRIEVAL_QUERY")
+        hits = qdrant_store.search(query_vector, limit=5, module_code=module_code)
+    except Exception:  # noqa: BLE001 - any vector-store failure degrades to keyword retrieval
+        logger.exception("Vector retrieval failed; using keyword retrieval from lessons for a while")
+        _vector_down_until = time.time() + _VECTOR_RETRY_SECONDS
+        return _keyword_context(question, module_code)
     context = "\n\n---\n\n".join(h.payload.get("chunk_text", "") for h in hits if h.payload)
+    if not context.strip():
+        return _keyword_context(question, module_code)
     return context, [h.payload for h in hits if h.payload]
 
 
