@@ -143,12 +143,15 @@ CIRCUIT_TIMELINE = [
 ]
 
 # Lessons completed per module, as (days_ago, hour) per lesson in order.
-# M1 and M2 finished, M3 in progress, M4 not started yet.
+# The math foundations (M5), M1 and M2 finished; M3 in progress; Qiskit (M6)
+# just started; everything else not started yet.
 LESSON_TIMELINE = {
     "QT-M1": [(40, 19), (39, 20), (37, 18), (36, 21)],
     "QT-M2": [(30, 19), (28, 20), (27, 21)],
     "QT-M3": [(9, 19), (7, 20), (5, 20), (2, 21), (0, 8)],
     "QT-M4": [],
+    "QT-M5": [(44, 20), (43, 19), (42, 21)],
+    "QT-M6": [(12, 20)],
 }
 
 # Challenge attempts, matched by the start of each seeded challenge's prompt
@@ -157,6 +160,8 @@ LESSON_TIMELINE = {
 # reads as a learner retrying. Unlisted challenges -- the last QT-M3 one and
 # all of QT-M4 -- stay unattempted, which is where "next up" points.
 CHALLENGE_TIMELINE = [
+    ("A qubit is in the state (1/√2)|0⟩ + (i/√2)|1⟩", 42, 21, True),
+    ("Which property must every quantum gate matrix", 42, 21, True),
     ("What does it mean for a qubit", 38, 21, True),
     ("What happens to a qubit", 38, 21, True),
     ("Two qubits are in the entangled", 36, 21, False),

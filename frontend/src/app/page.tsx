@@ -5,7 +5,7 @@ import MarketingNavbar from "@/components/MarketingNavbar";
 import HeroCloudBackground from "@/components/HeroCloudBackground";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import { Avatar, AvatarImage, AvatarGroup } from "@/components/ui/avatar";
-import { MODULES, moduleTitle } from "@/lib/learn/modules";
+import { CORE_MODULES, moduleTitle } from "@/lib/learn/modules";
 import { MODULE_INSTRUCTOR } from "@/lib/learn/presentation";
 import { createClient } from "@/lib/supabase/server";
 import { oauthAvatarUrl, oauthFullName } from "@/lib/auth/profile";
@@ -268,7 +268,7 @@ export default async function Home() {
 
           <div className="group relative mt-8 overflow-hidden">
             <div className="animate-marquee flex w-max gap-4 group-hover:[animation-play-state:paused]">
-              {[...MODULES, ...MODULES, ...MODULES, ...MODULES, ...MODULES, ...MODULES].map((m, i) => {
+              {[...CORE_MODULES, ...CORE_MODULES, ...CORE_MODULES, ...CORE_MODULES, ...CORE_MODULES, ...CORE_MODULES].map((m, i) => {
                 const style = PILL_STYLES[i % PILL_STYLES.length];
                 return (
                   <span
@@ -301,7 +301,7 @@ export default async function Home() {
           </RevealOnScroll>
 
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
-            {MODULES.map((m, i) => {
+            {CORE_MODULES.map((m, i) => {
               const tags = MODULE_TAGS[m.code] ?? ["Quantum", "Qylo"];
               const accent = CARD_ACCENT_STYLES[i % CARD_ACCENT_STYLES.length];
               const author = MODULE_INSTRUCTOR[m.code]?.name ?? "Qylo AI";

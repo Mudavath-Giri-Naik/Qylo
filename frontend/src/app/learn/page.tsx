@@ -44,7 +44,7 @@ export default async function LearnPage({ searchParams }: PageProps<"/learn">) {
   });
 
   return (
-    <main className="mx-auto flex max-w-7xl flex-col px-6 py-5 lg:h-[calc(100vh-4rem)] lg:overflow-hidden">
+    <main className="mx-auto flex w-full max-w-7xl flex-col px-6 py-5">
       <CourseGrid courses={courses} lang={lang} />
     </main>
   );

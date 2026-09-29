@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { OptionWheel, type OptionWheelItem } from "@/components/ui/option-wheel";
 import { useReducedMotion } from "@/lib/cojeev-motion/use-reduced-motion";
-import { MODULES, moduleTitle } from "@/lib/learn/modules";
+import { CORE_MODULES, moduleTitle } from "@/lib/learn/modules";
 
 const ROTATE_MS = 4000;
 
-const ITEMS: OptionWheelItem[] = MODULES.map((m) => ({
+const ITEMS: OptionWheelItem[] = CORE_MODULES.map((m) => ({
   id: m.code,
   label: moduleTitle(m, "en"),
   description: m.description.en ?? moduleTitle(m, "en"),

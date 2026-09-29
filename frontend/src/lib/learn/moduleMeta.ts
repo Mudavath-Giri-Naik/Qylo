@@ -1,4 +1,18 @@
-import { Atom, Boxes, Sigma, Waypoints, type LucideIcon } from "lucide-react";
+import {
+  Atom,
+  BrainCircuit,
+  Calculator,
+  Code2,
+  Cpu,
+  KeyRound,
+  Boxes,
+  Radio,
+  ShieldCheck,
+  Sigma,
+  Waves,
+  Waypoints,
+  type LucideIcon,
+} from "lucide-react";
 
 export type Difficulty = "Beginner" | "Intermediate" | "Advanced";
 
@@ -15,6 +29,14 @@ export const MODULE_META: Record<string, ModuleMeta2> = {
   "QT-M2": { category: "Hands-on", difficulty: "Beginner", icon: Waypoints, theme: "pink", hours: 5 },
   "QT-M3": { category: "Algorithms", difficulty: "Intermediate", icon: Sigma, theme: "indigo", hours: 8 },
   "QT-M4": { category: "Advanced Topics", difficulty: "Advanced", icon: Boxes, theme: "green", hours: 7 },
+  "QT-M5": { category: "Foundations", difficulty: "Beginner", icon: Calculator, theme: "indigo", hours: 5 },
+  "QT-M6": { category: "Hands-on", difficulty: "Beginner", icon: Code2, theme: "green", hours: 6 },
+  "QT-M7": { category: "Communication & Security", difficulty: "Intermediate", icon: Radio, theme: "pink", hours: 5 },
+  "QT-M8": { category: "Communication & Security", difficulty: "Intermediate", icon: KeyRound, theme: "blue", hours: 6 },
+  "QT-M9": { category: "Algorithms", difficulty: "Intermediate", icon: Waves, theme: "indigo", hours: 7 },
+  "QT-M10": { category: "Hardware & Noise", difficulty: "Intermediate", icon: Cpu, theme: "green", hours: 5 },
+  "QT-M11": { category: "Hardware & Noise", difficulty: "Advanced", icon: ShieldCheck, theme: "pink", hours: 8 },
+  "QT-M12": { category: "Advanced Topics", difficulty: "Advanced", icon: BrainCircuit, theme: "blue", hours: 7 },
 };
 
 export const THEME_STYLES: Record<

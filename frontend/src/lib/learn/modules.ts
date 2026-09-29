@@ -57,7 +57,68 @@ export const MODULES: ModuleMeta[] = [
       en: "QAOA and VQE — hybrid quantum-classical algorithms built for today's NISQ hardware.",
     },
   },
+  {
+    code: "QT-M5",
+    title: { en: "Mathematics for Quantum Computing" },
+    description: {
+      en: "Complex numbers, vectors, matrices, and Dirac notation — the math every quantum circuit is written in.",
+    },
+  },
+  {
+    code: "QT-M6",
+    title: { en: "Programming with Qiskit" },
+    description: {
+      en: "Write circuits in Python, run them on simulators, and read the results like a quantum developer.",
+    },
+  },
+  {
+    code: "QT-M7",
+    title: { en: "Quantum Communication" },
+    description: {
+      en: "Teleportation, superdense coding, and the no-cloning theorem — moving information with entanglement.",
+    },
+  },
+  {
+    code: "QT-M8",
+    title: { en: "Quantum Cryptography" },
+    description: {
+      en: "BB84 key distribution, eavesdropper detection, and why post-quantum cryptography matters today.",
+    },
+  },
+  {
+    code: "QT-M9",
+    title: { en: "Quantum Fourier Transform & Phase Estimation" },
+    description: {
+      en: "The QFT and quantum phase estimation — the engine inside Shor's algorithm and quantum chemistry.",
+    },
+  },
+  {
+    code: "QT-M10",
+    title: { en: "Noise and Real Quantum Hardware" },
+    description: {
+      en: "Decoherence, gate errors, and the physical qubits behind today's machines — plus how to mitigate noise.",
+    },
+  },
+  {
+    code: "QT-M11",
+    title: { en: "Quantum Error Correction" },
+    description: {
+      en: "Repetition codes, the Shor code, and surface codes — how fragile qubits become reliable logical qubits.",
+    },
+  },
+  {
+    code: "QT-M12",
+    title: { en: "Quantum Machine Learning" },
+    description: {
+      en: "Encoding data into qubits, variational classifiers, and quantum kernels — where quantum meets ML.",
+    },
+  },
 ];
+
+/** The original four-module learning path. The landing page and the
+    login/signup wheel feature these specifically (each has hand-picked
+    artwork and copy); the full catalog lives in MODULES. */
+export const CORE_MODULES: ModuleMeta[] = MODULES.slice(0, 4);
 
 export function moduleTitle(mod: ModuleMeta, lang: LessonLanguage): string {
   return mod.title[lang] ?? mod.title.en ?? mod.code;
